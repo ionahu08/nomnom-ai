@@ -1,0 +1,372 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		116E569CF12A8D765269E47D /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43F4BA86B249FD661DECB093 /* Auth.swift */; };
+		147AE434D01C00E345306087 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8932008FDA1112B4BE6827 /* KeychainService.swift */; };
+		18C72A332416F664C095BC25 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1101E50AE81FF3822EC4376A /* ContentView.swift */; };
+		4F52FC88CFEE5C6A2CD1B9C8 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B248A228CFDFB4F0FB9209CD /* AuthService.swift */; };
+		60AE8A81261325AD853B9669 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520DF7F015C57A53F3A6AE05 /* APIClient.swift */; };
+		8774038C0895DBFE6E3A9AA5 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4488768D62D2F82641E19291 /* LoginView.swift */; };
+		B8CA06BD3F8A7EF793146A19 /* NomNomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D26F5B9F96D66F9A2AFEEDE /* NomNomTests.swift */; };
+		C8400DF14EE13853F8C61823 /* NomNomApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3613CA5ABAD9C19E665F06F8 /* NomNomApp.swift */; };
+		D2236831E3C678E7B676B3E0 /* NomNomColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = F510BF00E85B48A6FFD157B8 /* NomNomColors.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		98D1C3A66F80F7F772EE5783 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 60A30F4CA9412915DA930694 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7E9ABC9EF4F0EFD62D11B0F9;
+			remoteInfo = NomNom;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		1101E50AE81FF3822EC4376A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		13C9743DF51DF115E6ED8ED1 /* NomNom.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = NomNom.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3613CA5ABAD9C19E665F06F8 /* NomNomApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NomNomApp.swift; sourceTree = "<group>"; };
+		43F4BA86B249FD661DECB093 /* Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth.swift; sourceTree = "<group>"; };
+		4488768D62D2F82641E19291 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		520DF7F015C57A53F3A6AE05 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		6D26F5B9F96D66F9A2AFEEDE /* NomNomTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NomNomTests.swift; sourceTree = "<group>"; };
+		6E8932008FDA1112B4BE6827 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
+		B248A228CFDFB4F0FB9209CD /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
+		D6284B197EC3012AB4575CA3 /* NomNomTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = NomNomTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F510BF00E85B48A6FFD157B8 /* NomNomColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NomNomColors.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		01B8BCEF9A62098F389B86B7 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		044AAEA990695583D5A60F3F /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				F510BF00E85B48A6FFD157B8 /* NomNomColors.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		09CD9F187BE3F8A02E379BDF /* NomNom */ = {
+			isa = PBXGroup;
+			children = (
+				DEF1A3CB3377C010BA500F9E /* App */,
+				DDA664F417C57691673B4974 /* Core */,
+				809F24C2EFAE91CCFBC9A486 /* Features */,
+			);
+			path = NomNom;
+			sourceTree = "<group>";
+		};
+		1474E961F803C26BD89688B1 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				4488768D62D2F82641E19291 /* LoginView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		4ABAC97B0D19C5EA53008C0E /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Camera;
+			sourceTree = "<group>";
+		};
+		809F24C2EFAE91CCFBC9A486 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				4ABAC97B0D19C5EA53008C0E /* Camera */,
+				8BE327E363C924DBF64045B2 /* Dashboard */,
+				1474E961F803C26BD89688B1 /* Settings */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		8BE327E363C924DBF64045B2 /* Dashboard */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Dashboard;
+			sourceTree = "<group>";
+		};
+		8F52EC90EF66436DD6490ED4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				13C9743DF51DF115E6ED8ED1 /* NomNom.app */,
+				D6284B197EC3012AB4575CA3 /* NomNomTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B31DE93BE78708A86A44724A /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				43F4BA86B249FD661DECB093 /* Auth.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		D17CDC29259E849E5FFA71CF = {
+			isa = PBXGroup;
+			children = (
+				09CD9F187BE3F8A02E379BDF /* NomNom */,
+				E22C7CAD01DC6A3DEC95171D /* NomNomTests */,
+				8F52EC90EF66436DD6490ED4 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DDA664F417C57691673B4974 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				01B8BCEF9A62098F389B86B7 /* Components */,
+				B31DE93BE78708A86A44724A /* Models */,
+				E0CB36BDC410CB15429A2719 /* Services */,
+				044AAEA990695583D5A60F3F /* Utilities */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		DEF1A3CB3377C010BA500F9E /* App */ = {
+			isa = PBXGroup;
+			children = (
+				1101E50AE81FF3822EC4376A /* ContentView.swift */,
+				3613CA5ABAD9C19E665F06F8 /* NomNomApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		E0CB36BDC410CB15429A2719 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				520DF7F015C57A53F3A6AE05 /* APIClient.swift */,
+				B248A228CFDFB4F0FB9209CD /* AuthService.swift */,
+				6E8932008FDA1112B4BE6827 /* KeychainService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		E22C7CAD01DC6A3DEC95171D /* NomNomTests */ = {
+			isa = PBXGroup;
+			children = (
+				6D26F5B9F96D66F9A2AFEEDE /* NomNomTests.swift */,
+			);
+			path = NomNomTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3ADA7F214D77AA2882102219 /* NomNomTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C7C9B6F526E57962064965B6 /* Build configuration list for PBXNativeTarget "NomNomTests" */;
+			buildPhases = (
+				0025AA404473C102ABC8BAFE /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				14C110585C7DD2B9ACE62812 /* PBXTargetDependency */,
+			);
+			name = NomNomTests;
+			packageProductDependencies = (
+			);
+			productName = NomNomTests;
+			productReference = D6284B197EC3012AB4575CA3 /* NomNomTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		7E9ABC9EF4F0EFD62D11B0F9 /* NomNom */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8C6D5FF5EAA0EBF4EDF9C1B6 /* Build configuration list for PBXNativeTarget "NomNom" */;
+			buildPhases = (
+				94E12890E85A01D2BAA99A6E /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = NomNom;
+			packageProductDependencies = (
+			);
+			productName = NomNom;
+			productReference = 13C9743DF51DF115E6ED8ED1 /* NomNom.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		60A30F4CA9412915DA930694 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = 4DB3DD7F82AFEF54111CC4F7 /* Build configuration list for PBXProject "NomNom" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = D17CDC29259E849E5FFA71CF;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 8F52EC90EF66436DD6490ED4 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				7E9ABC9EF4F0EFD62D11B0F9 /* NomNom */,
+				3ADA7F214D77AA2882102219 /* NomNomTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0025AA404473C102ABC8BAFE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B8CA06BD3F8A7EF793146A19 /* NomNomTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		94E12890E85A01D2BAA99A6E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				60AE8A81261325AD853B9669 /* APIClient.swift in Sources */,
+				116E569CF12A8D765269E47D /* Auth.swift in Sources */,
+				4F52FC88CFEE5C6A2CD1B9C8 /* AuthService.swift in Sources */,
+				18C72A332416F664C095BC25 /* ContentView.swift in Sources */,
+				147AE434D01C00E345306087 /* KeychainService.swift in Sources */,
+				8774038C0895DBFE6E3A9AA5 /* LoginView.swift in Sources */,
+				C8400DF14EE13853F8C61823 /* NomNomApp.swift in Sources */,
+				D2236831E3C678E7B676B3E0 /* NomNomColors.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		14C110585C7DD2B9ACE62812 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7E9ABC9EF4F0EFD62D11B0F9 /* NomNom */;
+			targetProxy = 98D1C3A66F80F7F772EE5783 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		62812728625BFC74472BA949 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = NomNom;
+				INFOPLIST_KEY_NSCameraUsageDescription = "NomNom needs camera access to photograph your food";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "NomNom needs photo library access to select food photos";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nomnom-ai.app";
+			};
+			name = Release;
+		};
+		959B5063FC805C84FDD65E60 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		981F054A89631AD91A059684 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		AAF95D881F01BADAD45A9634 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nomnom-ai.app.tests";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NomNom.app/NomNom";
+			};
+			name = Release;
+		};
+		C1AB53D0D8A278893A0067CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nomnom-ai.app.tests";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NomNom.app/NomNom";
+			};
+			name = Debug;
+		};
+		C8148FB95E0E69E6C4D53673 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = NomNom;
+				INFOPLIST_KEY_NSCameraUsageDescription = "NomNom needs camera access to photograph your food";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "NomNom needs photo library access to select food photos";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nomnom-ai.app";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4DB3DD7F82AFEF54111CC4F7 /* Build configuration list for PBXProject "NomNom" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				981F054A89631AD91A059684 /* Debug */,
+				959B5063FC805C84FDD65E60 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		8C6D5FF5EAA0EBF4EDF9C1B6 /* Build configuration list for PBXNativeTarget "NomNom" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C8148FB95E0E69E6C4D53673 /* Debug */,
+				62812728625BFC74472BA949 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C7C9B6F526E57962064965B6 /* Build configuration list for PBXNativeTarget "NomNomTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C1AB53D0D8A278893A0067CD /* Debug */,
+				AAF95D881F01BADAD45A9634 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 60A30F4CA9412915DA930694 /* Project object */;
+}
