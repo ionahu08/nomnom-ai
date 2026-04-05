@@ -5,8 +5,10 @@ from src.api.deps import get_current_user
 from src.database import get_db
 from src.models.user import User
 from src.schemas.food_log import FoodAnalysisResponse, FoodLogCreate, FoodLogResponse
+from src.services.ai_service import analyze_food_photo as ai_analyze
 from src.services.food_log_service import create_food_log, delete_food_log, list_today_logs
 from src.services.photo_service import save_photo
+from src.services.profile_service import get_profile
 
 router = APIRouter(prefix="/api/v1/food-logs", tags=["food-logs"])
 
@@ -23,17 +25,13 @@ async def analyze_food_photo(
     # Save photo to disk
     photo_filename = save_photo(image_bytes, file.filename or "photo.jpg")
 
-    # STUB: return fake analysis for now (replaced with real AI in S2)
-    return FoodAnalysisResponse(
-        food_name="Mystery Food",
-        calories=500,
-        protein_g=25.0,
-        carbs_g=50.0,
-        fat_g=15.0,
-        food_category="unknown",
-        cuisine_origin="unknown",
-        cat_roast="I can't see yet, but I'm sure it's questionable. 😼",
-    )
+    # Get user's cat style preference
+    profile = await get_profile(db, current_user.id)
+    cat_style = profile.cat_style if profile else "sassy"
+
+    # Call Haiku vision AI
+    analysis = await ai_analyze(image_bytes, cat_style)
+    return analysis
 
 
 @router.post("/", response_model=FoodLogResponse, status_code=status.HTTP_201_CREATED)

@@ -21,89 +21,197 @@ Built on top of Phase 1 (auth, profile, database) which is already done.
 
 ## Shortcut Phases
 
-### S1: Backend — food log endpoints + photo upload
+### S1: Backend — food log endpoints + photo upload [DONE]
 
 Add the ability to save, list, and delete food logs with photos.
 
-Files to create:
-- `src/models/food_log.py` — FoodLog model (id, user_id, photo_path, food_name, calories, protein_g, carbs_g, fat_g, food_category, cuisine_origin, cat_roast, logged_at, created_at)
+#### S1.1: FoodLog model + migration
+- Create `src/models/food_log.py` — FoodLog model (id, user_id, photo_path, food_name, calories, protein_g, carbs_g, fat_g, food_category, cuisine_origin, cat_roast, logged_at, created_at)
 - Update `src/models/__init__.py` — add FoodLog
-- `src/schemas/food_log.py` — FoodLogCreate, FoodLogResponse
-- `src/services/food_log_service.py` — create, list_today, delete
-- `src/services/photo_service.py` — save uploaded photo to disk, return path
-- `src/api/food_logs.py` — router with endpoints:
+- Run `alembic revision --autogenerate -m "create food_logs table"`
+- Run `alembic upgrade head`
+- Verify: `psql -d nomnom -c "\dt"` shows food_logs table
+
+#### S1.2: Food log schemas
+- Create `src/schemas/food_log.py`:
+  - FoodAnalysisResponse — what AI returns (food_name, calories, macros, cat_roast)
+  - FoodLogCreate — what client sends to save a confirmed log
+  - FoodLogResponse — what the API returns
+
+#### S1.3: Photo + food log services
+- Create `src/services/photo_service.py` — save_photo (writes to uploads/), get_photo_path, delete_photo
+- Create `src/services/food_log_service.py` — create_food_log, list_today_logs, get_food_log, delete_food_log
+
+#### S1.4: API endpoints + wire up
+- Create `src/api/food_logs.py` — router with endpoints:
   - POST /api/v1/food-logs/analyze — upload photo, get AI analysis (stub first, real AI in S2)
   - POST /api/v1/food-logs — save a confirmed food log
   - GET /api/v1/food-logs/today — list today's logs
   - DELETE /api/v1/food-logs/{log_id} — delete a log
-- `src/api/photos.py` — GET /api/v1/photos/{filename} — serve a food photo
+- Create `src/api/photos.py` — GET /api/v1/photos/{filename} — serve a food photo
 - Update `src/app.py` — register food_logs and photos routers
-- Alembic migration for food_logs table
-- Tests: food log CRUD
+
+#### S1.5: Tests + verify
+- Create `tests/integration/test_food_logs.py` — test analyze, save, list, delete, auth required
+- Run `uv run pytest tests/ -v` — all 24 tests pass
+
+---
 
 ### S2: Backend — AI analyze endpoint (Haiku)
 
 Wire up Anthropic Haiku to analyze food photos and generate roasts.
 
-Files to create:
-- `src/services/ai_service.py` — one function:
+#### S2.1: AI service with Haiku vision
+- Create `src/services/ai_service.py` — one function:
   - analyze_food_photo(image_bytes, cat_style) → calls Haiku vision API
+  - Creates Anthropic AsyncAnthropic client
   - Sends base64 image + system prompt with cat personality
-  - Parses response JSON: food_name, calories, protein_g, carbs_g, fat_g, food_category, cuisine_origin, cat_roast
-- Update `src/api/food_logs.py` — replace analyze stub with real AI call
-- Add ANTHROPIC_API_KEY to .env
-- Tests: ai_service (mocked)
+  - System prompt tells Haiku to return JSON: food_name, calories, protein_g, carbs_g, fat_g, food_category, cuisine_origin, cat_roast
+  - Parses JSON from response, returns FoodAnalysisResponse
+
+#### S2.2: Wire analyze endpoint to real AI
+- Update `src/api/food_logs.py`:
+  - Import ai_service
+  - Replace stub in POST /analyze with real call to analyze_food_photo()
+  - Pass image_bytes and user's cat_style (from profile, default "sassy")
+- Add ANTHROPIC_API_KEY to `.env`
+
+#### S2.3: Test + verify with real photo
+- Start server: `PYTHONPATH=. uv run python -m src.run`
+- Test with curl: upload a real food photo to POST /analyze
+- Verify AI returns food name, macros, and a funny roast
+- Create `tests/unit/test_ai_service.py` — mocked test (doesn't call real API)
+
+---
 
 ### S3: iOS — project setup + login screen
 
 Create the Xcode project and login screen.
 
-Files to create:
-- `NomNom-iOS/project.yml` — XcodeGen config (bundle ID, iOS 17, Swift 5.9)
-- `NomNom-iOS/NomNom/App/NomNomApp.swift` — app entry, auth gate
-- `NomNom-iOS/NomNom/App/ContentView.swift` — tab view (camera + today)
-- `NomNom-iOS/NomNom/Core/Services/APIClient.swift` — HTTP client with multipart upload
-  - Compile-time baseURL switch: localhost (simulator) vs ngrok (device)
-- `NomNom-iOS/NomNom/Core/Services/AuthService.swift` — login/logout, store token
-- `NomNom-iOS/NomNom/Core/Services/KeychainService.swift` — secure token storage
-- `NomNom-iOS/NomNom/Core/Models/Auth.swift` — LoginRequest, TokenResponse
-- `NomNom-iOS/NomNom/Features/Settings/LoginView.swift` — email + password form
-
-Steps:
+#### S3.1: Project setup + XcodeGen config
+- Install XcodeGen: `brew install xcodegen`
+- Create `NomNom-iOS/project.yml` — XcodeGen config:
+  - Bundle ID: com.nomnom-ai.app
+  - Deployment target: iOS 17.0
+  - Swift version: 5.9
+  - Sources: NomNom/
 - Run `xcodegen generate` to create .xcodeproj
-- Open in Xcode, set signing to your Apple ID
-- Run on simulator, verify login works
+- Open in Xcode, verify it builds
+
+#### S3.2: Core services (APIClient, Auth, Keychain)
+- Create `NomNom-iOS/NomNom/Core/Services/APIClient.swift`:
+  - Singleton HTTP client
+  - Compile-time baseURL switch: localhost (simulator) vs ngrok (device)
+  - Methods: request() for JSON, upload() for multipart photo
+  - Attaches JWT token to Authorization header
+- Create `NomNom-iOS/NomNom/Core/Services/KeychainService.swift`:
+  - Save/load/delete JWT token securely
+- Create `NomNom-iOS/NomNom/Core/Services/AuthService.swift`:
+  - ObservableObject with @Published isAuthenticated
+  - login(email, password) → calls /auth/login → saves token
+  - logout() → deletes token
+  - checkAuth() → tries loading saved token
+
+#### S3.3: Models + login screen
+- Create `NomNom-iOS/NomNom/Core/Models/Auth.swift`:
+  - LoginRequest, RegisterRequest, TokenResponse (Codable structs)
+- Create `NomNom-iOS/NomNom/Features/Settings/LoginView.swift`:
+  - Email + password text fields
+  - Login button
+  - Error message display
+- Create `NomNom-iOS/NomNom/App/NomNomApp.swift`:
+  - @main entry point
+  - Auth gate: show LoginView if not logged in, ContentView if logged in
+- Create `NomNom-iOS/NomNom/App/ContentView.swift`:
+  - TabView with 2 tabs: Camera, Today's Log
+  - Placeholder views for now
+
+#### S3.4: Verify on simulator
+- Run on iOS Simulator in Xcode (Cmd+R)
+- Start backend locally
+- Test: register → login → see the tab view
+- Verify token is saved (app remembers login after restart)
+
+---
 
 ### S4: iOS — camera screen + today's log
 
 The main app experience.
 
-Files to create:
-- `NomNom-iOS/NomNom/Core/Models/FoodLog.swift` — FoodLog, FoodAnalysisResponse
-- `NomNom-iOS/NomNom/Core/Services/PhotoCaptureService.swift` — camera access
-- `NomNom-iOS/NomNom/Features/Camera/CameraView.swift` — camera button, shows analysis result + roast
-- `NomNom-iOS/NomNom/Features/Camera/CameraViewModel.swift` — capture, upload, display
-- `NomNom-iOS/NomNom/Features/Dashboard/TodayView.swift` — list of today's food log cards
-- `NomNom-iOS/NomNom/Features/Dashboard/TodayViewModel.swift` — fetch today's logs
-- `NomNom-iOS/NomNom/Core/Components/FoodLogCard.swift` — thumbnail + food name + calories + roast
-- `NomNom-iOS/NomNom/Core/Components/RoastBubble.swift` — cat speech bubble
-- `NomNom-iOS/NomNom/Core/Utilities/NomNomColors.swift` — color palette
+#### S4.1: Food log models + utilities
+- Create `NomNom-iOS/NomNom/Core/Models/FoodLog.swift`:
+  - FoodLog, FoodAnalysisResponse (Codable structs matching backend schemas)
+- Create `NomNom-iOS/NomNom/Core/Utilities/NomNomColors.swift`:
+  - Color palette for the app
+
+#### S4.2: Camera screen
+- Create `NomNom-iOS/NomNom/Core/Services/PhotoCaptureService.swift`:
+  - Wraps UIImagePickerController for camera access
+  - Falls back to photo library on simulator (simulator has no camera)
+- Create `NomNom-iOS/NomNom/Features/Camera/CameraViewModel.swift`:
+  - capturePhoto() → opens camera
+  - analyzePhoto(imageData) → uploads to POST /analyze → gets AI response
+  - saveLog() → sends confirmed data to POST /food-logs
+  - @Published states: isAnalyzing, analysisResult, error
+- Create `NomNom-iOS/NomNom/Features/Camera/CameraView.swift`:
+  - Big camera button in center
+  - After photo taken: shows food photo + AI analysis + cat roast
+  - Confirm button to save, retake button to try again
+
+#### S4.3: Reusable components
+- Create `NomNom-iOS/NomNom/Core/Components/FoodLogCard.swift`:
+  - Shows: thumbnail photo, food name, calories, time
+- Create `NomNom-iOS/NomNom/Core/Components/RoastBubble.swift`:
+  - Cat speech bubble showing the roast text
+
+#### S4.4: Today's log screen
+- Create `NomNom-iOS/NomNom/Features/Dashboard/TodayViewModel.swift`:
+  - loadTodayLogs() → calls GET /food-logs/today
+  - deleteLog(id) → calls DELETE /food-logs/{id}
+  - @Published logs list
+- Create `NomNom-iOS/NomNom/Features/Dashboard/TodayView.swift`:
+  - Scrollable list of FoodLogCard components
+  - Pull to refresh
+  - Swipe to delete
+
+#### S4.5: Verify on simulator
+- Run on simulator
+- Test full flow: login → tap camera → pick photo → see roast → save → see in today's list
+- Verify delete works
+
+---
 
 ### S5: Deploy to phone
 
 Get the app running on a real iPhone.
 
-Steps:
-1. Enable Developer Mode on iPhone (connect USB, then Settings → Privacy & Security → Developer Mode)
-2. Add Apple ID to Xcode (Xcode → Settings → Accounts)
-3. In Xcode: select NomNom target → Signing → check "Automatically manage signing" → set Team to your Apple ID
-4. Install ngrok: `brew install ngrok`
-5. Start backend: `cd NomNom-Backend && PYTHONPATH=. uv run python -m src.run`
-6. Start ngrok: `ngrok http 8000` → copy the https URL
-7. Update APIClient.swift with ngrok URL
-8. Connect iPhone via USB → select as build target → Cmd+R
-9. On iPhone: Settings → General → VPN & Device Management → Trust
-10. Launch app, snap a photo, see the roast!
+#### S5.1: Prerequisites
+- Install ngrok: `brew install ngrok`
+- Sign up for free ngrok account at https://ngrok.com
+- Run `ngrok config add-authtoken YOUR_TOKEN`
+
+#### S5.2: iPhone setup
+- Connect iPhone to Mac via USB cable
+- Open Xcode (triggers Developer Mode option on iPhone)
+- On iPhone: Settings → Privacy & Security → Developer Mode → ON
+- iPhone will restart
+- On iPhone: tap "Trust This Computer" when prompted
+
+#### S5.3: Xcode signing
+- Add Apple ID to Xcode: Xcode → Settings → Accounts → "+" → Apple ID
+- Select NomNom target → Signing & Capabilities
+- Check "Automatically manage signing"
+- Set Team to your Apple ID
+- Set Bundle Identifier to `com.nomnom-ai.app`
+
+#### S5.4: Run it
+- Start backend: `cd NomNom-Backend && PYTHONPATH=. uv run python -m src.run`
+- Start ngrok: `ngrok http 8000` → copy the https URL
+- Update APIClient.swift with your ngrok URL (the #else branch)
+- In Xcode: select your iPhone as build target (not simulator)
+- Press Cmd+R to build and install
+- On iPhone: Settings → General → VPN & Device Management → tap your developer cert → Trust
+- Launch app, snap a photo, see the roast!
 
 ---
 

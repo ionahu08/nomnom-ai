@@ -1,22 +1,37 @@
+from unittest.mock import AsyncMock, patch
+
 import pytest
 from httpx import AsyncClient
+
+from src.schemas.food_log import FoodAnalysisResponse
+
+MOCK_ANALYSIS = FoodAnalysisResponse(
+    food_name="Test Burger",
+    calories=500,
+    protein_g=30.0,
+    carbs_g=40.0,
+    fat_g=25.0,
+    food_category="fast food",
+    cuisine_origin="American",
+    cat_roast="A burger? How original.",
+)
 
 
 @pytest.mark.asyncio
 async def test_analyze_food_photo(client: AsyncClient, auth_headers: dict):
-    """Test the analyze endpoint returns a stub response."""
-    # Create a fake image file
-    files = {"file": ("test.jpg", b"fake-image-data", "image/jpeg")}
-    resp = await client.post(
-        "/api/v1/food-logs/analyze",
-        files=files,
-        headers=auth_headers,
-    )
+    """Test the analyze endpoint with mocked AI."""
+    with patch("src.api.food_logs.ai_analyze", new_callable=AsyncMock, return_value=MOCK_ANALYSIS):
+        files = {"file": ("test.jpg", b"fake-image-data", "image/jpeg")}
+        resp = await client.post(
+            "/api/v1/food-logs/analyze",
+            files=files,
+            headers=auth_headers,
+        )
     assert resp.status_code == 200
     data = resp.json()
-    assert "food_name" in data
-    assert "calories" in data
-    assert "cat_roast" in data
+    assert data["food_name"] == "Test Burger"
+    assert data["calories"] == 500
+    assert data["cat_roast"] == "A burger? How original."
 
 
 @pytest.mark.asyncio
