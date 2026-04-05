@@ -10,12 +10,20 @@
 		116E569CF12A8D765269E47D /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43F4BA86B249FD661DECB093 /* Auth.swift */; };
 		147AE434D01C00E345306087 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8932008FDA1112B4BE6827 /* KeychainService.swift */; };
 		18C72A332416F664C095BC25 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1101E50AE81FF3822EC4376A /* ContentView.swift */; };
+		1D50A47A3D22AF760757A139 /* FoodLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4CCD1699B41931BB7C95E2 /* FoodLog.swift */; };
+		21EF5829DF01EE2D3DC299E6 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF03334B9010CF5624F63B2 /* TodayView.swift */; };
+		23B0C2B7A26106EB78BAB16D /* TodayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F714A14E6B955D044C020667 /* TodayViewModel.swift */; };
+		280CA48C4D0756E267B96E43 /* FoodLogCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BCEEBF8D63B932F4B168638 /* FoodLogCard.swift */; };
 		4F52FC88CFEE5C6A2CD1B9C8 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B248A228CFDFB4F0FB9209CD /* AuthService.swift */; };
 		60AE8A81261325AD853B9669 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520DF7F015C57A53F3A6AE05 /* APIClient.swift */; };
 		8774038C0895DBFE6E3A9AA5 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4488768D62D2F82641E19291 /* LoginView.swift */; };
+		A03704AC0EC19A07830F1410 /* PhotoCaptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67B214C6A5B1BF471C587B98 /* PhotoCaptureService.swift */; };
+		B445B4E8FBB2C1C814866CDA /* RoastBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E3DC3BCFAF5DEB6151365F /* RoastBubble.swift */; };
 		B8CA06BD3F8A7EF793146A19 /* NomNomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D26F5B9F96D66F9A2AFEEDE /* NomNomTests.swift */; };
+		C83947662071AD5A7D05FF90 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1AB7201EE6D1731C65C7BA /* CameraView.swift */; };
 		C8400DF14EE13853F8C61823 /* NomNomApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3613CA5ABAD9C19E665F06F8 /* NomNomApp.swift */; };
 		D2236831E3C678E7B676B3E0 /* NomNomColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = F510BF00E85B48A6FFD157B8 /* NomNomColors.swift */; };
+		FA01E1953C0BC6F48F1545DA /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DBAC3EDF8C7103753678F5E /* CameraViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,23 +37,33 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0A1AB7201EE6D1731C65C7BA /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		1101E50AE81FF3822EC4376A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		13C9743DF51DF115E6ED8ED1 /* NomNom.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = NomNom.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D4CCD1699B41931BB7C95E2 /* FoodLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodLog.swift; sourceTree = "<group>"; };
+		1DBAC3EDF8C7103753678F5E /* CameraViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewModel.swift; sourceTree = "<group>"; };
 		3613CA5ABAD9C19E665F06F8 /* NomNomApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NomNomApp.swift; sourceTree = "<group>"; };
 		43F4BA86B249FD661DECB093 /* Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth.swift; sourceTree = "<group>"; };
 		4488768D62D2F82641E19291 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		520DF7F015C57A53F3A6AE05 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		53E3DC3BCFAF5DEB6151365F /* RoastBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoastBubble.swift; sourceTree = "<group>"; };
+		67B214C6A5B1BF471C587B98 /* PhotoCaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCaptureService.swift; sourceTree = "<group>"; };
 		6D26F5B9F96D66F9A2AFEEDE /* NomNomTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NomNomTests.swift; sourceTree = "<group>"; };
 		6E8932008FDA1112B4BE6827 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
+		7BF03334B9010CF5624F63B2 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
+		9BCEEBF8D63B932F4B168638 /* FoodLogCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodLogCard.swift; sourceTree = "<group>"; };
 		B248A228CFDFB4F0FB9209CD /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
 		D6284B197EC3012AB4575CA3 /* NomNomTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = NomNomTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F510BF00E85B48A6FFD157B8 /* NomNomColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NomNomColors.swift; sourceTree = "<group>"; };
+		F714A14E6B955D044C020667 /* TodayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		01B8BCEF9A62098F389B86B7 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				9BCEEBF8D63B932F4B168638 /* FoodLogCard.swift */,
+				53E3DC3BCFAF5DEB6151365F /* RoastBubble.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -79,6 +97,8 @@
 		4ABAC97B0D19C5EA53008C0E /* Camera */ = {
 			isa = PBXGroup;
 			children = (
+				0A1AB7201EE6D1731C65C7BA /* CameraView.swift */,
+				1DBAC3EDF8C7103753678F5E /* CameraViewModel.swift */,
 			);
 			path = Camera;
 			sourceTree = "<group>";
@@ -96,6 +116,8 @@
 		8BE327E363C924DBF64045B2 /* Dashboard */ = {
 			isa = PBXGroup;
 			children = (
+				7BF03334B9010CF5624F63B2 /* TodayView.swift */,
+				F714A14E6B955D044C020667 /* TodayViewModel.swift */,
 			);
 			path = Dashboard;
 			sourceTree = "<group>";
@@ -113,6 +135,7 @@
 			isa = PBXGroup;
 			children = (
 				43F4BA86B249FD661DECB093 /* Auth.swift */,
+				1D4CCD1699B41931BB7C95E2 /* FoodLog.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -152,6 +175,7 @@
 				520DF7F015C57A53F3A6AE05 /* APIClient.swift */,
 				B248A228CFDFB4F0FB9209CD /* AuthService.swift */,
 				6E8932008FDA1112B4BE6827 /* KeychainService.swift */,
+				67B214C6A5B1BF471C587B98 /* PhotoCaptureService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -249,11 +273,19 @@
 				60AE8A81261325AD853B9669 /* APIClient.swift in Sources */,
 				116E569CF12A8D765269E47D /* Auth.swift in Sources */,
 				4F52FC88CFEE5C6A2CD1B9C8 /* AuthService.swift in Sources */,
+				C83947662071AD5A7D05FF90 /* CameraView.swift in Sources */,
+				FA01E1953C0BC6F48F1545DA /* CameraViewModel.swift in Sources */,
 				18C72A332416F664C095BC25 /* ContentView.swift in Sources */,
+				1D50A47A3D22AF760757A139 /* FoodLog.swift in Sources */,
+				280CA48C4D0756E267B96E43 /* FoodLogCard.swift in Sources */,
 				147AE434D01C00E345306087 /* KeychainService.swift in Sources */,
 				8774038C0895DBFE6E3A9AA5 /* LoginView.swift in Sources */,
 				C8400DF14EE13853F8C61823 /* NomNomApp.swift in Sources */,
 				D2236831E3C678E7B676B3E0 /* NomNomColors.swift in Sources */,
+				A03704AC0EC19A07830F1410 /* PhotoCaptureService.swift in Sources */,
+				B445B4E8FBB2C1C814866CDA /* RoastBubble.swift in Sources */,
+				21EF5829DF01EE2D3DC299E6 /* TodayView.swift in Sources */,
+				23B0C2B7A26106EB78BAB16D /* TodayViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
