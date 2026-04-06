@@ -55,6 +55,45 @@ async def get_today_logs(
     return logs
 
 
+@router.patch("/{log_id}", response_model=FoodLogResponse)
+async def update_food_log(
+    log_id: int,
+    data: FoodLogCreate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Update a food log (mark as user corrected)."""
+    from sqlalchemy import select
+    from src.models.food_log import FoodLog
+
+    # Get the food log
+    stmt = select(FoodLog).where(FoodLog.id == log_id).where(FoodLog.user_id == current_user.id)
+    result = await db.execute(stmt)
+    food_log = result.scalar_one_or_none()
+
+    if not food_log:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Food log not found",
+        )
+
+    # Update fields
+    food_log.food_name = data.foodName
+    food_log.calories = data.calories
+    food_log.protein_g = data.proteinG
+    food_log.carbs_g = data.carbsG
+    food_log.fat_g = data.fatG
+    food_log.food_category = data.foodCategory
+    food_log.cuisine_origin = data.cuisineOrigin
+    food_log.cat_roast = data.catRoast
+    food_log.is_user_corrected = True  # Mark as corrected
+
+    await db.commit()
+    await db.refresh(food_log)
+
+    return food_log
+
+
 @router.delete("/{log_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def remove_food_log(
     log_id: int,

@@ -10,6 +10,9 @@ class CameraViewModel: ObservableObject {
     @Published var showCamera = false
     @Published var errorMessage: String?
     @Published var savedSuccessfully = false
+    @Published var showCorrectModal = false
+    @Published var correctedFoodName = ""
+    @Published var savedFoodLogId: Int?
 
     private let api = APIClient.shared
 
@@ -25,6 +28,7 @@ class CameraViewModel: ObservableObject {
                 imageData: imageData
             )
             analysisResult = result
+            correctedFoodName = result.foodName
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -50,11 +54,48 @@ class CameraViewModel: ObservableObject {
                 catRoast: analysis.catRoast
             )
 
-            let _: FoodLogResponse = try await api.post(
+            let response: FoodLogResponse = try await api.post(
                 path: "/api/v1/food-logs/",
                 body: logData
             )
+            savedFoodLogId = response.id
             savedSuccessfully = true
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+
+        isSaving = false
+    }
+
+    func correctFood() async {
+        guard let logId = savedFoodLogId, !correctedFoodName.isEmpty else { return }
+
+        isSaving = true
+        errorMessage = nil
+
+        do {
+            struct CorrectionData: Codable {
+                let foodName: String
+                let isUserCorrected: Bool
+
+                enum CodingKeys: String, CodingKey {
+                    case foodName = "food_name"
+                    case isUserCorrected = "is_user_corrected"
+                }
+            }
+
+            let correctionData = CorrectionData(
+                foodName: correctedFoodName,
+                isUserCorrected: true
+            )
+
+            let _: FoodLogResponse = try await api.patch(
+                path: "/api/v1/food-logs/\(logId)",
+                body: correctionData
+            )
+
+            showCorrectModal = false
+            analysisResult?.foodName = correctedFoodName
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -67,5 +108,8 @@ class CameraViewModel: ObservableObject {
         analysisResult = nil
         errorMessage = nil
         savedSuccessfully = false
+        showCorrectModal = false
+        correctedFoodName = ""
+        savedFoodLogId = nil
     }
 }

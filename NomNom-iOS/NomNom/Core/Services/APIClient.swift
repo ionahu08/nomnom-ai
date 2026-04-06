@@ -111,6 +111,10 @@ class APIClient {
         try await request("POST", path: path, body: body)
     }
 
+    func patch<T: Decodable>(path: String, body: Encodable? = nil) async throws -> T {
+        try await request("PATCH", path: path, body: body)
+    }
+
     func delete(path: String) async throws {
         guard let url = URL(string: "\(baseURL)\(path)") else {
             throw APIError.invalidURL

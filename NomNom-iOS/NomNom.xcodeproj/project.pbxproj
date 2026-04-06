@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 53;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -39,7 +39,7 @@
 /* Begin PBXFileReference section */
 		0A1AB7201EE6D1731C65C7BA /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		1101E50AE81FF3822EC4376A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		13C9743DF51DF115E6ED8ED1 /* NomNom.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = NomNom.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13C9743DF51DF115E6ED8ED1 /* NomNom.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NomNom.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D4CCD1699B41931BB7C95E2 /* FoodLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodLog.swift; sourceTree = "<group>"; };
 		1DBAC3EDF8C7103753678F5E /* CameraViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewModel.swift; sourceTree = "<group>"; };
 		3613CA5ABAD9C19E665F06F8 /* NomNomApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NomNomApp.swift; sourceTree = "<group>"; };
@@ -53,7 +53,7 @@
 		7BF03334B9010CF5624F63B2 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		9BCEEBF8D63B932F4B168638 /* FoodLogCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodLogCard.swift; sourceTree = "<group>"; };
 		B248A228CFDFB4F0FB9209CD /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
-		D6284B197EC3012AB4575CA3 /* NomNomTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = NomNomTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D6284B197EC3012AB4575CA3 /* NomNomTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = text; name = NomNomTests.xctest; path = .xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F510BF00E85B48A6FFD157B8 /* NomNomColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NomNomColors.swift; sourceTree = "<group>"; };
 		F714A14E6B955D044C020667 /* TodayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -233,11 +233,10 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1430;
-				TargetAttributes = {
-				};
+				LastUpgradeCheck = 1400;
 			};
 			buildConfigurationList = 4DB3DD7F82AFEF54111CC4F7 /* Build configuration list for PBXProject "NomNom" */;
+			compatibilityVersion = "Xcode 2.4";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -245,8 +244,6 @@
 				en,
 			);
 			mainGroup = D17CDC29259E849E5FFA71CF;
-			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
 			productRefGroup = 8F52EC90EF66436DD6490ED4 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -307,6 +304,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = N6Y6L8G2VB;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = NomNom;
 				INFOPLIST_KEY_NSCameraUsageDescription = "NomNom needs camera access to photograph your food";
@@ -365,6 +363,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = N6Y6L8G2VB;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = NomNom;
 				INFOPLIST_KEY_NSCameraUsageDescription = "NomNom needs camera access to photograph your food";

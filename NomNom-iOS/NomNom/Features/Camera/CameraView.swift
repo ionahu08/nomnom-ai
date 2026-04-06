@@ -158,6 +158,24 @@ struct CameraView: View {
                 }
                 .padding(.horizontal, 16)
 
+                // Correct button (after save)
+                if viewModel.savedSuccessfully == false && viewModel.savedFoodLogId != nil {
+                    Button(action: { viewModel.showCorrectModal = true }) {
+                        HStack {
+                            Image(systemName: "pencil")
+                            Text("This is wrong")
+                        }
+                        .font(.headline)
+                        .foregroundColor(NomNomColors.warning)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(NomNomColors.surfaceSecondary)
+                        .cornerRadius(12)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 8)
+                }
+
                 if let error = viewModel.errorMessage {
                     Text(error)
                         .font(.caption)
@@ -166,6 +184,57 @@ struct CameraView: View {
                 }
             }
             .padding(.vertical, 16)
+        }
+        .sheet(isPresented: $viewModel.showCorrectModal) {
+            correctFoodModal
+        }
+    }
+
+    // MARK: - Correction modal
+
+    private var correctFoodModal: some View {
+        NavigationStack {
+            VStack(spacing: 16) {
+                Text("What's the actual food?")
+                    .font(.headline)
+                    .foregroundColor(NomNomColors.textPrimary)
+
+                TextField("Enter food name", text: $viewModel.correctedFoodName)
+                    .padding()
+                    .background(NomNomColors.surfaceSecondary)
+                    .cornerRadius(12)
+                    .font(.body)
+
+                Button(action: { Task { await viewModel.correctFood() } }) {
+                    HStack {
+                        if viewModel.isSaving {
+                            ProgressView().tint(.white)
+                        }
+                        Text("Confirm")
+                    }
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(NomNomColors.primary)
+                    .cornerRadius(12)
+                }
+                .disabled(viewModel.isSaving || viewModel.correctedFoodName.isEmpty)
+
+                Spacer()
+            }
+            .padding(16)
+            .background(NomNomColors.background.ignoresSafeArea())
+            .navigationTitle("Correct Food")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Cancel") {
+                        viewModel.showCorrectModal = false
+                    }
+                    .foregroundColor(NomNomColors.primary)
+                }
+            }
         }
     }
 
