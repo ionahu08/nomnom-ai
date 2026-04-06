@@ -36,11 +36,6 @@ struct CameraView: View {
                     Task { await viewModel.analyzePhoto() }
                 }
             }
-            .alert("Saved!", isPresented: $viewModel.savedSuccessfully) {
-                Button("OK") { viewModel.reset() }
-            } message: {
-                Text("Your food log has been saved.")
-            }
         }
     }
 
@@ -128,49 +123,79 @@ struct CameraView: View {
                 .cornerRadius(16)
                 .padding(.horizontal, 16)
 
+                // Saved status (after save)
+                if viewModel.savedSuccessfully {
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(NomNomColors.success)
+                        Text("Saved!")
+                            .foregroundColor(NomNomColors.success)
+                            .font(.subheadline.bold())
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(NomNomColors.success.opacity(0.1))
+                    .cornerRadius(12)
+                    .padding(.horizontal, 16)
+                }
+
                 // Action buttons
-                HStack(spacing: 12) {
-                    Button(action: { viewModel.reset() }) {
-                        Text("Retake")
+                if !viewModel.savedSuccessfully {
+                    HStack(spacing: 12) {
+                        Button(action: { viewModel.reset() }) {
+                            Text("Retake")
+                                .font(.headline)
+                                .foregroundColor(NomNomColors.textPrimary)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(NomNomColors.surfaceSecondary)
+                                .cornerRadius(12)
+                        }
+
+                        Button(action: { Task { await viewModel.saveLog() } }) {
+                            HStack {
+                                if viewModel.isSaving {
+                                    ProgressView().tint(.white)
+                                }
+                                Text("Save")
+                            }
                             .font(.headline)
-                            .foregroundColor(NomNomColors.textPrimary)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(NomNomColors.primary)
+                            .cornerRadius(12)
+                        }
+                        .disabled(viewModel.isSaving)
+                    }
+                    .padding(.horizontal, 16)
+                }
+
+                // Correct button and Done button (after save)
+                if viewModel.savedFoodLogId != nil {
+                    HStack(spacing: 12) {
+                        Button(action: { viewModel.showCorrectModal = true }) {
+                            HStack {
+                                Image(systemName: "pencil")
+                                Text("This is wrong")
+                            }
+                            .font(.headline)
+                            .foregroundColor(NomNomColors.warning)
                             .frame(maxWidth: .infinity)
                             .padding()
                             .background(NomNomColors.surfaceSecondary)
                             .cornerRadius(12)
-                    }
-
-                    Button(action: { Task { await viewModel.saveLog() } }) {
-                        HStack {
-                            if viewModel.isSaving {
-                                ProgressView().tint(.white)
-                            }
-                            Text("Save")
                         }
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(NomNomColors.primary)
-                        .cornerRadius(12)
-                    }
-                    .disabled(viewModel.isSaving)
-                }
-                .padding(.horizontal, 16)
 
-                // Correct button (after save)
-                if viewModel.savedSuccessfully == false && viewModel.savedFoodLogId != nil {
-                    Button(action: { viewModel.showCorrectModal = true }) {
-                        HStack {
-                            Image(systemName: "pencil")
-                            Text("This is wrong")
+                        Button(action: { viewModel.reset() }) {
+                            Text("Done")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(NomNomColors.primary)
+                                .cornerRadius(12)
                         }
-                        .font(.headline)
-                        .foregroundColor(NomNomColors.warning)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(NomNomColors.surfaceSecondary)
-                        .cornerRadius(12)
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 8)

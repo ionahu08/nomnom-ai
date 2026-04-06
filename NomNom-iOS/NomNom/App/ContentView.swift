@@ -16,6 +16,12 @@ struct ContentView: View {
                     Image(systemName: "list.bullet")
                     Text("Today")
                 }
+
+            SettingsView()
+                .tabItem {
+                    Image(systemName: "gearshape.fill")
+                    Text("Settings")
+                }
         }
         .tint(NomNomColors.primary)
     }
