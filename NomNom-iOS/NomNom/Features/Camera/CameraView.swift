@@ -31,8 +31,8 @@ struct CameraView: View {
             .sheet(isPresented: $viewModel.showCamera) {
                 PhotoPicker(imageData: $viewModel.capturedImageData)
             }
-            .onChange(of: viewModel.capturedImageData) {
-                if viewModel.capturedImageData != nil {
+            .onChange(of: viewModel.capturedImageData != nil) { hasData in
+                if hasData {
                     Task { await viewModel.analyzePhoto() }
                 }
             }
