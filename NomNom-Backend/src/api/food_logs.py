@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.deps import get_current_user
 from src.database import get_db
+from src.llm.cache import SemanticCache
 from src.models.user import User
 from src.schemas.food_log import FoodAnalysisResponse, FoodLogCreate, FoodLogResponse
 from src.services.ai_service import analyze_food_photo as ai_analyze
@@ -29,8 +30,8 @@ async def analyze_food_photo(
     profile = await get_profile(db, current_user.id)
     cat_style = profile.cat_style if profile else "sassy"
 
-    # Call Haiku vision AI
-    analysis = await ai_analyze(image_bytes, cat_style)
+    # Call Haiku vision AI (with semantic cache check)
+    analysis = await ai_analyze(image_bytes, cat_style, db=db)
 
     # Add photo path to the response
     return analysis.model_copy(update={"photo_path": photo_filename})
@@ -44,6 +45,14 @@ async def save_food_log(
 ):
     """Save a confirmed food log after user reviews the AI analysis."""
     food_log = await create_food_log(db, current_user.id, data)
+
+    # Cache the analysis for semantic search (for future similar meals)
+    await SemanticCache.cache_analysis(
+        db=db,
+        food_description=data.foodName,
+        food_log_id=food_log.id,
+    )
+
     return food_log
 
 

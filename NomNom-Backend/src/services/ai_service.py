@@ -13,7 +13,10 @@ import base64
 import logging
 from typing import Optional
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.config import settings
+from src.llm.cache import SemanticCache, cache_stats
 from src.llm.client import LLMClient
 from src.llm.guardrails import FoodAnalysisGuardrails, GuardrailViolation
 from src.llm.parser import FoodAnalysisParser, ParseError
@@ -30,7 +33,7 @@ parser = FoodAnalysisParser()
 
 
 async def analyze_food_photo(
-    image_bytes: bytes, cat_style: str = "sassy"
+    image_bytes: bytes, cat_style: str = "sassy", db: Optional[AsyncSession] = None
 ) -> FoodAnalysisResponse:
     """
     Analyze a food photo using the production LLM harness.
@@ -41,10 +44,12 @@ async def analyze_food_photo(
     - Structured output via tool_use (forced JSON)
     - Validation (catches hallucinations)
     - Comprehensive logging
+    - Semantic cache (if db provided)
 
     Args:
         image_bytes: JPEG image data as bytes
         cat_style: Cat personality ("sassy", "grumpy", "wholesome", "concerned", "neutral")
+        db: Optional database session for semantic cache
 
     Returns:
         FoodAnalysisResponse with validated nutritional data
@@ -82,10 +87,21 @@ async def analyze_food_photo(
             }
         ]
 
-        # Step 4: Get tool definitions (enforce structured output)
+        # Step 4: Check semantic cache (if db provided)
+        if db is not None:
+            food_description = "food photo"
+            cached_analysis = await SemanticCache.get_cached_analysis(db, food_description)
+            if cached_analysis is not None:
+                logger.info(
+                    "Semantic cache hit - returning cached analysis",
+                    extra={"food_name": cached_analysis.food_name},
+                )
+                return cached_analysis
+
+        # Step 5: Get tool definitions (enforce structured output)
         tools = get_tools_for_task(task_type.value)
 
-        # Step 5: Call LLM with retry, timeout, fallback
+        # Step 6: Call LLM with retry, timeout, fallback
         logger.info(
             "Calling LLM for food analysis",
             extra={
@@ -116,10 +132,10 @@ async def analyze_food_photo(
             },
         )
 
-        # Step 6: Parse and validate response
+        # Step 7: Parse and validate response
         analysis = await parser.parse_response(response, FoodAnalysisResponse)
 
-        # Step 7: Apply guardrails (catch toxicity, safety issues)
+        # Step 8: Apply guardrails (catch toxicity, safety issues)
         try:
             analysis = FoodAnalysisGuardrails.validate(analysis)
         except GuardrailViolation as e:
