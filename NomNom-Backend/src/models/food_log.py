@@ -1,9 +1,12 @@
 from datetime import datetime
+from typing import Optional
 
+from pgvector.sqlalchemy import Vector
 from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, JSON, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database import Base
+from src.llm.embedding import EMBEDDING_DIM
 
 
 class FoodLog(Base):
@@ -29,6 +32,11 @@ class FoodLog(Base):
 
     # Raw AI response for debugging
     ai_raw_response: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+
+    # Embedding vector for semantic cache and search
+    embedding: Mapped[Optional[list[float]]] = mapped_column(
+        Vector(EMBEDDING_DIM), nullable=True
+    )
 
     # User corrections (for future evaluation tracking)
     is_user_corrected: Mapped[bool] = mapped_column(Boolean, default=False)

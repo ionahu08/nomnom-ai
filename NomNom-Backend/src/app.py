@@ -8,6 +8,7 @@ from src.api.auth import router as auth_router
 from src.api.food_logs import router as food_logs_router
 from src.api.photos import router as photos_router
 from src.api.profile import router as profile_router
+from src.api.recommendations import router as recommendations_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -44,6 +45,7 @@ def create_app() -> FastAPI:
     app.include_router(food_logs_router)
     app.include_router(photos_router)
     app.include_router(profile_router)
+    app.include_router(recommendations_router)
 
     @app.get("/health")
     async def health_check():
