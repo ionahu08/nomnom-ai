@@ -17,79 +17,163 @@
 
 ## What We're Building
 
+**In Plain English:**
+
+Right now Claude gives generic recommendations: "Eat more protein."
+
+We're going to make it smarter: "You've eaten 800 calories today, need 1200 more. You love Italian food. Here are 3 high-protein Italian meals..."
+
+**How?**
+
 **Part 1 (Phase 6): Embeddings & Vector Search**
-- Enable pgvector extension in PostgreSQL
-- Create embedding_service.py — generate embeddings for text
-- Add NutritionKB model — knowledge base entries with embeddings
-- Implement semantic search — find similar food logs and nutrition tips
+
+Embeddings = convert text to a list of numbers that represents its meaning.
+```
+"Caesar salad" → [0.23, 0.81, 0.41, ..., 0.52]  (1024 numbers)
+"Garden salad" → [0.22, 0.79, 0.40, ..., 0.51]  (similar!)
+```
+
+Vector search = "find all meals in the database similar to this one."
+
+What you're building:
+- pgvector: PostgreSQL extension to store + search embeddings
+- embedding_service: converts text → embeddings
+- NutritionKB: database table of nutrition facts (with embeddings)
+- Knowledge retrieval: "Find nutrition tips relevant to what the user needs"
 
 **Part 2 (Phase 7): RAG Recommendations**
-- Create recommendations API endpoint
-- Flow: user asks "what should I eat?" → retrieve context from KB + past meals → build prompt with retrieved context → stream Sonnet response
-- Streaming: use Server-Sent Events (SSE) to stream recommendation token-by-token to iOS
+
+RAG = Retrieval-Augmented Generation. Instead of Claude guessing, you give Claude facts first, then ask for a recommendation.
+
+```
+Step 1: User asks "What should I eat?"
+  ↓
+Step 2: Retrieve context
+  - What's their calorie deficit today? (from Phase 8 dashboard data)
+  - What nutrition tips are relevant? (search NutritionKB with embeddings)
+  - What meals did they like before? (search past food_logs with embeddings)
+  ↓
+Step 3: Build smart prompt
+  "User needs 400 more calories. Here are relevant nutrition tips:
+   [retrieves tips]. They enjoyed: [retrieves past meals].
+   What should they eat?"
+  ↓
+Step 4: Claude gives specific, personalized recommendation
+  "Based on your love of Italian food and protein needs, try..."
+  ↓
+Step 5: Stream response token-by-token to iOS (SSE streaming)
+```
+
+Result: Much better recommendations, because Claude has context.
 
 ---
 
 ## Phase 6: Embeddings + Vector Search + RAG Knowledge Base
 
-### Phase 6.1: Enable pgvector
+### Phase 6.1: Enable pgvector — Add Vector Search to PostgreSQL
 
-#### 6.1.A: Install pgvector PostgreSQL extension
+**In Plain English:**
+
+PostgreSQL is a database for storing text, numbers, dates. But embeddings are lists of 1024 numbers, and searching them is different.
+
+pgvector = PostgreSQL extension that adds vector search superpowers.
+
+```
+Normal search (PostgreSQL):
+"SELECT * FROM meals WHERE name LIKE '%salad%'"
+→ finds salads by name matching
+
+Vector search (pgvector):
+"SELECT * FROM meals WHERE embedding <-> user_query_embedding < 0.1"
+→ finds meals SIMILAR IN MEANING to query (even if name doesn't match!)
+```
+
+#### 6.1.A: Install pgvector extension
 
 Commands:
 ```bash
-# Connect to PostgreSQL
+# Connect to your database and enable pgvector
 psql -d nomnom -c "CREATE EXTENSION IF NOT EXISTS vector;"
 
-# Verify installation
+# Verify it worked
 psql -d nomnom -c "SELECT extname FROM pg_extension WHERE extname='vector';"
 ```
 
-#### 6.1.B: Update database.py
+#### 6.1.B: Auto-enable pgvector on app startup
 
 Update `src/database.py`:
-- Import `from sqlalchemy import event`
-- Add event listener on connection: `conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))`
-- This auto-creates pgvector on startup
+```python
+# When app starts, automatically enable pgvector
+@event.listens_for(Engine, "connect")
+def receive_connect(dbapi_conn, connection_record):
+    dbapi_conn.execute("CREATE EXTENSION IF NOT EXISTS vector;")
+```
+
+This way, pgvector is always available when your app runs.
 
 ---
 
-### Phase 6.2: Embedding Service
+### Phase 6.2: Embedding Service — Convert Text to Numbers
 
-Create the service that generates embeddings.
+**In Plain English:**
 
-#### 6.2.A: Create `src/services/embedding_service.py`
+Embedding = convert text to a list of 1024 numbers that represent its meaning.
 
-```python
-# What it does:
-# - Generate embeddings for text using Claude API or Voyage
-# - Store embeddings as Vector(1024) in database
-# - Perform similarity search via pgvector
-
-# Key functions:
-# - embed_text(text: str) -> list[float]
-#     Call Anthropic embedding API or Voyage
-#     Return 1024-dim vector
-# - similarity_search(
-#     db: AsyncSession,
-#     query_embedding: list[float],
-#     table: str,  # "food_logs" or "nutrition_kb"
-#     limit: int = 5,
-#     similarity_threshold: float = 0.5
-#   ) -> list[Result]
-#     Use pgvector: SELECT * FROM table WHERE embedding <-> query_embedding < distance
-#     Return top-k results ordered by similarity
+```
+embed_text("Caesar salad") → [0.23, 0.81, 0.41, ..., 0.52]
+embed_text("Garden salad") → [0.22, 0.79, 0.40, ..., 0.51]
+                                                    (similar!)
 ```
 
-Files to create:
-- `src/services/embedding_service.py` — embedding generation + similarity search
+Then you can find similar meals:
+```
+User's favorite pasta → embed it
+Search for similar past meals → "Found 5 pastas user liked!"
+```
 
-Note: For now, use placeholder embeddings (not calling API). Phase 6.4 will integrate real embeddings.
+#### 6.2.A: Create `src/services/embedding_service.py` — The Embedder
+
+**What this does:**
+
+```python
+def embed_text(text):
+  # Call Claude's embedding API
+  # (or Voyage API - both work)
+  embedding = anthropic.create_embedding(text)
+  return embedding  # list of 1024 numbers
+
+def similarity_search(table, query_embedding, limit=5):
+  # Use pgvector to find similar rows
+  # embedding <-> means "distance between embeddings"
+  # Lower distance = more similar
+  results = database.query(table).order_by(
+    column.embedding.op("<->")(query_embedding)
+  ).limit(limit)
+  
+  return results  # Top 5 most similar
+```
+
+How it works:
+1. Convert text to embedding (list of 1024 numbers)
+2. Store embedding in database column (vector(1024))
+3. Query: "Find rows with embeddings closest to this vector"
+4. Return top-K matches (most similar)
+
+Files to create:
+- `src/services/embedding_service.py` — embedding + similarity search
+
+**Note:** For now, use placeholder embeddings (not calling real API). Later phases will integrate real embeddings.
 
 #### 6.2.B: Test embedding service
 
+What to test:
+- embed_text returns 1024-dim vector ✓
+- Similarity search finds similar items ✓
+- "Caesar salad" is similar to "Garden salad" but not "Pizza" ✓
+- Limit works (returns top 5) ✓
+
 Files to create:
-- `tests/unit/services/test_embedding_service.py` — test embed_text, similarity_search (mocked)
+- `tests/unit/services/test_embedding_service.py` — test embed_text, similarity_search
 
 Commands:
 - `uv run pytest tests/unit/services/test_embedding_service.py -v`
@@ -250,72 +334,113 @@ Keep it {{ cat_style }} and fun!
 
 ### Phase 7.2: Recommendations Endpoint with Streaming
 
-#### 7.2.A: Create `src/api/recommendations.py`
+**In Plain Language:**
 
-```python
-# Endpoint:
-# POST /api/v1/recommendations/meal
-# Body: { "query": "I need more protein" }
-# Response: Server-Sent Events stream (text/event-stream)
-
-# Flow:
-# 1. Get user profile (dietary preferences, targets)
-# 2. Get today's food intake (calories, macros)
-# 3. Embed query
-# 4. Retrieve nutrition context (knowledge_service)
-# 5. Retrieve similar meals (knowledge_service)
-# 6. Build prompt with template
-# 7. Call Sonnet (streaming)
-# 8. Stream response token-by-token as SSE
+Without streaming:
+```
+User: "What should I eat?"
+(waits 5 seconds for Claude to finish thinking)
+Claude: "Try a chicken salad with..." (all at once)
 ```
 
-Files to create:
-- `src/api/recommendations.py` — recommendations endpoint
-
-#### 7.2.B: Wire SSE streaming into LLMClient
-
-Update `src/llm/client.py`:
-- Add `stream_message()` method that yields tokens
-- Use `anthropic.AsyncAnthropic().messages.stream()` for token-by-token streaming
-
-```python
-async def stream_message(
-    self,
-    model: str,
-    messages: list,
-    max_tokens: int,
-    system: str | None = None
-):
-    # Use Anthropic streaming
-    # Yield each token as it arrives
-    # Handle errors gracefully
+With streaming:
+```
+User: "What should I eat?"
+(gets words immediately as Claude types)
+"Try" → "a" → "chicken" → "salad" → "with" → ...
+(feels fast because user sees text appearing!)
 ```
 
-#### 7.2.C: Implement SSE in FastAPI
+How it works:
+1. User asks "What should I eat?"
+2. Backend retrieves context (nutrition tips, past meals)
+3. Backend sends prompt to Sonnet with streaming enabled
+4. Sonnet generates response word-by-word
+5. Backend sends each word to iOS app via SSE (Server-Sent Events)
+6. iOS app displays words as they arrive (magic!)
 
-Update `src/api/recommendations.py`:
+#### 7.2.A: Create `src/api/recommendations.py` — The Recommendation Endpoint
+
+**What this does:**
+
 ```python
-from fastapi.responses import StreamingResponse
-
 @router.post("/meal")
 async def recommend_meal(
     query: str,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    # ... prepare context ...
-    
-    async def event_generator():
-        async for token in llm_client.stream_message(...):
-            yield f"data: {token}\n\n"
-    
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
+  # Step 1: Get user context
+  profile = get_user_profile(current_user.id)
+  today_intake = get_today_intake(current_user.id)
+  
+  # Step 2: Retrieve context from knowledge base
+  nutrition_tips = knowledge_service.retrieve_nutrition_context(query)
+  similar_meals = knowledge_service.retrieve_similar_meals(query)
+  
+  # Step 3: Build prompt with context
+  prompt = render_template(
+    "recommend_meal.j2",
+    today_intake=today_intake,
+    nutrition_tips=nutrition_tips,
+    similar_meals=similar_meals,
+    query=query
+  )
+  
+  # Step 4: Stream response
+  async def event_generator():
+    async for token in llm_client.stream_message(
+      model="sonnet",
+      prompt=prompt
+    ):
+      yield f"data: {token}\n\n"
+  
+  return StreamingResponse(event_generator(), media_type="text/event-stream")
+```
+
+Files to create:
+- `src/api/recommendations.py` — recommendations endpoint
+
+#### 7.2.B: Add streaming to LLMClient
+
+Update `src/llm/client.py`:
+```python
+async def stream_message(
+    self,
+    model: str,
+    messages: list,
+    system: str | None = None
+):
+    # Use Anthropic streaming API
+    async with self.anthropic_client.messages.stream(...) as stream:
+        async for text in stream.text_stream:
+            yield text  # Yield each token as it arrives
+```
+
+#### 7.2.C: Implement SSE in FastAPI
+
+Server-Sent Events (SSE) = standard way to stream data from server to client.
+
+```python
+from fastapi.responses import StreamingResponse
+
+# Backend sends: "data: Try\n\n"
+# Then:          "data: a\n\n"
+# Then:          "data: chicken\n\n"
+#
+# iOS app receives each line and displays it
 ```
 
 #### 7.2.D: Test recommendations endpoint
 
+What to test:
+- Retrieves nutrition tips correctly ✓
+- Retrieves similar past meals ✓
+- Streaming sends tokens one-by-one ✓
+- iOS can parse SSE events ✓
+
 Files to create:
-- `tests/integration/test_recommendations.py` — test /meal endpoint (mocked streaming)
+- `tests/integration/test_recommendations.py` — test /meal with mocked streaming
 
 Commands:
 - `uv run pytest tests/integration/test_recommendations.py -v`
@@ -324,10 +449,23 @@ Commands:
 
 ### Phase 7.3: iOS Streaming Service
 
-Update iOS app to handle SSE streaming (you may have this already):
+**In Plain English:**
+
+iOS needs to know how to parse SSE messages:
+```
+Receive: "data: Try\n\n"
+Parse: "Try"
+Display in UI
+
+Receive: "data: a\n\n"
+Parse: "a"
+Append to UI (now shows "Try a")
+
+... repeat until done
+```
 
 Files to update:
-- `NomNom-iOS/NomNom/Core/Services/StreamingService.swift` — parse SSE events, yield tokens
+- `NomNom-iOS/NomNom/Core/Services/StreamingService.swift` — parse SSE, yield tokens to SwiftUI
 
 ---
 

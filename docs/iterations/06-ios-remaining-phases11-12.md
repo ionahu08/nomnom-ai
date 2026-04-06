@@ -15,12 +15,40 @@
 
 ## What We're Building
 
-**Complete the iOS app:**
-- Dashboard: today's macro progress bars, cat mood + status line, quick add button
-- Timeline: scrollable photo grid of all past meals, grouped by date
-- Weekly Recap: detail screen for past recaps with stats
-- Onboarding: multi-step flow (profile info, dietary preferences, cat style selection)
-- Settings: profile editing, preference management, logout
+**In Plain English:**
+
+Right now you can take photos and see them logged. We're going to add the rest of the app:
+
+1. **Dashboard** (Today tab)
+   - Show progress bars (calories, protein, carbs, fat with colors)
+   - Show cat emoji + mood + funny status line
+   - Show list of today's meals with photos
+   - Pull-to-refresh to reload
+
+2. **Timeline** (Timeline tab)
+   - Scrollable grid of all past food photos
+   - Grouped by date (Today, Yesterday, Last Week, etc.)
+   - Tap photo to see details (name, calories, macros, time logged)
+   - Swipe to delete
+
+3. **Weekly Recaps** (Recaps tab)
+   - List of past weekly summaries
+   - Tap to see full recap with stats (best day, worst day, avg calories)
+   - Shows the funny AI-generated narrative
+
+4. **Onboarding** (First launch only)
+   - Multi-screen flow to set up profile
+   - Step 1: Age, gender
+   - Step 2: Height, weight
+   - Step 3: Activity level
+   - Step 4: Pick cat style (sassy, grumpy, wholesome, etc.)
+   - Step 5: Review and save
+
+5. **Settings** (Settings tab)
+   - Edit profile fields
+   - Change cat style
+   - Manage dietary preferences
+   - Logout button
 
 ---
 

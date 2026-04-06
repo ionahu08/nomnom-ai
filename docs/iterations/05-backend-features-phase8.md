@@ -18,11 +18,34 @@
 
 ## What We're Building
 
-**Complete the backend:**
-- Dashboard: today's macro progress, cat mood, status line
-- Cat mood calculation: rules-based (no AI) — reacts to user's nutrition intake
-- Weekly recaps: Sunday automation — AI generates funny recap narratives
-- Scheduler: APScheduler runs Sunday recap job for all users
+**In Plain English:**
+
+Right now the app just logs food. We're going to make it interactive and fun:
+
+1. **Dashboard** — "Here's your progress today"
+   - Show progress bars: calories 1500/2000, protein 60g/120g, etc.
+   - Show cat mood (happy, proud, judging, etc.) based on how well you're eating
+   - Show status line from cat: "You're crushing it today!" or "You need more veggies"
+
+2. **Cat Mood** — Rules-based (no AI, just if/else)
+   ```
+   If you've hit all targets perfectly → mood = "proud"
+   If you've eaten way too many calories → mood = "judging"
+   If you've barely eaten anything → mood = "worried"
+   If protein is good but eating junk → mood = "conflicted"
+   If no food logged yet → mood = "sleeping"
+   ```
+
+3. **Weekly Recaps** — Funny AI-generated summaries
+   - Every Sunday at midnight, automatically generate a recap
+   - Claude writes: "You ate pizza 4 times this week 😼. Here's what you should focus on next week..."
+   - Shows stats: best day, worst day, average calories, most-eaten category
+
+4. **Scheduler** — Sunday recap automation
+   - Background job runs every Sunday at midnight
+   - Loops through all users who logged food that week
+   - Generates a recap for each one
+   - No manual work needed
 
 ---
 
