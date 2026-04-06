@@ -6,6 +6,7 @@ struct FoodAnalysisResponse: Codable {
     let proteinG: Double
     let carbsG: Double
     let fatG: Double
+    let photoPath: String
     let foodCategory: String?
     let cuisineOrigin: String?
     let catRoast: String
@@ -16,6 +17,7 @@ struct FoodAnalysisResponse: Codable {
         case proteinG = "protein_g"
         case carbsG = "carbs_g"
         case fatG = "fat_g"
+        case photoPath = "photo_path"
         case foodCategory = "food_category"
         case cuisineOrigin = "cuisine_origin"
         case catRoast = "cat_roast"

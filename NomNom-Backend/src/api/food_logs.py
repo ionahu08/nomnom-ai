@@ -31,7 +31,9 @@ async def analyze_food_photo(
 
     # Call Haiku vision AI
     analysis = await ai_analyze(image_bytes, cat_style)
-    return analysis
+
+    # Add photo path to the response
+    return analysis.model_copy(update={"photo_path": photo_filename})
 
 
 @router.post("/", response_model=FoodLogResponse, status_code=status.HTTP_201_CREATED)

@@ -1,47 +1,68 @@
-import base64
-import json
-import logging
+"""
+AI Service — Production-grade food analysis using LLM Harness.
 
-import anthropic
+This replaces the basic AI calls with the full harness:
+- Retry logic for resilience
+- Fallback models for reliability
+- Structured output enforcement via tool_use
+- Validation with Pydantic
+- Comprehensive logging
+"""
+
+import base64
+import logging
+from typing import Optional
 
 from src.config import settings
+from src.llm.client import LLMClient
+from src.llm.guardrails import FoodAnalysisGuardrails, GuardrailViolation
+from src.llm.parser import FoodAnalysisParser, ParseError
+from src.llm.prompt_engine import render_analyze_food_prompt
+from src.llm.router import TaskType, get_route
+from src.llm.tools import get_tools_for_task
 from src.schemas.food_log import FoodAnalysisResponse
 
 logger = logging.getLogger(__name__)
 
-client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
-
-SYSTEM_PROMPT = """You are a funny, {cat_style} cat who judges people's food choices.
-
-When shown a food photo, you must:
-1. Identify the food
-2. Estimate its nutritional content
-3. Write a short, funny roast about the food (1-2 sentences, in character as a {cat_style} cat)
-
-Respond with ONLY valid JSON in this exact format (no markdown, no extra text):
-{{
-  "food_name": "name of the food",
-  "calories": estimated calories as integer,
-  "protein_g": estimated protein in grams as number,
-  "carbs_g": estimated carbs in grams as number,
-  "fat_g": estimated fat in grams as number,
-  "food_category": "category like salad, fast food, dessert, home-cooked, etc",
-  "cuisine_origin": "cuisine like Japanese, Italian, American, etc",
-  "cat_roast": "your funny roast about this food"
-}}"""
+# Initialize LLM client once
+llm_client = LLMClient(api_key=settings.anthropic_api_key)
+parser = FoodAnalysisParser()
 
 
-async def analyze_food_photo(image_bytes: bytes, cat_style: str = "sassy") -> FoodAnalysisResponse:
-    """Send a food photo to Haiku vision and get analysis + roast."""
-    image_b64 = base64.b64encode(image_bytes).decode("utf-8")
+async def analyze_food_photo(
+    image_bytes: bytes, cat_style: str = "sassy"
+) -> FoodAnalysisResponse:
+    """
+    Analyze a food photo using the production LLM harness.
 
-    prompt = SYSTEM_PROMPT.format(cat_style=cat_style)
+    This is the complete, resilient version with:
+    - Retry logic (up to 2 attempts)
+    - Fallback model (Haiku → Sonnet if needed)
+    - Structured output via tool_use (forced JSON)
+    - Validation (catches hallucinations)
+    - Comprehensive logging
 
-    message = await client.messages.create(
-        model="claude-haiku-4-5-20251001",
-        max_tokens=500,
-        system=prompt,
-        messages=[
+    Args:
+        image_bytes: JPEG image data as bytes
+        cat_style: Cat personality ("sassy", "grumpy", "wholesome", "concerned", "neutral")
+
+    Returns:
+        FoodAnalysisResponse with validated nutritional data
+
+    Raises:
+        ParseError: If AI response is invalid and retries fail
+    """
+    try:
+        # Step 1: Get route (model selection + config)
+        task_type = TaskType.ANALYZE_FOOD
+        route = get_route(task_type)
+
+        # Step 2: Render prompt with cat personality
+        system_prompt = render_analyze_food_prompt(cat_style=cat_style)
+
+        # Step 3: Prepare image as base64 + message
+        image_b64 = base64.b64encode(image_bytes).decode("utf-8")
+        messages = [
             {
                 "role": "user",
                 "content": [
@@ -59,41 +80,87 @@ async def analyze_food_photo(image_bytes: bytes, cat_style: str = "sassy") -> Fo
                     },
                 ],
             }
-        ],
-    )
+        ]
 
-    raw_text = message.content[0].text
-    logger.info("Haiku response: %s", raw_text)
+        # Step 4: Get tool definitions (enforce structured output)
+        tools = get_tools_for_task(task_type.value)
 
-    # Strip markdown code fences if present (e.g. ```json ... ```)
-    cleaned = raw_text.strip()
-    if cleaned.startswith("```"):
-        cleaned = cleaned.split("\n", 1)[1] if "\n" in cleaned else cleaned[3:]
-        cleaned = cleaned.rsplit("```", 1)[0]
-        cleaned = cleaned.strip()
-
-    try:
-        data = json.loads(cleaned)
-    except json.JSONDecodeError:
-        logger.error("Failed to parse Haiku response as JSON: %s", raw_text)
-        return FoodAnalysisResponse(
-            food_name="Unknown Food",
-            calories=0,
-            protein_g=0,
-            carbs_g=0,
-            fat_g=0,
-            food_category="unknown",
-            cuisine_origin="unknown",
-            cat_roast="I tried to judge your food but my brain broke. Try again.",
+        # Step 5: Call LLM with retry, timeout, fallback
+        logger.info(
+            "Calling LLM for food analysis",
+            extra={
+                "model": route.primary_model,
+                "fallback": route.fallback_model,
+                "cat_style": cat_style,
+            },
         )
 
+        response = await llm_client.create_message_with_retry(
+            model=route.primary_model,
+            messages=messages,
+            system=system_prompt,
+            max_tokens=route.max_tokens,
+            fallback_model=route.fallback_model,
+            tools=tools,
+            temperature=route.temperature,
+        )
+
+        logger.debug(
+            f"LLM response received",
+            extra={
+                "model": response.model if hasattr(response, "model") else "unknown",
+                "usage": {
+                    "input_tokens": response.usage.input_tokens,
+                    "output_tokens": response.usage.output_tokens,
+                },
+            },
+        )
+
+        # Step 6: Parse and validate response
+        analysis = await parser.parse_response(response, FoodAnalysisResponse)
+
+        # Step 7: Apply guardrails (catch toxicity, safety issues)
+        try:
+            analysis = FoodAnalysisGuardrails.validate(analysis)
+        except GuardrailViolation as e:
+            logger.warning(f"Guardrail violation: {e}")
+            # Return fallback if guardrails fail
+            return _get_fallback_response(f"Guardrail violation: {e}")
+
+        logger.info(
+            "Food analysis succeeded",
+            extra={
+                "food_name": analysis.food_name,
+                "calories": analysis.calories,
+                "cat_style": cat_style,
+            },
+        )
+
+        return analysis
+
+    except ParseError as e:
+        logger.error(f"Failed to parse food analysis response: {e}")
+        # Return graceful fallback
+        return _get_fallback_response(str(e))
+    except Exception as e:
+        logger.error(f"Unexpected error during food analysis: {e}", exc_info=True)
+        return _get_fallback_response(str(e))
+
+
+def _get_fallback_response(error_message: str) -> FoodAnalysisResponse:
+    """
+    Return a safe fallback response when analysis fails.
+
+    This lets the user know something went wrong but doesn't crash the app.
+    """
+    logger.warning(f"Returning fallback response due to: {error_message}")
     return FoodAnalysisResponse(
-        food_name=data.get("food_name", "Unknown Food"),
-        calories=int(data.get("calories", 0)),
-        protein_g=float(data.get("protein_g", 0)),
-        carbs_g=float(data.get("carbs_g", 0)),
-        fat_g=float(data.get("fat_g", 0)),
-        food_category=data.get("food_category"),
-        cuisine_origin=data.get("cuisine_origin"),
-        cat_roast=data.get("cat_roast", "No comment."),
+        food_name="Unknown Food",
+        calories=0,
+        protein_g=0,
+        carbs_g=0,
+        fat_g=0,
+        food_category="unknown",
+        cuisine_origin="unknown",
+        cat_roast="I tried to judge your food but encountered a problem. Please try again.",
     )

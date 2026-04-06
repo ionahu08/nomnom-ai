@@ -43,7 +43,7 @@ class CameraViewModel: ObservableObject {
 
         do {
             let logData = FoodLogCreate(
-                photoPath: "from-app.jpg",
+                photoPath: analysis.photoPath,
                 foodName: analysis.foodName,
                 calories: analysis.calories,
                 proteinG: analysis.proteinG,
@@ -95,7 +95,6 @@ class CameraViewModel: ObservableObject {
             )
 
             showCorrectModal = false
-            analysisResult?.foodName = correctedFoodName
         } catch {
             errorMessage = error.localizedDescription
         }
