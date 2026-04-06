@@ -347,74 +347,107 @@ All endpoints prefixed with `/api/v1`.
 
 ## LLM Harness Design (src/llm/)
 
+**Plain English:** An LLM Harness is a **safety net** that wraps around Claude API calls to make them reliable. Instead of calling Claude directly and hoping for the best, the harness:
+- Retries if it fails
+- Uses a backup model if the first one keeps failing
+- Validates the response to make sure it's actually good
+- Handles slow/broken API calls gracefully
+
+**Result:** Your app stops crashing when Claude has a bad day.
+
 This is the core AI engineering layer. All AI calls go through this harness — no direct Anthropic SDK calls anywhere else.
 
-### client.py - Anthropic SDK wrapper
+### client.py - Anthropic SDK wrapper with Retry + Fallback
 
-```
-What it does:
+**In Plain Language:**
+- Try to call Claude Haiku. If it fails, wait 1 second and try again.
+- If it fails twice, give up on Haiku and use Claude Sonnet instead (more reliable).
+- If everything fails, return a graceful error (don't crash the app).
+
+**Technical Details:**
 - Wraps anthropic.AsyncAnthropic with retry, timeout, and fallback logic
-- On failure: retry up to 2 times with exponential backoff
-- If Haiku fails after retries: fall back to Sonnet (or vice versa)
-- If all models fail: return a graceful fallback (cached result or default)
-- Timeout: 10s for Haiku, 30s for Sonnet
-- Token budget: cap max_tokens per call to prevent runaway costs
-- Logs every call to ai_call_logs via logger.py
-```
+- On failure: retry up to 2 times with exponential backoff (1s, then 2s)
+- If Haiku fails after retries: fall back to Sonnet
+- Timeout: 10s for Haiku, 30s for Sonnet (don't wait forever)
+- Token budget: cap max_tokens per call (prevent expensive runaway calls)
+- Logs every call to ai_call_logs table via logger.py
 
-### router.py - multi-model router
+### router.py - Choose the right model for the job
 
-```
-What it does:
+**In Plain Language:**
+- Food photo analysis? Use Haiku (fast + cheap).
+- Writing a funny recommendation? Use Sonnet (smarter).
+- Generating a weekly recap story? Use Sonnet (better writing).
+
+**Technical Details:**
 - Routes tasks to the right model:
-  - "analyze_food" -> Haiku (fast, cheap)
-  - "recommend_meal" -> Sonnet (better writing)
-  - "weekly_recap" -> Sonnet (narrative quality)
-- Simple mapping, but demonstrates the pattern used in production AI systems
+  - "analyze_food" → Haiku (fast, cheap)
+  - "recommend_meal" → Sonnet (better writing)
+  - "weekly_recap" → Sonnet (narrative quality)
+
+### prompts/ - Jinja2 prompt templates (not hardcoded strings)
+
+**In Plain Language:**
+Instead of writing prompts like this in your Python code:
+```python
+prompt = "You are a sassy cat. Analyze this food..."
 ```
 
-### prompts/ - Jinja2 prompt templates
-
+Store them in separate `.j2` files that are like **fill-in-the-blank templates:**
+```jinja2
+You are a {{ cat_style }} cat.
+Analyze this food and return JSON.
 ```
-What it does:
+
+Now you can change the cat style without editing code:
+```python
+prompt = render("template.j2", cat_style="grumpy")
+```
+
+**Technical Details:**
 - Each AI task has a .j2 template file instead of hardcoded strings
-- Templates inject: cat_style, user preferences, today's intake, etc.
+- Templates inject variables: cat_style, user preferences, today's intake, etc.
 - cat_personas.j2 defines personality modifiers per cat style
 - Few-shot examples included in analyze_food.j2 for consistent output
+- Production AI systems always separate prompts from code (easy to version control, review, tweak)
 
-Why this matters:
-- Production AI systems separate prompts from code
-- Makes it easy to tweak prompts without changing Python code
-- Version-controllable and reviewable
+### tools.py - Force Claude to return valid JSON
+
+**In Plain Language:**
+Problem: Claude might return text like "Pizza has 500 calories" instead of JSON.
+
+Solution: Tell Claude "You MUST return JSON in THIS exact shape, no other format allowed":
+```json
+{
+  "food_name": "string",
+  "calories": 500,
+  "protein_g": 25
+}
 ```
 
-### tools.py - Anthropic tool_use definitions
+Claude is now forced to follow this format. No garbage text.
 
-```
-What it does:
+**Technical Details:**
 - Defines tool schemas that tell the AI exactly what JSON shape to return
-- Example: analyze_food tool has properties: food_name, calories, protein_g, etc.
-- The AI is forced to return structured data matching the schema
-- No more "hope the AI returns valid JSON" — the SDK guarantees the shape
+- Example: analyze_food tool has properties: food_name, calories, protein_g, fat_g, etc.
+- The AI is forced to return structured data matching the schema via `tool_use`
+- This is more reliable than asking for JSON in the prompt (SDK guarantees the shape)
 
-Why this matters:
-- This is how production apps get reliable structured output from LLMs
-- tool_use is more reliable than asking for JSON in the prompt
-```
+### parser.py - Check the response is actually good + auto-retry
 
-### parser.py - output parsing & validation
+**In Plain Language:**
+Even with tool_use, Claude might return bad data like:
+- Calories: 50,000 (impossible)
+- Protein: -50g (negative doesn't make sense)
 
-```
-What it does:
+Solution: Check the data and if it's bad, try again automatically.
+
+**Technical Details:**
 - Takes raw AI tool_use output and validates with Pydantic models
 - Checks: are calories between 0-5000? is protein between 0-500g?
 - If validation fails: retry the AI call (up to 2 times)
 - If still fails: return a "could not analyze" fallback
-
-Why this matters:
-- AI output is never trusted blindly
-- Pydantic gives you typed, validated data
-```
+- AI output is never trusted blindly — always validate before using
 
 ### cache.py - semantic caching
 
