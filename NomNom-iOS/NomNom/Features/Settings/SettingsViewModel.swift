@@ -8,7 +8,11 @@ class SettingsViewModel: ObservableObject {
     @Published var savedSuccessfully = false
 
     private let profileService = ProfileService()
-    private let authService = AuthService.shared
+    private let authService: AuthService
+
+    init(authService: AuthService) {
+        self.authService = authService
+    }
 
     func loadProfile() async {
         isLoading = true

@@ -1,7 +1,12 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @StateObject private var viewModel = SettingsViewModel()
+    @EnvironmentObject var authService: AuthService
+    @StateObject private var viewModel: SettingsViewModel
+
+    init() {
+        _viewModel = StateObject(wrappedValue: SettingsViewModel(authService: AuthService()))
+    }
 
     var body: some View {
         NavigationStack {
