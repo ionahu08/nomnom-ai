@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config import settings
-from src.models.user import User
+from src.models.user import User, UserProfile
 
 
 def hash_password(password: str) -> str:
@@ -35,6 +35,20 @@ async def register_user(db: AsyncSession, email: str, password: str) -> User:
     db.add(user)
     await db.commit()
     await db.refresh(user)
+
+    # Auto-create default profile for new user
+    profile = UserProfile(
+        user_id=user.id,
+        age=25,
+        gender="other",
+        height_cm=170.0,
+        weight_kg=70.0,
+        activity_level="moderate",
+        cat_style="sassy",
+    )
+    db.add(profile)
+    await db.commit()
+
     return user
 
 
