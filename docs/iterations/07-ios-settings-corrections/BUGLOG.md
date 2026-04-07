@@ -95,6 +95,14 @@ Tracker for issues, blockers, decisions, and testing notes during this iteration
 - **Resolution**: Fixed by auto-creating default profile on registration (same fix as Issue #9)
 - **Test**: Register new account → Today tab → "What to eat?" button → AI recommendation displays with meal suggestions ✅
 
+### Issue: Logout Button Has No Immediate Feedback
+- **Date Found**: 2026-04-06
+- **Severity**: Medium (UX)
+- **Root Cause**: SettingsView created its own dummy AuthService instance. Logout button called viewModel.logout() which logged out the dummy, not the real environment authService. NomNomApp couldn't detect the state change.
+- **Location**: `Features/Settings/SettingsView.swift:105`
+- **Resolution**: Changed logout button to call `authService.logout()` directly from the environment object
+- **Test**: Settings tab → tap Logout → immediately redirected to LoginView ✅
+
 ### Issue: Food Correction Button Needs Polish
 - **Date Found**: 2026-04-06
 - **Severity**: Medium (UX)
