@@ -107,6 +107,36 @@ class APIClient {
         try await request("GET", path: path)
     }
 
+    // Binary data fetching (for images, etc.)
+    func getData(path: String) async throws -> Data {
+        guard let url = URL(string: "\(baseURL)\(path)") else {
+            throw APIError.invalidURL
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+
+        if let token = token {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.networkError(URLError(.badServerResponse))
+        }
+
+        switch httpResponse.statusCode {
+        case 200...299:
+            return data
+        case 401, 403:
+            await MainActor.run { onUnauthorized?() }
+            throw APIError.unauthorized
+        default:
+            throw APIError.serverError(httpResponse.statusCode)
+        }
+    }
+
     func post<T: Decodable>(path: String, body: Encodable? = nil) async throws -> T {
         try await request("POST", path: path, body: body)
     }

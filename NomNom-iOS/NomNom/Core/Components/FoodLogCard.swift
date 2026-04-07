@@ -72,7 +72,7 @@ struct FoodLogCard: View {
             let filename = log.photoPath.split(separator: "/").last.map(String.init) ?? log.photoPath
 
             do {
-                let imageData: Data = try await APIClient.shared.get(
+                let imageData: Data = try await APIClient.shared.getData(
                     path: "/api/v1/photos/\(filename)"
                 )
                 if let uiImage = UIImage(data: imageData) {
