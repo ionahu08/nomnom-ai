@@ -73,11 +73,11 @@ Tracker for issues, blockers, decisions, and testing notes during this iteration
 - **Date Found**: 2026-04-06
 - **Severity**: High (broken user experience)
 - **Root Cause**: `APIClient.shared.get()` method designed for JSON responses (uses JSONDecoder). FoodLogCard was attempting to fetch binary photo data using this JSON-expecting method, causing silent failure.
-- **Location**: `FoodLogCard.swift:75` and `APIClient.swift`
+- **Location**: `FoodLogCard.swift` and `APIClient.swift`
 - **Resolution**: 
   1. Added new `getData()` method to APIClient.swift that fetches raw binary data without JSON decoding
   2. Updated FoodLogCard.swift to use `APIClient.shared.getData()` instead of `get()`
-- **Test**: iOS app builds successfully; ready for device testing
+- **Test**: Photo → save → navigate to Today tab → thumbnail displays actual food photo ✅
 
 ## Blockers (Current)
 
