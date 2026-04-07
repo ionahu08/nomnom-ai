@@ -24,7 +24,7 @@ Complete the iOS app's missing pieces: a Settings tab (logout, cat style, macro 
 - SwiftUI MVVM (new screen from scratch)
 - REST API integration in Swift (profile + recommendations endpoints)
 - Bug diagnosis and UX state machine fix
-- Async/await in SwiftUI
+- Async/await in SwiftUI 
 
 ## Success Criteria
 
