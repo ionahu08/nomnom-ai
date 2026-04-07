@@ -27,7 +27,7 @@ class SettingsViewModel: ObservableObject {
     }
 
     func saveProfile() async {
-        guard var profile = profile else {
+        guard let profile = profile else {
             errorMessage = "No profile to save"
             return
         }
