@@ -93,7 +93,7 @@ Tracker for issues, blockers, decisions, and testing notes during this iteration
 - **Root Cause**: Same as above — recommendations endpoint calls get_effective_targets(profile) which fails if profile doesn't exist
 - **Location**: `src/api/recommendations.py:49` and `src/services/auth_service.py`
 - **Resolution**: Fixed by auto-creating default profile on registration (same fix as Issue #9)
-- **Test**: Register new account → Today tab → "What to eat?" button → recommendation displays ✅
+- **Test**: Register new account → Today tab → "What to eat?" button → AI recommendation displays with meal suggestions ✅
 
 ### Issue: Food Correction Button Needs Polish
 - **Date Found**: 2026-04-06
