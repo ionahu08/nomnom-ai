@@ -35,9 +35,10 @@ class APIClient {
         #if targetEnvironment(simulator)
         self.baseURL = baseURL ?? "http://localhost:8000"
         #else
-        self.baseURL = baseURL ?? "https://viewer-set-worm-extended.trycloudflare.com"
+        self.baseURL = baseURL ?? "https://upgrades-defend-values-precious.trycloudflare.com"
         #endif
     }
+
 
     func setToken(_ token: String?) {
         self.token = token
