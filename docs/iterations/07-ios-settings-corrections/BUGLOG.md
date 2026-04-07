@@ -79,6 +79,29 @@ Tracker for issues, blockers, decisions, and testing notes during this iteration
   2. Updated FoodLogCard.swift to use `APIClient.shared.getData()` instead of `get()`
 - **Test**: Photo → save → navigate to Today tab → thumbnail displays actual food photo ✅
 
+### Issue: Settings Tab Returns 404 (Profile Not Found)
+- **Date Found**: 2026-04-06
+- **Severity**: High (blocked user onboarding)
+- **Root Cause**: User profile was not auto-created on registration. GET /api/v1/profile returned 404 because UserProfile didn't exist for new users.
+- **Location**: `src/services/auth_service.py` register_user()
+- **Resolution**: Modified register_user() to auto-create default UserProfile with sensible defaults (age:25, gender:other, height:170cm, weight:70kg, activity:moderate, cat_style:sassy)
+- **Test**: Register new account → Settings tab loads profile ✅
+
+### Issue: Meal Recommendation Returns 404 (Profile Not Found)
+- **Date Found**: 2026-04-06
+- **Severity**: High (feature broken on first login)
+- **Root Cause**: Same as above — recommendations endpoint calls get_effective_targets(profile) which fails if profile doesn't exist
+- **Location**: `src/api/recommendations.py:49` and `src/services/auth_service.py`
+- **Resolution**: Fixed by auto-creating default profile on registration (same fix as Issue #9)
+- **Test**: Register new account → Today tab → "What to eat?" button → recommendation displays ✅
+
+### Issue: Food Correction Button Needs Polish
+- **Date Found**: 2026-04-06
+- **Severity**: Medium (UX)
+- **Status**: Functionally working but UX could be improved
+- **Notes**: "This is wrong" button works correctly but UI flow could be more polished
+- **Next Steps**: Polish the correction modal/flow in a future iteration
+
 ## Blockers (Current)
 
 None at this time.
