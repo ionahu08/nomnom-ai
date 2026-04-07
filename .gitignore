@@ -3,3 +3,10 @@ __pycache__/
 *.pyc
 *.db
 .venv/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Xcode
+*.xcworkspace/xcuserdata/
