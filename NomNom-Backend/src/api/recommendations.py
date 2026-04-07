@@ -14,7 +14,6 @@ from src.schemas.recommendation import MealRecommendationResponse
 from src.services.knowledge_service import get_relevant_nutrition_entries
 from src.services.profile_service import get_effective_targets, get_profile
 from src.services.food_log_service import list_today_logs
-from src.services.ai_service import analyze_food_photo
 from src.llm.router import TaskType, get_route
 from src.llm.prompt_engine import render_recommend_meal_prompt
 from src.llm.client import LLMClient
