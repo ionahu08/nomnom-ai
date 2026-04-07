@@ -35,7 +35,7 @@ class APIClient {
         #if targetEnvironment(simulator)
         self.baseURL = baseURL ?? "http://localhost:8000"
         #else
-        self.baseURL = baseURL ?? "https://loris-spleenish-nonoperatically.ngrok-free.dev"
+        self.baseURL = baseURL ?? "https://viewer-set-worm-extended.trycloudflare.com"
         #endif
     }
 
