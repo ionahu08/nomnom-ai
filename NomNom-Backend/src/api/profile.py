@@ -51,6 +51,7 @@ async def create_user_profile(
 
 
 @router.get("/", response_model=ProfileResponse)
+@router.get("", response_model=ProfileResponse)
 async def get_user_profile(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),

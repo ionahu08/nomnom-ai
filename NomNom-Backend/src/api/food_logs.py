@@ -5,7 +5,7 @@ from src.api.deps import get_current_user
 from src.database import get_db
 from src.llm.cache import SemanticCache
 from src.models.user import User
-from src.schemas.food_log import FoodAnalysisResponse, FoodLogCreate, FoodLogResponse
+from src.schemas.food_log import FoodAnalysisResponse, FoodLogCreate, FoodLogResponse, FoodLogUpdate
 from src.services.ai_service import analyze_food_photo as ai_analyze
 from src.services.food_log_service import create_food_log, delete_food_log, list_today_logs
 from src.services.photo_service import save_photo
@@ -49,7 +49,7 @@ async def save_food_log(
     # Cache the analysis for semantic search (for future similar meals)
     await SemanticCache.cache_analysis(
         db=db,
-        food_description=data.foodName,
+        food_description=data.food_name,
         food_log_id=food_log.id,
     )
 
@@ -69,7 +69,7 @@ async def get_today_logs(
 @router.patch("/{log_id}", response_model=FoodLogResponse)
 async def update_food_log(
     log_id: int,
-    data: FoodLogCreate,
+    data: FoodLogUpdate,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -88,16 +88,9 @@ async def update_food_log(
             detail="Food log not found",
         )
 
-    # Update fields
-    food_log.food_name = data.foodName
-    food_log.calories = data.calories
-    food_log.protein_g = data.proteinG
-    food_log.carbs_g = data.carbsG
-    food_log.fat_g = data.fatG
-    food_log.food_category = data.foodCategory
-    food_log.cuisine_origin = data.cuisineOrigin
-    food_log.cat_roast = data.catRoast
-    food_log.is_user_corrected = True  # Mark as corrected
+    # Update food name and mark as corrected
+    food_log.food_name = data.food_name
+    food_log.is_user_corrected = True
 
     await db.commit()
     await db.refresh(food_log)

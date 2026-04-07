@@ -66,6 +66,11 @@ class FoodLogCreate(BaseModel):
     ai_raw_response: dict | None = None
 
 
+class FoodLogUpdate(BaseModel):
+    """Update a food log (user correction)."""
+    food_name: str
+
+
 class FoodLogResponse(BaseModel):
     """A food log entry returned from the API."""
     id: int
