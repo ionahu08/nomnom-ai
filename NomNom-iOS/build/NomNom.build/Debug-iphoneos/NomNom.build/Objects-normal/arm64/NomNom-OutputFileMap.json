@@ -1,0 +1,219 @@
+{
+  "" : {
+    "diagnostics" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/NomNom-primary.dia",
+    "emit-module-dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/NomNom-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/NomNom-primary-emit-module.dia",
+    "pch" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/NomNom-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/NomNom-primary.swiftdeps"
+  },
+  "/Users/ionahu/sources/NomNom/NomNom-iOS/NomNom/App/ContentView.swift" : {
+    "const-values" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/ContentView.swiftconstvalues",
+    "dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/ContentView.d",
+    "diagnostics" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/ContentView.dia",
+    "index-unit-output-path" : "/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/ContentView.o",
+    "llvm-bc" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/ContentView.bc",
+    "object" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/ContentView.o",
+    "swift-dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/ContentView.swiftdeps",
+    "swiftmodule" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/ContentView~partial.swiftmodule"
+  },
+  "/Users/ionahu/sources/NomNom/NomNom-iOS/NomNom/App/NomNomApp.swift" : {
+    "const-values" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/NomNomApp.swiftconstvalues",
+    "dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/NomNomApp.d",
+    "diagnostics" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/NomNomApp.dia",
+    "index-unit-output-path" : "/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/NomNomApp.o",
+    "llvm-bc" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/NomNomApp.bc",
+    "object" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/NomNomApp.o",
+    "swift-dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/NomNomApp.swiftdeps",
+    "swiftmodule" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/NomNomApp~partial.swiftmodule"
+  },
+  "/Users/ionahu/sources/NomNom/NomNom-iOS/NomNom/Core/Components/FoodLogCard.swift" : {
+    "const-values" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/FoodLogCard.swiftconstvalues",
+    "dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/FoodLogCard.d",
+    "diagnostics" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/FoodLogCard.dia",
+    "index-unit-output-path" : "/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/FoodLogCard.o",
+    "llvm-bc" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/FoodLogCard.bc",
+    "object" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/FoodLogCard.o",
+    "swift-dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/FoodLogCard.swiftdeps",
+    "swiftmodule" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/FoodLogCard~partial.swiftmodule"
+  },
+  "/Users/ionahu/sources/NomNom/NomNom-iOS/NomNom/Core/Components/RoastBubble.swift" : {
+    "const-values" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/RoastBubble.swiftconstvalues",
+    "dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/RoastBubble.d",
+    "diagnostics" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/RoastBubble.dia",
+    "index-unit-output-path" : "/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/RoastBubble.o",
+    "llvm-bc" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/RoastBubble.bc",
+    "object" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/RoastBubble.o",
+    "swift-dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/RoastBubble.swiftdeps",
+    "swiftmodule" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/RoastBubble~partial.swiftmodule"
+  },
+  "/Users/ionahu/sources/NomNom/NomNom-iOS/NomNom/Core/Models/Auth.swift" : {
+    "const-values" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/Auth.swiftconstvalues",
+    "dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/Auth.d",
+    "diagnostics" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/Auth.dia",
+    "index-unit-output-path" : "/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/Auth.o",
+    "llvm-bc" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/Auth.bc",
+    "object" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/Auth.o",
+    "swift-dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/Auth.swiftdeps",
+    "swiftmodule" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/Auth~partial.swiftmodule"
+  },
+  "/Users/ionahu/sources/NomNom/NomNom-iOS/NomNom/Core/Models/FoodLog.swift" : {
+    "const-values" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/FoodLog.swiftconstvalues",
+    "dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/FoodLog.d",
+    "diagnostics" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/FoodLog.dia",
+    "index-unit-output-path" : "/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/FoodLog.o",
+    "llvm-bc" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/FoodLog.bc",
+    "object" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/FoodLog.o",
+    "swift-dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/FoodLog.swiftdeps",
+    "swiftmodule" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/FoodLog~partial.swiftmodule"
+  },
+  "/Users/ionahu/sources/NomNom/NomNom-iOS/NomNom/Core/Models/UserProfile.swift" : {
+    "const-values" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/UserProfile.swiftconstvalues",
+    "dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/UserProfile.d",
+    "diagnostics" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/UserProfile.dia",
+    "index-unit-output-path" : "/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/UserProfile.o",
+    "llvm-bc" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/UserProfile.bc",
+    "object" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/UserProfile.o",
+    "swift-dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/UserProfile.swiftdeps",
+    "swiftmodule" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/UserProfile~partial.swiftmodule"
+  },
+  "/Users/ionahu/sources/NomNom/NomNom-iOS/NomNom/Core/Services/APIClient.swift" : {
+    "const-values" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/APIClient.swiftconstvalues",
+    "dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/APIClient.d",
+    "diagnostics" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/APIClient.dia",
+    "index-unit-output-path" : "/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/APIClient.o",
+    "llvm-bc" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/APIClient.bc",
+    "object" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/APIClient.o",
+    "swift-dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/APIClient.swiftdeps",
+    "swiftmodule" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/APIClient~partial.swiftmodule"
+  },
+  "/Users/ionahu/sources/NomNom/NomNom-iOS/NomNom/Core/Services/AuthService.swift" : {
+    "const-values" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/AuthService.swiftconstvalues",
+    "dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/AuthService.d",
+    "diagnostics" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/AuthService.dia",
+    "index-unit-output-path" : "/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/AuthService.o",
+    "llvm-bc" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/AuthService.bc",
+    "object" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/AuthService.o",
+    "swift-dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/AuthService.swiftdeps",
+    "swiftmodule" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/AuthService~partial.swiftmodule"
+  },
+  "/Users/ionahu/sources/NomNom/NomNom-iOS/NomNom/Core/Services/KeychainService.swift" : {
+    "const-values" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/KeychainService.swiftconstvalues",
+    "dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/KeychainService.d",
+    "diagnostics" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/KeychainService.dia",
+    "index-unit-output-path" : "/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/KeychainService.o",
+    "llvm-bc" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/KeychainService.bc",
+    "object" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/KeychainService.o",
+    "swift-dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/KeychainService.swiftdeps",
+    "swiftmodule" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/KeychainService~partial.swiftmodule"
+  },
+  "/Users/ionahu/sources/NomNom/NomNom-iOS/NomNom/Core/Services/PhotoCaptureService.swift" : {
+    "const-values" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/PhotoCaptureService.swiftconstvalues",
+    "dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/PhotoCaptureService.d",
+    "diagnostics" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/PhotoCaptureService.dia",
+    "index-unit-output-path" : "/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/PhotoCaptureService.o",
+    "llvm-bc" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/PhotoCaptureService.bc",
+    "object" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/PhotoCaptureService.o",
+    "swift-dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/PhotoCaptureService.swiftdeps",
+    "swiftmodule" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/PhotoCaptureService~partial.swiftmodule"
+  },
+  "/Users/ionahu/sources/NomNom/NomNom-iOS/NomNom/Core/Services/ProfileService.swift" : {
+    "const-values" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/ProfileService.swiftconstvalues",
+    "dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/ProfileService.d",
+    "diagnostics" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/ProfileService.dia",
+    "index-unit-output-path" : "/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/ProfileService.o",
+    "llvm-bc" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/ProfileService.bc",
+    "object" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/ProfileService.o",
+    "swift-dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/ProfileService.swiftdeps",
+    "swiftmodule" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/ProfileService~partial.swiftmodule"
+  },
+  "/Users/ionahu/sources/NomNom/NomNom-iOS/NomNom/Core/Services/RecommendationService.swift" : {
+    "const-values" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/RecommendationService.swiftconstvalues",
+    "dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/RecommendationService.d",
+    "diagnostics" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/RecommendationService.dia",
+    "index-unit-output-path" : "/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/RecommendationService.o",
+    "llvm-bc" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/RecommendationService.bc",
+    "object" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/RecommendationService.o",
+    "swift-dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/RecommendationService.swiftdeps",
+    "swiftmodule" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/RecommendationService~partial.swiftmodule"
+  },
+  "/Users/ionahu/sources/NomNom/NomNom-iOS/NomNom/Core/Utilities/NomNomColors.swift" : {
+    "const-values" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/NomNomColors.swiftconstvalues",
+    "dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/NomNomColors.d",
+    "diagnostics" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/NomNomColors.dia",
+    "index-unit-output-path" : "/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/NomNomColors.o",
+    "llvm-bc" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/NomNomColors.bc",
+    "object" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/NomNomColors.o",
+    "swift-dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/NomNomColors.swiftdeps",
+    "swiftmodule" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/NomNomColors~partial.swiftmodule"
+  },
+  "/Users/ionahu/sources/NomNom/NomNom-iOS/NomNom/Features/Camera/CameraView.swift" : {
+    "const-values" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/CameraView.swiftconstvalues",
+    "dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/CameraView.d",
+    "diagnostics" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/CameraView.dia",
+    "index-unit-output-path" : "/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/CameraView.o",
+    "llvm-bc" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/CameraView.bc",
+    "object" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/CameraView.o",
+    "swift-dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/CameraView.swiftdeps",
+    "swiftmodule" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/CameraView~partial.swiftmodule"
+  },
+  "/Users/ionahu/sources/NomNom/NomNom-iOS/NomNom/Features/Camera/CameraViewModel.swift" : {
+    "const-values" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/CameraViewModel.swiftconstvalues",
+    "dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/CameraViewModel.d",
+    "diagnostics" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/CameraViewModel.dia",
+    "index-unit-output-path" : "/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/CameraViewModel.o",
+    "llvm-bc" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/CameraViewModel.bc",
+    "object" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/CameraViewModel.o",
+    "swift-dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/CameraViewModel.swiftdeps",
+    "swiftmodule" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/CameraViewModel~partial.swiftmodule"
+  },
+  "/Users/ionahu/sources/NomNom/NomNom-iOS/NomNom/Features/Dashboard/TodayView.swift" : {
+    "const-values" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/TodayView.swiftconstvalues",
+    "dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/TodayView.d",
+    "diagnostics" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/TodayView.dia",
+    "index-unit-output-path" : "/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/TodayView.o",
+    "llvm-bc" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/TodayView.bc",
+    "object" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/TodayView.o",
+    "swift-dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/TodayView.swiftdeps",
+    "swiftmodule" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/TodayView~partial.swiftmodule"
+  },
+  "/Users/ionahu/sources/NomNom/NomNom-iOS/NomNom/Features/Dashboard/TodayViewModel.swift" : {
+    "const-values" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/TodayViewModel.swiftconstvalues",
+    "dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/TodayViewModel.d",
+    "diagnostics" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/TodayViewModel.dia",
+    "index-unit-output-path" : "/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/TodayViewModel.o",
+    "llvm-bc" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/TodayViewModel.bc",
+    "object" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/TodayViewModel.o",
+    "swift-dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/TodayViewModel.swiftdeps",
+    "swiftmodule" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/TodayViewModel~partial.swiftmodule"
+  },
+  "/Users/ionahu/sources/NomNom/NomNom-iOS/NomNom/Features/Settings/LoginView.swift" : {
+    "const-values" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/LoginView.swiftconstvalues",
+    "dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/LoginView.d",
+    "diagnostics" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/LoginView.dia",
+    "index-unit-output-path" : "/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/LoginView.o",
+    "llvm-bc" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/LoginView.bc",
+    "object" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/LoginView.o",
+    "swift-dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/LoginView.swiftdeps",
+    "swiftmodule" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/LoginView~partial.swiftmodule"
+  },
+  "/Users/ionahu/sources/NomNom/NomNom-iOS/NomNom/Features/Settings/SettingsView.swift" : {
+    "const-values" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/SettingsView.swiftconstvalues",
+    "dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/SettingsView.d",
+    "diagnostics" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/SettingsView.dia",
+    "index-unit-output-path" : "/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/SettingsView.o",
+    "llvm-bc" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/SettingsView.bc",
+    "object" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/SettingsView.o",
+    "swift-dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/SettingsView.swiftdeps",
+    "swiftmodule" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/SettingsView~partial.swiftmodule"
+  },
+  "/Users/ionahu/sources/NomNom/NomNom-iOS/NomNom/Features/Settings/SettingsViewModel.swift" : {
+    "const-values" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/SettingsViewModel.swiftconstvalues",
+    "dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/SettingsViewModel.d",
+    "diagnostics" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/SettingsViewModel.dia",
+    "index-unit-output-path" : "/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/SettingsViewModel.o",
+    "llvm-bc" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/SettingsViewModel.bc",
+    "object" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/SettingsViewModel.o",
+    "swift-dependencies" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/SettingsViewModel.swiftdeps",
+    "swiftmodule" : "/Users/ionahu/sources/NomNom/NomNom-iOS/build/NomNom.build/Debug-iphoneos/NomNom.build/Objects-normal/arm64/SettingsViewModel~partial.swiftmodule"
+  }
+}

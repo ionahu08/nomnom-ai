@@ -80,6 +80,10 @@ struct FoodLogCard: View {
                         self.photoImage = uiImage
                         self.isLoadingPhoto = false
                     }
+                } else {
+                    await MainActor.run {
+                        self.isLoadingPhoto = false
+                    }
                 }
             } catch {
                 await MainActor.run {
