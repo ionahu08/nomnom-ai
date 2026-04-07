@@ -102,7 +102,7 @@ struct SettingsView: View {
                 // Account Section
                 Section("Account") {
                     Button(role: .destructive) {
-                        viewModel.logout()
+                        authService.logout()
                     } label: {
                         HStack {
                             Image(systemName: "arrowtriangleright.turn.counterclockwise")
