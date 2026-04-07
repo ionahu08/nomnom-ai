@@ -7,3 +7,9 @@ uploads/*
 .venv/
 .ruff_cache/
 .pytest_cache/
+
+# Python test artifacts
+tests/__pycache__/
+tests/**/__pycache__/
+.pytest_cache/
+.coverage
