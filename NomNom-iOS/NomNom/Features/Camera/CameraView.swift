@@ -123,19 +123,6 @@ struct CameraView: View {
                 .cornerRadius(16)
                 .padding(.horizontal, 16)
 
-                // Meal type picker (before save)
-                if !viewModel.savedSuccessfully {
-                    Picker("Meal Type", selection: $viewModel.selectedMealType) {
-                        Text("Breakfast").tag("breakfast")
-                        Text("Lunch").tag("lunch")
-                        Text("Dinner").tag("dinner")
-                        Text("Snack").tag("snack")
-                    }
-                    .pickerStyle(.segmented)
-                    .padding(.horizontal, 16)
-                    .padding(.top, 16)
-                }
-
                 // Saved status (after save)
                 if viewModel.savedSuccessfully {
                     HStack(spacing: 8) {
