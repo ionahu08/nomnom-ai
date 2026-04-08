@@ -3,11 +3,21 @@ import SwiftUI
 struct DiaryView: View {
     @StateObject private var viewModel = DiaryViewModel()
     @State private var displayedMonth: Date = Date()
+    @State private var showYearPicker = false
+    @State private var swipeDirection: Edge = .trailing
 
     var body: some View {
         NavigationStack {
             ZStack {
-                NomNomColors.background.ignoresSafeArea()
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.09, green: 0.07, blue: 0.13),
+                        Color(red: 0.14, green: 0.09, blue: 0.07),
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
 
                 VStack(spacing: 0) {
                     // Error banner
@@ -34,7 +44,10 @@ struct DiaryView: View {
                         VStack(spacing: 16) {
                             // Month/year navigation header
                             HStack {
-                                Button(action: { goToPreviousMonth() }) {
+                                Button(action: { withAnimation(.easeInOut(duration: 0.3)) {
+                                    swipeDirection = .trailing
+                                    goToPreviousMonth()
+                                }}) {
                                     Image(systemName: "chevron.left")
                                         .foregroundColor(NomNomColors.primary)
                                         .font(.system(size: 16, weight: .semibold))
@@ -42,13 +55,23 @@ struct DiaryView: View {
 
                                 Spacer()
 
-                                Text(formatMonthYear(displayedMonth))
-                                    .font(.headline)
-                                    .foregroundColor(NomNomColors.textPrimary)
+                                Button(action: { showYearPicker = true }) {
+                                    HStack(spacing: 4) {
+                                        Text(formatMonthYear(displayedMonth))
+                                            .font(.headline.weight(.semibold))
+                                            .foregroundColor(NomNomColors.textPrimary)
+                                        Image(systemName: "chevron.down.circle.fill")
+                                            .font(.caption)
+                                            .foregroundColor(NomNomColors.primary)
+                                    }
+                                }
 
                                 Spacer()
 
-                                Button(action: { goToNextMonth() }) {
+                                Button(action: { withAnimation(.easeInOut(duration: 0.3)) {
+                                    swipeDirection = .leading
+                                    goToNextMonth()
+                                }}) {
                                     Image(systemName: "chevron.right")
                                         .foregroundColor(NomNomColors.primary)
                                         .font(.system(size: 16, weight: .semibold))
@@ -73,6 +96,28 @@ struct DiaryView: View {
                                         }
                                     }
                                 )
+                                .id(displayedMonth)
+                                .transition(.asymmetric(
+                                    insertion: .move(edge: swipeDirection),
+                                    removal: .move(edge: swipeDirection == .trailing ? .leading : .trailing)
+                                ))
+                                .gesture(
+                                    DragGesture(minimumDistance: 40, coordinateSpace: .local)
+                                        .onEnded { value in
+                                            let h = value.translation.width
+                                            let v = value.translation.height
+                                            guard abs(h) > abs(v) else { return }
+                                            withAnimation(.easeInOut(duration: 0.3)) {
+                                                if h < 0 {
+                                                    swipeDirection = .leading
+                                                    goToNextMonth()
+                                                } else {
+                                                    swipeDirection = .trailing
+                                                    goToPreviousMonth()
+                                                }
+                                            }
+                                        }
+                                )
                                 .padding(.horizontal, 16)
                             }
 
@@ -86,9 +131,22 @@ struct DiaryView: View {
                     }
                 }
             }
-            .navigationTitle("Food Diary")
+            .navigationTitle("🐾 Food Diary")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
+            .sheet(isPresented: $showYearPicker) {
+                YearPickerSheet(
+                    selectedYear: Calendar.current.component(.year, from: displayedMonth),
+                    onSelect: { year in
+                        var comps = Calendar.current.dateComponents([.year, .month], from: displayedMonth)
+                        comps.year = year
+                        displayedMonth = Calendar.current.date(from: comps) ?? displayedMonth
+                        showYearPicker = false
+                    }
+                )
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+            }
             .task {
                 // Initialize displayedMonth to current month
                 let calendar = Calendar.current
@@ -120,22 +178,32 @@ struct DiaryView: View {
     private var logsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Date header
-            Text(formatDateDisplay(viewModel.selectedDate))
-                .font(.headline)
-                .foregroundColor(NomNomColors.textPrimary)
-                .padding(.horizontal, 16)
+            HStack(spacing: 6) {
+                Image(systemName: "pawprint.fill")
+                    .foregroundColor(NomNomColors.primary)
+                    .font(.caption)
+                Text(formatDateDisplay(viewModel.selectedDate))
+                    .font(.headline)
+                    .foregroundColor(NomNomColors.textPrimary)
+            }
+            .padding(.horizontal, 16)
 
             if viewModel.isLoadingLogs {
                 ProgressView()
                     .tint(NomNomColors.primary)
             } else if viewModel.logsForSelectedDate.isEmpty {
-                VStack(spacing: 8) {
-                    Text("No food logged")
-                        .font(.subheadline)
+                VStack(spacing: 10) {
+                    Text("🐱")
+                        .font(.system(size: 44))
+                    Text("Nothing here yet")
+                        .font(.subheadline.weight(.medium))
                         .foregroundColor(NomNomColors.textSecondary)
+                    Text("The cat is judging your restraint")
+                        .font(.caption)
+                        .foregroundColor(NomNomColors.textSecondary.opacity(0.6))
                 }
                 .frame(maxWidth: .infinity)
-                .padding()
+                .padding(.vertical, 24)
             } else {
                 // Summary card
                 todaySummary
@@ -238,15 +306,21 @@ struct MonthCalendarView: View {
 
     var body: some View {
         let calendar = Calendar.current
-        let monthName = formatMonthYear(month)
         let daysInMonth = calendar.range(of: .day, in: .month, for: month)?.count ?? 0
         let firstDay = calendar.date(from: calendar.dateComponents([.year, .month], from: month))!
         let firstWeekday = calendar.component(.weekday, from: firstDay) - 1 // 0=Sunday
 
-        return VStack(alignment: .leading, spacing: 12) {
-            Text(monthName)
-                .font(.headline)
-                .foregroundColor(NomNomColors.textPrimary)
+        return VStack(alignment: .leading, spacing: 16) {
+            // Weekday headers
+            let weekdays = ["S", "M", "T", "W", "T", "F", "S"]
+            HStack {
+                ForEach(Array(weekdays.enumerated()), id: \.offset) { _, label in
+                    Text(label)
+                        .font(.caption2.weight(.semibold))
+                        .foregroundColor(NomNomColors.textSecondary)
+                        .frame(maxWidth: .infinity)
+                }
+            }
 
             // 7-column grid
             let columns = Array(repeating: GridItem(.flexible()), count: 7)
@@ -270,8 +344,11 @@ struct MonthCalendarView: View {
             }
         }
         .padding()
-        .background(NomNomColors.surface)
-        .cornerRadius(12)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color(red: 0.14, green: 0.11, blue: 0.18))
+                .shadow(color: NomNomColors.primary.opacity(0.12), radius: 14, x: 0, y: 4)
+        )
     }
 
     private func formatMonthYear(_ date: Date) -> String {
@@ -315,8 +392,15 @@ struct DayCell: View {
             }
             .frame(maxWidth: .infinity)
             .frame(height: 60)
-            .background(isSelected ? NomNomColors.primary : NomNomColors.background)
-            .cornerRadius(8)
+            .background(
+                isSelected
+                    ? AnyView(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(NomNomColors.primary)
+                            .shadow(color: NomNomColors.primary.opacity(0.5), radius: 6)
+                      )
+                    : AnyView(Color.clear)
+            )
         }
     }
 
@@ -389,5 +473,46 @@ struct AsyncPhotoThumbnail: View {
         }
 
         isLoading = false
+    }
+}
+
+// MARK: - Year Picker Sheet
+
+struct YearPickerSheet: View {
+    let selectedYear: Int
+    let onSelect: (Int) -> Void
+
+    var years: [Int] { Array((2026...Calendar.current.component(.year, from: Date())).reversed()) }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Text("🐾 Select Year")
+                .font(.headline)
+                .foregroundColor(NomNomColors.textPrimary)
+                .padding()
+            Divider().background(NomNomColors.textSecondary.opacity(0.3))
+            ScrollView {
+                VStack(spacing: 0) {
+                    ForEach(years, id: \.self) { year in
+                        Button(action: { onSelect(year) }) {
+                            HStack {
+                                Text(String(year))
+                                    .font(.title3.weight(year == selectedYear ? .bold : .regular))
+                                    .foregroundColor(year == selectedYear ? NomNomColors.primary : NomNomColors.textPrimary)
+                                Spacer()
+                                if year == selectedYear {
+                                    Image(systemName: "pawprint.fill")
+                                        .foregroundColor(NomNomColors.primary)
+                                }
+                            }
+                            .padding(.horizontal, 24)
+                            .padding(.vertical, 14)
+                        }
+                        Divider().background(NomNomColors.textSecondary.opacity(0.1))
+                    }
+                }
+            }
+        }
+        .background(NomNomColors.background.ignoresSafeArea())
     }
 }
