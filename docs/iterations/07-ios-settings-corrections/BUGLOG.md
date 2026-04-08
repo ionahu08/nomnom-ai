@@ -110,6 +110,20 @@ Tracker for issues, blockers, decisions, and testing notes during this iteration
 - **Notes**: "This is wrong" button works correctly but UI flow could be more polished
 - **Next Steps**: Polish the correction modal/flow in a future iteration
 
+## Infrastructure & Lessons Learned
+
+### Cloudflare Tunnel Ephemeral URLs Problem
+- **Issue**: Cloudflare's free tunnel generates new random URLs each restart
+- **Impact**: iOS app hardcoded URL becomes invalid → "server not found" errors
+- **Solution Used**: Update APIClient.swift with new URL and rebuild app each time tunnel restarts
+- **Better Solution**: Use ngrok with a claimed static domain (see teacher's DEPLOYMENT.md pattern) or pay for persistent Cloudflare domain
+- **Lesson**: For device testing, **always claim a persistent/static domain** rather than relying on ephemeral URLs
+
+### ngrok Bandwidth Limits
+- **Issue**: ngrok free tier hit monthly bandwidth limit (ERR_NGROK_725)
+- **Workaround**: Switched to Cloudflare Tunnel (no bandwidth limits)
+- **Better Solution**: Create ngrok account, claim static domain at https://dashboard.ngrok.com/domains, use same domain every restart (teacher's approach in Nexora-Backend/docs/DEPLOYMENT.md)
+
 ## Blockers (Current)
 
 None at this time.
