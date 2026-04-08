@@ -1,26 +1,27 @@
-# BUGLOG — Iteration 08: Meal Categorization
+# BUGLOG — Iteration 08: Meal Categorization (Simplified)
 
 Tracker for issues, blockers, decisions, and testing notes during this iteration.
 
+**Status**: COMPLETE ✅ — Feature implemented then **simplified** based on user feedback. Meal categorization removed from UI; timestamps added instead.
+
 ## Critical Issues
 
-None — implementation complete and tested.
+None.
 
 ## Known Limitations
 
-| Limitation | Impact | Workaround | Priority |
-|------------|--------|-----------|----------|
-| Meal type optional (not required) | Users can skip picking | Default to "breakfast" if not provided | Low |
-| Can't change meal type after save | Correction modal doesn't show picker (only food_name) | PATCH supports meal_type now — could add UI in future | Low |
-| No meal type suggestions | User must manually pick every time | Could be inferred from time-of-day | Low |
-| TodayView grouping is client-side | No server-side grouping | Client groups logs after fetch | N/A |
+| Limitation | Impact | Status |
+|------------|--------|--------|
+| meal_type column unused | Takes up space, no functionality | By design — kept for future use, zero impact |
+| No meal time auto-detection | If feature re-added later, would need to implement | Acceptable for MVP |
 
 ## Implementation Notes
 
-- Migration adds `meal_type` as nullable String(20) to allow backward compatibility
-- Defaults to "breakfast" in CameraViewModel UI, but null is accepted in API (falls under "Other" in UI)
-- Service layer uses `model_dump()` so meal_type flows automatically
-- No breaking changes: existing logs have meal_type=NULL, still displayable
+- Migration adds `meal_type` as nullable String(20) — harmless, backward compatible
+- Service layer uses `model_dump()` so meal_type flows automatically (unused)
+- Timestamp parsing: ISO8601 → user-friendly "HH:MM AM/PM" format
+- formatTime() helper added to TodayView for display
+- No breaking changes: existing logs unaffected
 
 ## Blockers
 
@@ -28,33 +29,41 @@ None at this time.
 
 ## Decisions Made
 
+### Decision: Remove Meal Categorization from UI (Mid-Iteration Pivot) ⭐
+
+**Context**: Initial design included meal type picker and grouping logic. After building, user raised concern: "Do users really care about meal categories (breakfast/lunch/etc)?"
+
+**Options Considered**:
+1. Keep picker (already built)
+2. Auto-detect meal time (6-11am = breakfast) — zero friction
+3. **Remove entirely, show timestamps instead — simplest** ✓ CHOSEN
+
+**Rationale**:
+- Picker adds friction: user must tap + choose on every food entry
+- Grouping is nice UI but doesn't solve a problem users complained about
+- No user asked for this feature (built because it "seemed good to have")
+- Adding timestamp to each log is more useful context
+- Simpler > fancier
+
+**What Changed**:
+- ❌ Removed segmented picker from CameraView
+- ❌ Removed meal category grouping from TodayView  
+- ❌ Removed selectedMealType state from CameraViewModel
+- ✅ Added timestamp display (ISO8601 → "12:30 PM" format)
+
+**What Stayed**:
+- ✅ Database column meal_type (harmless, backward compatible)
+- ✅ Schemas support meal_type (optional field, unused)
+- If users ask for this later, it's easy to re-add
+
+**Lesson**: Iterate fast, remove features early if they don't solve real problems. Better to ship simple than feature-rich without user validation.
+
 ### Decision: meal_type is optional (nullable)
 
 **Context**: Should meal_type be required at save or optional?
-**Chosen**: Optional (nullable), with default "breakfast" in iOS
-**Rationale**: Backward compatibility, users can skip picking if they want, reduces friction for MVP
-**Impact**: Logs without meal_type show under "Other" section
-
-### Decision: Four meal categories only
-
-**Context**: What categories to support? (Breakfast, lunch, dinner, snack, custom names, etc.)
-**Chosen**: 4 fixed categories (breakfast, lunch, dinner, snack)
-**Rationale**: Simple, covers 95% of use cases, no custom text entry complexity
-**Impact**: Users pick from dropdown, not free text
-
-### Decision: Use segmented picker in Camera view
-
-**Context**: Where should user pick meal type? Before save? After analysis? As popup?
-**Chosen**: Segmented picker between food info card and Save/Retake buttons
-**Rationale**: Prominent, not intrusive, user sees all 4 options at once
-**Impact**: UI takes 1 line, easy to change
-
-### Decision: Group by meal type in TodayView
-
-**Context**: How to display grouped logs? Sections with headers? Tabs? Filter buttons?
-**Chosen**: Sections with headers (Breakfast / Lunch / Dinner / Snack / Other)
-**Rationale**: SwiftUI List + Section pattern is native, clean visual hierarchy
-**Impact**: No major refactor needed, logs flow naturally
+**Chosen**: Optional (nullable)
+**Rationale**: Backward compatibility, unused field takes no space
+**Impact**: Logs have meal_type=NULL, don't affect display
 
 ---
 
@@ -84,16 +93,19 @@ None at this time.
   - All 8 modified files compile without errors or warnings
   - Build succeeded in Release/Debug modes
 
-### Manual Testing (iPhone Device/Simulator)
+### Manual Testing (iPhone Device/Simulator) — UPDATED
 
 - [ ] Open Camera tab, take photo
-- [ ] Analyze result, see segmented picker with 4 options (Breakfast/Lunch/Dinner/Snack)
-- [ ] Tap different meal types, verify state updates
-- [ ] Tap "Save", verify food log saved with correct meal_type
-- [ ] Go to Today tab, verify logs grouped under appropriate section headers
-- [ ] Test logs without explicit meal_type selection (default to "breakfast")
-- [ ] Verify daily summary still shows aggregate macros across all meals
-- [ ] Delete logs from different categories, verify sections disappear
+- [ ] Analyze result, **NO picker** (meal type removed)
+- [ ] Tap "Save", verify food log saved (meal_type=null)
+- [ ] Go to Today tab, verify logs shown **chronologically** (newest first)
+- [ ] **Verify each log shows timestamp** (e.g., "12:30 PM" above food name)
+- [ ] Verify daily summary still shows aggregate macros
+- [ ] Delete logs, verify list updates
+
+### Previous Tests (No Longer Applicable)
+- ~~Segmented picker with 4 options~~ (removed)
+- ~~Logs grouped by meal category~~ (removed, back to chronological)
 
 ---
 
@@ -103,11 +115,13 @@ None at this time.
 2. ✅ Update backend schemas + service (complete)
 3. ✅ Update iOS models (complete)
 4. ✅ Add meal picker to CameraView (complete)
-5. ✅ Update TodayView to group logs (complete)
+5. ✅ **Remove meal picker + add timestamps** (complete — mid-iteration pivot)
 6. 🚧 **Manual testing on device** (pending user execution)
+   - Verify timestamps display correctly
+   - Verify chronological ordering
 7. Create SUMMARY.md at iteration end (pending completion)
 
 ---
 
-**Last Updated**: 2026-04-08 12:40  
-**Status**: Implementation Complete ✅ (Ready for Device Testing)
+**Last Updated**: 2026-04-08 12:55  
+**Status**: Simplified & Complete ✅ (Meal categorization removed, timestamps added)
