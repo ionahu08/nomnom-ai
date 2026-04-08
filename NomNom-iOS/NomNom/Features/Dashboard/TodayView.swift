@@ -83,17 +83,55 @@ struct TodayView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 8)
 
-                // Food log cards
-                ForEach(viewModel.logs) { log in
-                    FoodLogCard(log: log)
-                        .padding(.horizontal, 16)
-                        .swipeActions(edge: .trailing) {
-                            Button(role: .destructive) {
-                                Task { await viewModel.deleteLog(id: log.id) }
-                            } label: {
-                                Label("Delete", systemImage: "trash")
+                // Food log cards grouped by meal type
+                let mealOrder = ["breakfast", "lunch", "dinner", "snack"]
+                let grouped = Dictionary(grouping: viewModel.logs, by: { $0.mealType?.lowercased() ?? "other" })
+
+                ForEach(mealOrder, id: \.self) { mealType in
+                    if let logsForMeal = grouped[mealType], !logsForMeal.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(mealType.capitalized)
+                                .font(.headline)
+                                .foregroundColor(NomNomColors.textPrimary)
+                                .padding(.horizontal, 16)
+
+                            ForEach(logsForMeal) { log in
+                                FoodLogCard(log: log)
+                                    .padding(.horizontal, 16)
+                                    .swipeActions(edge: .trailing) {
+                                        Button(role: .destructive) {
+                                            Task { await viewModel.deleteLog(id: log.id) }
+                                        } label: {
+                                            Label("Delete", systemImage: "trash")
+                                        }
+                                    }
                             }
                         }
+                        .padding(.top, 8)
+                    }
+                }
+
+                // Show uncategorized logs at the bottom
+                if let others = grouped["other"], !others.isEmpty {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Other")
+                            .font(.headline)
+                            .foregroundColor(NomNomColors.textPrimary)
+                            .padding(.horizontal, 16)
+
+                        ForEach(others) { log in
+                            FoodLogCard(log: log)
+                                .padding(.horizontal, 16)
+                                .swipeActions(edge: .trailing) {
+                                    Button(role: .destructive) {
+                                        Task { await viewModel.deleteLog(id: log.id) }
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
+                                    }
+                                }
+                        }
+                    }
+                    .padding(.top, 8)
                 }
             }
             .padding(.bottom, 16)

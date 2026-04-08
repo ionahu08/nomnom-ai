@@ -12,6 +12,7 @@ class CameraViewModel: ObservableObject {
     @Published var savedSuccessfully = false
     @Published var showCorrectModal = false
     @Published var correctedFoodName = ""
+    @Published var selectedMealType: String = "breakfast"
     @Published var savedFoodLogId: Int?
 
     private let api = APIClient.shared
@@ -51,7 +52,8 @@ class CameraViewModel: ObservableObject {
                 fatG: analysis.fatG,
                 foodCategory: analysis.foodCategory,
                 cuisineOrigin: analysis.cuisineOrigin,
-                catRoast: analysis.catRoast
+                catRoast: analysis.catRoast,
+                mealType: selectedMealType
             )
 
             let response: FoodLogResponse = try await api.post(
@@ -109,6 +111,7 @@ class CameraViewModel: ObservableObject {
         savedSuccessfully = false
         showCorrectModal = false
         correctedFoodName = ""
+        selectedMealType = "breakfast"
         savedFoodLogId = nil
     }
 }

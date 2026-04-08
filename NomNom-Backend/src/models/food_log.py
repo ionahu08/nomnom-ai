@@ -30,6 +30,9 @@ class FoodLog(Base):
     # Cat roast
     cat_roast: Mapped[str] = mapped_column(Text)
 
+    # Meal type (breakfast, lunch, dinner, snack)
+    meal_type: Mapped[str | None] = mapped_column(String(20), nullable=True)
+
     # Raw AI response for debugging
     ai_raw_response: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 

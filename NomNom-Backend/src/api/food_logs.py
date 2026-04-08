@@ -92,6 +92,10 @@ async def update_food_log(
     food_log.food_name = data.food_name
     food_log.is_user_corrected = True
 
+    # Update meal type if provided
+    if data.meal_type is not None:
+        food_log.meal_type = data.meal_type
+
     await db.commit()
     await db.refresh(food_log)
 

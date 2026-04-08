@@ -63,12 +63,14 @@ class FoodLogCreate(BaseModel):
     food_category: str | None = None
     cuisine_origin: str | None = None
     cat_roast: str
+    meal_type: str | None = None
     ai_raw_response: dict | None = None
 
 
 class FoodLogUpdate(BaseModel):
     """Update a food log (user correction)."""
     food_name: str
+    meal_type: str | None = None
 
 
 class FoodLogResponse(BaseModel):
@@ -84,6 +86,7 @@ class FoodLogResponse(BaseModel):
     food_category: str | None
     cuisine_origin: str | None
     cat_roast: str
+    meal_type: str | None
     is_user_corrected: bool
     logged_at: datetime
     created_at: datetime

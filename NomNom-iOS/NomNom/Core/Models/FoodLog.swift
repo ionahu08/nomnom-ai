@@ -34,6 +34,7 @@ struct FoodLogCreate: Codable {
     let foodCategory: String?
     let cuisineOrigin: String?
     let catRoast: String
+    let mealType: String?
 
     enum CodingKeys: String, CodingKey {
         case photoPath = "photo_path"
@@ -45,6 +46,7 @@ struct FoodLogCreate: Codable {
         case foodCategory = "food_category"
         case cuisineOrigin = "cuisine_origin"
         case catRoast = "cat_roast"
+        case mealType = "meal_type"
     }
 }
 
@@ -60,6 +62,7 @@ struct FoodLogResponse: Codable, Identifiable {
     let foodCategory: String?
     let cuisineOrigin: String?
     let catRoast: String
+    let mealType: String?
     let isUserCorrected: Bool
     let loggedAt: String
     let createdAt: String
@@ -76,6 +79,7 @@ struct FoodLogResponse: Codable, Identifiable {
         case foodCategory = "food_category"
         case cuisineOrigin = "cuisine_origin"
         case catRoast = "cat_roast"
+        case mealType = "meal_type"
         case isUserCorrected = "is_user_corrected"
         case loggedAt = "logged_at"
         case createdAt = "created_at"
