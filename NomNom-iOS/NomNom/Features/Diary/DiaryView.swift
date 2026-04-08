@@ -2,13 +2,14 @@ import SwiftUI
 
 struct DiaryView: View {
     @StateObject private var viewModel = DiaryViewModel()
+    @State private var displayedMonth: Date = Date()
 
     var body: some View {
         NavigationStack {
             ZStack {
                 NomNomColors.background.ignoresSafeArea()
 
-                VStack {
+                VStack(spacing: 0) {
                     // Error banner
                     if let error = viewModel.errorMessage {
                         HStack {
@@ -29,29 +30,59 @@ struct DiaryView: View {
                         .padding(16)
                     }
 
-                    ScrollViewReader { proxy in
-                        ScrollView {
-                            VStack(spacing: 24) {
-                                // Calendar months
-                                if viewModel.isLoadingCalendar {
-                                    ProgressView()
-                                        .tint(NomNomColors.primary)
-                                } else {
-                                    calendarMonths
+                    ScrollView {
+                        VStack(spacing: 16) {
+                            // Month/year navigation header
+                            HStack {
+                                Button(action: { goToPreviousMonth() }) {
+                                    Image(systemName: "chevron.left")
+                                        .foregroundColor(NomNomColors.primary)
+                                        .font(.system(size: 16, weight: .semibold))
                                 }
 
-                                Divider()
-                                    .padding(.vertical, 16)
+                                Spacer()
 
-                                // Logs for selected date
-                                logsSection
+                                Text(formatMonthYear(displayedMonth))
+                                    .font(.headline)
+                                    .foregroundColor(NomNomColors.textPrimary)
+
+                                Spacer()
+
+                                Button(action: { goToNextMonth() }) {
+                                    Image(systemName: "chevron.right")
+                                        .foregroundColor(NomNomColors.primary)
+                                        .font(.system(size: 16, weight: .semibold))
+                                }
                             }
-                            .padding(.vertical, 16)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
+
+                            // Calendar for current month
+                            if viewModel.isLoadingCalendar {
+                                ProgressView()
+                                    .tint(NomNomColors.primary)
+                            } else {
+                                MonthCalendarView(
+                                    month: displayedMonth,
+                                    summary: viewModel.calendarSummary,
+                                    selectedDate: viewModel.selectedDate,
+                                    onDateTap: { date in
+                                        viewModel.selectedDate = date
+                                        Task {
+                                            await viewModel.loadLogs(for: date)
+                                        }
+                                    }
+                                )
+                                .padding(.horizontal, 16)
+                            }
+
+                            Divider()
+                                .padding(.vertical, 16)
+
+                            // Logs for selected date
+                            logsSection
                         }
-                        .onAppear {
-                            // Jump to selected date on load
-                            proxy.scrollTo(viewModel.selectedDate, anchor: .top)
-                        }
+                        .padding(.vertical, 16)
                     }
                 }
             }
@@ -59,51 +90,27 @@ struct DiaryView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .task {
+                // Initialize displayedMonth to current month
+                let calendar = Calendar.current
+                let now = Date()
+                let components = calendar.dateComponents([.year, .month], from: now)
+                displayedMonth = calendar.date(from: DateComponents(year: components.year, month: components.month, day: 1)) ?? now
+
                 await viewModel.loadCalendarSummary()
             }
         }
     }
 
-    // MARK: - Calendar Months
+    // MARK: - Month Navigation
 
-    private var calendarMonths: some View {
+    private func goToPreviousMonth() {
         let calendar = Calendar.current
-        let startDate = calendar.date(from: DateComponents(year: 2026, month: 1, day: 1))!
+        displayedMonth = calendar.date(byAdding: .month, value: -1, to: displayedMonth) ?? displayedMonth
+    }
 
-        let now = Date()
-        let endComponents = calendar.dateComponents([.year, .month], from: now)
-        var nextMonthComponents = endComponents
-        nextMonthComponents.month! += 1
-        if nextMonthComponents.month! > 12 {
-            nextMonthComponents.month! = 1
-            nextMonthComponents.year! += 1
-        }
-        nextMonthComponents.day = 1
-        let endDate = calendar.date(from: nextMonthComponents)!
-
-        var months: [Date] = []
-        var currentMonth = startDate
-        while currentMonth < endDate {
-            months.append(currentMonth)
-            currentMonth = calendar.date(byAdding: .month, value: 1, to: currentMonth)!
-        }
-
-        return VStack(spacing: 24) {
-            ForEach(months, id: \.self) { month in
-                MonthCalendarView(
-                    month: month,
-                    summary: viewModel.calendarSummary,
-                    selectedDate: viewModel.selectedDate,
-                    onDateTap: { date in
-                        viewModel.selectedDate = date
-                        Task {
-                            await viewModel.loadLogs(for: date)
-                        }
-                    }
-                )
-            }
-        }
-        .padding(.horizontal, 16)
+    private func goToNextMonth() {
+        let calendar = Calendar.current
+        displayedMonth = calendar.date(byAdding: .month, value: 1, to: displayedMonth) ?? displayedMonth
     }
 
     // MARK: - Logs Section
@@ -199,6 +206,12 @@ struct DiaryView: View {
     private func formatDateDisplay(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMMM d, yyyy"
+        return formatter.string(from: date)
+    }
+
+    private func formatMonthYear(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM yyyy"
         return formatter.string(from: date)
     }
 
