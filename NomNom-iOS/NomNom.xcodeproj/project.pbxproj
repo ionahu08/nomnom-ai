@@ -11,8 +11,6 @@
 		147AE434D01C00E345306087 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8932008FDA1112B4BE6827 /* KeychainService.swift */; };
 		18C72A332416F664C095BC25 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1101E50AE81FF3822EC4376A /* ContentView.swift */; };
 		1D50A47A3D22AF760757A139 /* FoodLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4CCD1699B41931BB7C95E2 /* FoodLog.swift */; };
-		21EF5829DF01EE2D3DC299E6 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF03334B9010CF5624F63B2 /* TodayView.swift */; };
-		23B0C2B7A26106EB78BAB16D /* TodayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F714A14E6B955D044C020667 /* TodayViewModel.swift */; };
 		280CA48C4D0756E267B96E43 /* FoodLogCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BCEEBF8D63B932F4B168638 /* FoodLogCard.swift */; };
 		4F52FC88CFEE5C6A2CD1B9C8 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B248A228CFDFB4F0FB9209CD /* AuthService.swift */; };
 		60AE8A81261325AD853B9669 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520DF7F015C57A53F3A6AE05 /* APIClient.swift */; };
@@ -55,12 +53,10 @@
 		67B214C6A5B1BF471C587B98 /* PhotoCaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCaptureService.swift; sourceTree = "<group>"; };
 		6D26F5B9F96D66F9A2AFEEDE /* NomNomTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NomNomTests.swift; sourceTree = "<group>"; };
 		6E8932008FDA1112B4BE6827 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
-		7BF03334B9010CF5624F63B2 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		9BCEEBF8D63B932F4B168638 /* FoodLogCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodLogCard.swift; sourceTree = "<group>"; };
 		B248A228CFDFB4F0FB9209CD /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
 		D6284B197EC3012AB4575CA3 /* NomNomTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = text; name = NomNomTests.xctest; path = .xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F510BF00E85B48A6FFD157B8 /* NomNomColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NomNomColors.swift; sourceTree = "<group>"; };
-		F714A14E6B955D044C020667 /* TodayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewModel.swift; sourceTree = "<group>"; };
 		6D26837FC7D83641EEC9EFD3 /* ProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileService.swift; sourceTree = "<group>"; };
 		83D5B31BF8156883AE1956E6 /* RecommendationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommendationService.swift; sourceTree = "<group>"; };
 		5CD7B27D4625A4DA31EC1B1F /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
@@ -128,8 +124,6 @@
 		8BE327E363C924DBF64045B2 /* Dashboard */ = {
 			isa = PBXGroup;
 			children = (
-				7BF03334B9010CF5624F63B2 /* TodayView.swift */,
-				F714A14E6B955D044C020667 /* TodayViewModel.swift */,
 			);
 			path = Dashboard;
 			sourceTree = "<group>";
@@ -300,8 +294,6 @@
 				B445B4E8FBB2C1C814866CDA /* RoastBubble.swift in Sources */,
 				B1D9B86DC9961F40303BF540 /* SettingsView.swift in Sources */,
 				329C8A2AEFFFCA650447916E /* SettingsViewModel.swift in Sources */,
-				21EF5829DF01EE2D3DC299E6 /* TodayView.swift in Sources */,
-				23B0C2B7A26106EB78BAB16D /* TodayViewModel.swift in Sources */,
 				3160700177D3BE045FD55315 /* UserProfile.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
