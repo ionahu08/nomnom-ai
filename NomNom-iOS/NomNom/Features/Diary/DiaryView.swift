@@ -109,11 +109,11 @@ struct DiaryView: View {
                                             guard abs(h) > abs(v) else { return }
                                             withAnimation(.easeInOut(duration: 0.3)) {
                                                 if h < 0 {
-                                                    swipeDirection = .leading
-                                                    goToNextMonth()
-                                                } else {
                                                     swipeDirection = .trailing
                                                     goToPreviousMonth()
+                                                } else {
+                                                    swipeDirection = .leading
+                                                    goToNextMonth()
                                                 }
                                             }
                                         }
