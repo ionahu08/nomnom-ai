@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 # Model configuration: timeout (seconds) and max_tokens per model
 MODEL_CONFIG = {
-    "claude-haiku-4-5-20251001": {"timeout": 10, "max_tokens": 500},
+    "claude-haiku-4-5-20251001": {"timeout": 20, "max_tokens": 400},
     "claude-sonnet-4-20250514": {"timeout": 30, "max_tokens": 2000},
 }
 
