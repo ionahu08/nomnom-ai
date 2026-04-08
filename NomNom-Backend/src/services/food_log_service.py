@@ -26,7 +26,7 @@ async def list_logs_for_date(db: AsyncSession, user_id: int, date: date_type) ->
             FoodLog.logged_at >= day_start,
             FoodLog.logged_at < day_end,
         )
-        .order_by(FoodLog.logged_at.asc())
+        .order_by(FoodLog.logged_at.desc())
     )
     return list(result.scalars().all())
 

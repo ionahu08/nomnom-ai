@@ -329,6 +329,19 @@ struct DayCell: View {
 
 // MARK: - Async Photo Thumbnail
 
+actor PhotoCache {
+    static let shared = PhotoCache()
+    private var cache: [String: UIImage] = [:]
+
+    func image(for key: String) -> UIImage? {
+        cache[key]
+    }
+
+    func setImage(_ image: UIImage, for key: String) {
+        cache[key] = image
+    }
+}
+
 struct AsyncPhotoThumbnail: View {
     let photoPath: String
     @State private var image: UIImage?
@@ -354,12 +367,21 @@ struct AsyncPhotoThumbnail: View {
 
     private func loadPhoto() async {
         guard image == nil, !isLoading else { return }
+
+        let filename = photoPath.split(separator: "/").last.map(String.init) ?? photoPath
+
+        // Check cache first
+        if let cachedImage = await PhotoCache.shared.image(for: filename) {
+            self.image = cachedImage
+            return
+        }
+
         isLoading = true
 
         do {
-            let filename = photoPath.split(separator: "/").last.map(String.init) ?? photoPath
             let data = try await APIClient.shared.getData(path: "/api/v1/photos/\(filename)")
             if let uiImage = UIImage(data: data) {
+                await PhotoCache.shared.setImage(uiImage, for: filename)
                 self.image = uiImage
             }
         } catch {
