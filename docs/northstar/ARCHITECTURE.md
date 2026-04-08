@@ -85,12 +85,12 @@ System design, component interactions, and data flow for the NomNom app.
 
 ## Request Flow: Save Food Log
 
-1. **iOS App** user taps "Save" → POST to `/api/v1/food-logs/` with FoodLogCreate payload
-2. **Backend** validates auth → stores in `food_logs` table with `is_user_corrected = false`
+1. **iOS App** user selects meal type (breakfast/lunch/dinner/snack) → taps "Save" → POST to `/api/v1/food-logs/` with FoodLogCreate payload
+2. **Backend** validates auth → stores in `food_logs` table with `meal_type` and `is_user_corrected = false`
 3. **Cache Service** embeds food description → stores in `pgvector` alongside food_log_id
-4. **Response** returns saved FoodLog object with ID
+4. **Response** returns saved FoodLog object with ID and meal_type
 5. **iOS** shows "Saved ✓" inline, enables "This is wrong" button
-6. User can now tap "This is wrong" to correct the food name via PATCH
+6. User can now tap "This is wrong" to correct the food name (and optionally meal type) via PATCH
 
 ## Request Flow: Get Today's Logs
 
@@ -156,6 +156,7 @@ class FoodLog(Base):
     food_category: str?
     cuisine_origin: str?
     cat_roast: str
+    meal_type: str?              # breakfast, lunch, dinner, snack (user-selected)
     ai_raw_response: dict?       # Full Claude response (for audit)
     embedding: Vector(384)       # pgvector for semantic cache
     is_user_corrected: bool      # User edited the food name?

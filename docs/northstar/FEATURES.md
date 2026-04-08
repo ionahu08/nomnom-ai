@@ -56,7 +56,7 @@ Complete inventory of NomNom features with status and implementation reference.
   - Schema: `FoodLogUpdate` (accepts only food_name)
 
 ### Today's Food Logs View
-- **Status**: ✅ Complete
+- **Status**: ✅ Complete (Iteration 7), 🚧 Grouping by meal type (Iteration 8)
 - **Features**:
   - List all food logs from today
   - Display thumbnail, food name, macros, cat roast
@@ -64,10 +64,25 @@ Complete inventory of NomNom features with status and implementation reference.
   - Pull-to-refresh
   - Swipe-to-delete individual logs
   - Error display banner
+  - Group logs by meal category (Breakfast/Lunch/Dinner/Snack) — NEW
 - **Implementation**:
   - Backend: `src/api/food_logs.py`, `get_today_logs()` endpoint
   - iOS: `Features/Dashboard/TodayView.swift`, `Features/Dashboard/TodayViewModel.swift`
   - Database: Query `food_logs` WHERE user_id = ? AND DATE(logged_at) = TODAY
+
+### Meal Categorization
+- **Status**: 🚧 In Progress (Iteration 8)
+- **Features**:
+  - Classify each food log as Breakfast, Lunch, Dinner, or Snack
+  - Segmented picker in Camera tab (shown before save)
+  - Group Today tab logs by meal category with section headers
+  - Each category shows daily summary (total cals, macros)
+  - Optional: can update meal type via food correction PATCH
+- **Implementation**:
+  - Backend: `src/api/food_logs.py`, `src/services/food_log_service.py`
+  - iOS: `Features/Camera/CameraView.swift`, `Features/Camera/CameraViewModel.swift`, `Features/Dashboard/TodayView.swift`
+  - Database: `food_logs.meal_type` (String, nullable)
+  - Schema: `FoodLogCreate`, `FoodLogUpdate`, `FoodLogResponse` include `meal_type`
 
 ### Settings Tab
 - **Status**: ✅ Complete
@@ -167,7 +182,8 @@ Complete inventory of NomNom features with status and implementation reference.
 | Analysis | POST /food-logs/analyze | food_logs (embedding) | AIService | CameraView |
 | Save Log | POST /food-logs | food_logs | FoodLogService | CameraView |
 | Correct | PATCH /food-logs/{id} | food_logs | FoodLogService | CameraView |
-| Today Logs | GET /food-logs/today | food_logs | FoodLogService | TodayView |
+| Categorize | (in Save/Correct) | food_logs.meal_type | FoodLogService | CameraView |
+| Today Logs | GET /food-logs/today | food_logs (grouped) | FoodLogService | TodayView |
 | Profile | GET/PUT /profile | user_profiles | ProfileService | SettingsView |
 | Recommend | GET /recommendations/meal | nutrition_kb (RAG) | KnowledgeService | TodayView |
 | Photos | GET /photos/{id} | uploads/ (disk) | (static files) | FoodLogCard |
@@ -185,5 +201,5 @@ Complete inventory of NomNom features with status and implementation reference.
 
 ---
 
-**Last Updated**: 2026-04-07  
-**Current Iteration**: 07 (iOS Settings, Corrections, Recommendations)
+**Last Updated**: 2026-04-08  
+**Current Iteration**: 08 (Meal Categorization)

@@ -21,8 +21,8 @@ iOS App (SwiftUI) ──▶ NomNom-Backend (FastAPI) ──▶ PostgreSQL + pgve
 
 ## Current Iteration
 
-**Iteration 07: iOS Settings, Corrections & Recommendations** — In Progress 🚧
-See `docs/iterations/07-ios-settings-corrections/PLAN.md` and `PHASES.md`.
+**Iteration 08: Meal Categorization** — In Progress 🚧
+See `docs/iterations/08-meal-categorization/PLAN.md` and `PHASES.md`.
 
 ## Key Docs
 
