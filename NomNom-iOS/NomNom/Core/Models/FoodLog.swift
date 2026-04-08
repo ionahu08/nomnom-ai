@@ -85,3 +85,16 @@ struct FoodLogResponse: Codable, Identifiable {
         case createdAt = "created_at"
     }
 }
+
+struct DayCalendarSummary: Codable, Identifiable {
+    var id: String { date }
+    let date: String  // "YYYY-MM-DD"
+    let count: Int
+    let photoPaths: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case date
+        case count
+        case photoPaths = "photo_paths"
+    }
+}

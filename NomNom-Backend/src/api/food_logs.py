@@ -1,3 +1,5 @@
+from datetime import date as date_type
+
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -5,9 +7,21 @@ from src.api.deps import get_current_user
 from src.database import get_db
 from src.llm.cache import SemanticCache
 from src.models.user import User
-from src.schemas.food_log import FoodAnalysisResponse, FoodLogCreate, FoodLogResponse, FoodLogUpdate
+from src.schemas.food_log import (
+    DayCalendarSummary,
+    FoodAnalysisResponse,
+    FoodLogCreate,
+    FoodLogResponse,
+    FoodLogUpdate,
+)
 from src.services.ai_service import analyze_food_photo as ai_analyze
-from src.services.food_log_service import create_food_log, delete_food_log, list_today_logs
+from src.services.food_log_service import (
+    create_food_log,
+    delete_food_log,
+    list_calendar_summary,
+    list_logs_for_date,
+    list_today_logs,
+)
 from src.services.photo_service import save_photo
 from src.services.profile_service import get_profile
 
@@ -64,6 +78,40 @@ async def get_today_logs(
     """List all food logs for today."""
     logs = await list_today_logs(db, current_user.id)
     return logs
+
+
+@router.get("/by-date", response_model=list[FoodLogResponse])
+async def get_logs_by_date(
+    date: str,  # "YYYY-MM-DD"
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Fetch all food logs for a specific date."""
+    try:
+        target_date = date_type.fromisoformat(date)
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid date format. Use YYYY-MM-DD.")
+
+    logs = await list_logs_for_date(db, current_user.id, target_date)
+    return logs
+
+
+@router.get("/calendar-summary", response_model=list[DayCalendarSummary])
+async def get_calendar_summary(
+    start: str,  # "YYYY-MM-DD"
+    end: str,  # "YYYY-MM-DD"
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Fetch calendar summary (per-day metadata) for a date range."""
+    try:
+        start_date = date_type.fromisoformat(start)
+        end_date = date_type.fromisoformat(end)
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid date format. Use YYYY-MM-DD.")
+
+    summary = await list_calendar_summary(db, current_user.id, start_date, end_date)
+    return summary
 
 
 @router.patch("/{log_id}", response_model=FoodLogResponse)

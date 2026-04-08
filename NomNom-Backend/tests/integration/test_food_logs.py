@@ -119,3 +119,87 @@ async def test_delete_nonexistent_log(client: AsyncClient, auth_headers: dict):
 async def test_food_logs_require_auth(client: AsyncClient):
     resp = await client.get("/api/v1/food-logs/today")
     assert resp.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_get_logs_by_date(client: AsyncClient, auth_headers: dict):
+    """Test fetching logs for a specific date."""
+    # Save a food log
+    resp = await client.post(
+        "/api/v1/food-logs/",
+        json={
+            "photo_path": "sushi.jpg",
+            "food_name": "Sushi",
+            "calories": 400,
+            "protein_g": 25.0,
+            "carbs_g": 45.0,
+            "fat_g": 12.0,
+            "cat_roast": "Raw fish? Fancy.",
+        },
+        headers=auth_headers,
+    )
+    assert resp.status_code == 201
+
+    # Fetch logs for today using /by-date endpoint
+    resp = await client.get("/api/v1/food-logs/by-date?date=2026-04-08", headers=auth_headers)
+    assert resp.status_code == 200
+    data = resp.json()
+    assert len(data) == 1
+    assert data[0]["food_name"] == "Sushi"
+    assert data[0]["calories"] == 400
+
+
+@pytest.mark.asyncio
+async def test_get_logs_by_date_invalid_format(client: AsyncClient, auth_headers: dict):
+    """Test /by-date with invalid date format."""
+    resp = await client.get("/api/v1/food-logs/by-date?date=04-08-2026", headers=auth_headers)
+    assert resp.status_code == 400
+    assert "Invalid date format" in resp.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_get_calendar_summary(client: AsyncClient, auth_headers: dict):
+    """Test fetching calendar summary for a date range."""
+    # Save food logs on different dates
+    logs_data = [
+        {"photo_path": "pizza.jpg", "food_name": "Pizza", "calories": 600},
+        {"photo_path": "salad.jpg", "food_name": "Salad", "calories": 250},
+    ]
+
+    for log in logs_data:
+        await client.post(
+            "/api/v1/food-logs/",
+            json={
+                **log,
+                "protein_g": 20.0,
+                "carbs_g": 50.0,
+                "fat_g": 15.0,
+                "cat_roast": "Test roast",
+            },
+            headers=auth_headers,
+        )
+
+    # Fetch calendar summary
+    resp = await client.get(
+        "/api/v1/food-logs/calendar-summary?start=2026-04-01&end=2026-04-30",
+        headers=auth_headers,
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert len(data) >= 1
+    # Find today's summary
+    today_summary = next((d for d in data if d["date"] == "2026-04-08"), None)
+    assert today_summary is not None
+    assert today_summary["count"] == 2
+    assert len(today_summary["photo_paths"]) >= 1
+
+
+@pytest.mark.asyncio
+async def test_get_calendar_summary_invalid_dates(client: AsyncClient, auth_headers: dict):
+    """Test calendar-summary with invalid date format."""
+    resp = await client.get(
+        "/api/v1/food-logs/calendar-summary?start=04-01-2026&end=04-30-2026",
+        headers=auth_headers,
+    )
+    assert resp.status_code == 400
+    assert "Invalid date format" in resp.json()["detail"]

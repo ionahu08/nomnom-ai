@@ -92,3 +92,10 @@ class FoodLogResponse(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class DayCalendarSummary(BaseModel):
+    """Summary for a calendar day (used in Food Diary view)."""
+    date: str  # "YYYY-MM-DD"
+    count: int  # number of logs that day
+    photo_paths: list[str]  # first 3 photo filenames for thumbnail badges

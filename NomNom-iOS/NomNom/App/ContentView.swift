@@ -11,10 +11,10 @@ struct ContentView: View {
                     Text("Camera")
                 }
 
-            TodayView()
+            DiaryView()
                 .tabItem {
-                    Image(systemName: "list.bullet")
-                    Text("Today")
+                    Image(systemName: "calendar")
+                    Text("Food Diary")
                 }
 
             SettingsView()
