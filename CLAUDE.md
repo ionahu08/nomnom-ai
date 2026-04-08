@@ -21,8 +21,10 @@ iOS App (SwiftUI) ──▶ NomNom-Backend (FastAPI) ──▶ PostgreSQL + pgve
 
 ## Current Iteration
 
-**Iteration 08: Meal Categorization** — In Progress 🚧
-See `docs/iterations/08-meal-categorization/PLAN.md` and `PHASES.md`.
+**Iteration 09: Food Diary (Calendar View)** — Complete ✅
+See `docs/iterations/09-food-diary/SUMMARY.md` for retrospective.
+
+**Next:** Iteration 10 (Recommendations from History) — Planned
 
 ## Key Docs
 
