@@ -114,7 +114,10 @@ Tracker for issues, blockers, decisions, and testing notes during this iteration
 
 ### Cloudflare Tunnel Ephemeral URLs Problem
 - **Issue**: Cloudflare's free tunnel generates new random URLs each restart
-- **Impact**: iOS app hardcoded URL becomes invalid → "server not found" errors
+- **Symptoms**: 
+  - iOS app shows "A server with the specified hostname could not be found"
+  - `curl` returns: "Could not resolve host: upgrades-defend-values-precious.trycloudflare.com"
+- **Root Cause**: Old URL was hardcoded in APIClient.swift, but tunnel restarted and generated new random domain
 - **Solution Used**: Update APIClient.swift with new URL and rebuild app each time tunnel restarts
 - **Better Solution**: Use ngrok with a claimed static domain (see teacher's DEPLOYMENT.md pattern) or pay for persistent Cloudflare domain
 - **Lesson**: For device testing, **always claim a persistent/static domain** rather than relying on ephemeral URLs
