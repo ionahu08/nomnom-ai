@@ -320,15 +320,17 @@ struct AsyncPhotoThumbnail: View {
     @State private var isLoading = false
 
     var body: some View {
-        if let image = image {
-            Image(uiImage: image)
-                .resizable()
-                .scaledToFill()
-        } else {
-            Image(systemName: "photo")
-                .foregroundColor(NomNomColors.textSecondary)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(NomNomColors.surface)
+        Group {
+            if let image = image {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                Image(systemName: "photo")
+                    .foregroundColor(NomNomColors.textSecondary)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(NomNomColors.surface)
+            }
         }
         .task {
             await loadPhoto()
