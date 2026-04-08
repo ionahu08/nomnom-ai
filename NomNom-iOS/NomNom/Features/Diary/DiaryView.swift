@@ -97,6 +97,8 @@ struct DiaryView: View {
                 displayedMonth = calendar.date(from: DateComponents(year: components.year, month: components.month, day: 1)) ?? now
 
                 await viewModel.loadCalendarSummary()
+                // After calendar loads, load logs for the selected date
+                await viewModel.loadLogs(for: viewModel.selectedDate)
             }
         }
     }
