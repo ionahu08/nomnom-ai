@@ -44,48 +44,40 @@ Each Phase starts by stating "what NomNom can currently do" and "what it can do 
 > **Goal**: Establish a cognitive framework + put NomNom design on paper, giving the next 10 weeks direction.
 > **Duration**: 1–2 days
 
-### 0.0 Workspace Setup (Do This First, 10 Minutes)
+### 0.0 Workspace Setup (Already Done in Phase 0)
 
-Every output over the next 10 weeks (specs, notes, retros, code) needs a stable physical location. Build the directory first so each Phase knows where things go.
-
-**Recommended structure** (build locally):
+The learning materials live inside the real NomNom repo. Structure:
 
 ```
-~/Documents/NomNom_Learning/
-├── README.md                              ← Project navigation (top-level intro)
-├── 00_roadmap/
-│   ├── roadmap_main_nomnom.md             ← Main roadmap (this document)
-│   └── roadmap_reference.md               ← Capability stack version (reference)
-├── 01_capability_profile/
-│   └── Chris_Capability_Profile.md        ← To be created in 0.4
-├── 02_nomnom_spec/
-│   └── NomNom_v1_spec.md                  ← To be created in 0.3
-├── 03_phase_retrospectives/               ← End-of-Phase retros
-│   ├── phase_1_retro.md
-│   ├── phase_2_retro.md
-│   └── ...
-└── 04_code/                               ← NomNom code + side practice
-    ├── nomnom/                            ← Main project
-    └── side_projects/                     ← tech_comparison_agent, etc.
+NomNom/                                    ← real product repo
+├── CLAUDE.md                              ← AI context (dual-purpose framing)
+├── NomNom-Backend/
+│   └── src/llm/                           ← ⭐ main learning target (12 files)
+├── NomNom-iOS/                            ← iOS app (not in scope for learning)
+├── docs/
+│   ├── northstar/                         ← product vision (already exists)
+│   ├── iterations/                        ← 09 past iterations + future (10+) retros
+│   └── learning/                          ← LLM Harnessing learning plan
+│       ├── 00_roadmap/                    ← this document + capability stack reference
+│       ├── 01_capability_profile/         ← Iona_Capability_Profile.md
+│       ├── 03_phase_retrospectives/       ← End-of-Phase retros (populated as I go)
+│       └── 05_learning_notes/             ← deep concept notes
+└── learning_lab/                          ← Phase 1-6 hands-on sandbox (separate from production)
 ```
 
 **Mapping** (what each folder holds):
 
 | Directory | Purpose | Who Updates It |
 |---|---|---|
-| `00_roadmap/` | Learning roadmaps (static) | Almost never |
-| `01_capability_profile/` | Your capability profile | End of each Phase |
-| `02_nomnom_spec/` | NomNom product spec | When the product evolves |
-| `03_phase_retrospectives/` | Per-Phase retros | End of each Phase |
-| `04_code/` | Code | Daily |
-| `05_learning_notes/` | Notes taken during learning | when picking up new knownledge |
+| `docs/learning/00_roadmap/` | Learning roadmaps (this doc + reference) | Almost never; minor Phase notes added during journey |
+| `docs/learning/01_capability_profile/` | 7-layer skill tracker | End of each Phase |
+| `docs/learning/03_phase_retrospectives/` | Per-Phase retros | End of each Phase |
+| `docs/learning/05_learning_notes/` | Deep concept notes | When a concept crystallizes |
+| `learning_lab/` | Sandbox practice code | During each Phase |
+| `NomNom-Backend/src/llm/` | ⭐ Production LLM code to be understood + refactored | After learning_lab work each Phase |
+| `docs/iterations/10+/` | Real product iteration records (post-learning refactors) | After each Phase's refactor work |
 
-**Claude Code usage**: Each time you start Claude Code, `cd ~/Documents/NomNom_Learning/`. It reads all files directly — no manual upload needed.
-
-**Project knowledge sync strategy**:
-- ✅ Upload the two roadmaps in `00_roadmap/` (won't change for 10 weeks)
-- ❌ Don't upload other directories (they change daily, version mismatches will appear)
-- When you want Claude to see the latest spec or capability profile, **paste into the chat live** or **temporarily upload to that conversation**
+**Claude Code usage**: Run from repo root. `CLAUDE.md` is auto-loaded — it includes dual-purpose framing and Phase-aware AI behavior rules.
 
 ### 0.1 Cognitive Map
 
@@ -133,41 +125,67 @@ Read in order:
 3. **Karpathy — LLM OS Concept Diagram** (15 minutes)
    - Search "Karpathy LLM OS"
 
-### 0.3 NomNom Product Definition (Core Action, 2–3 hours)
+### 0.3 NomNom Reality Check (Core Action, 1 hour)
 
-**Write a `NomNom_v1_spec.md`** that answers:
+> **Important context**: NomNom is **not** being built from scratch. By the start of this learning journey (May 10, 2026), the product is already at **Iteration 09 (Food Diary)**, with a working iOS app, FastAPI backend, RAG, semantic cache, and an LLM module at `NomNom-Backend/src/llm/`. The challenge isn't to build it — it's to **understand the LLM-related code I've already shipped with heavy AI assistance**.
 
-**Target users**:
-- Who will use NomNom? (Fitness people? Weight-loss seekers? Chronic disease management?)
-- Pick **one primary scenario** (don't be greedy — MVP serves one user story).
+#### What NomNom is today (May 2026)
 
-**Core features (V1)**:
-- User takes a photo of food → what does the system output?
-- Example: Recognize food, estimate portion, give macros (calories, protein, fat, carbs).
+- **Stack**: iOS (SwiftUI) + FastAPI backend + PostgreSQL with pgvector + Anthropic Claude API
+- **Live features** (see `docs/northstar/FEATURES.md`): auth, photo→nutrition analysis, food log saving, food correction, today's logs, meal categorization, settings, semantic cache, RAG meal recommendations, food diary calendar
+- **Architecture** (see `docs/northstar/ARCHITECTURE.md`): standard FastAPI 3-tier with an `src/llm/` module orchestrating all Claude calls
+- **Iteration history**: 9 iterations complete (Iterations 01–09 in `docs/iterations/`)
+- **Honest self-assessment**: most of `src/llm/` was AI-assisted; design choices are not deeply owned
 
-**MVP boundary (what V1 does NOT do)**:
-- V1 has no user system, no history, no nutritional advice
-- V1 only does "one photo → one nutrition data response"
+#### The LLM module inventory (the actual learning target)
 
-**Technical decisions (write down assumptions; verify later)**:
-- Which Claude model? Why?
-- Input: local image vs. URL?
-- Output format: JSON? What schema?
-- Where does it run? (CLI script, Streamlit, mobile app?)
+`NomNom-Backend/src/llm/` contains ~1,500 lines across 12 files. Each file corresponds to a Phase of the roadmap:
 
-**v2-v6 roadmap** (one sentence per version):
-- v2: Stabilize output + eval (Phase 2)
-- v3: Nutrition label PDF parsing + RAG knowledge base (Phase 3)
-- v4: Performance optimization (Phase 4)
-- v5: Open question handling ("what should I eat for weight loss?") (Phase 5)
-- v6: MCP server-ization for use by other agents (Phase 6)
+| File | Lines | Phase | What "understood" means |
+|---|---|---|---|
+| `client.py` | 154 | Phase 1 | Defend the retry/timeout/fallback design |
+| `prompt_engine.py` | 138 | Phase 1 | Defend the prompt template architecture |
+| `prompts/` | — | Phase 1 | Defend each prompt's structure & techniques used |
+| `parser.py` | 154 | Phase 2 | Explain why not just `json.loads()` |
+| `guardrails.py` | 141 | Phase 2 | List validation rules + reasoning behind each |
+| `tools.py` | 88 | Phase 2/3 | Walk through the full tool_use flow |
+| `evaluator.py` | 158 | Phase 2 | Critique the grader design; identify improvements |
+| `embedding.py` | 94 | Phase 3 | Justify the embedding model + dimension choice |
+| `cache.py` | 187 | Phase 3 | Defend the cosine 0.15 threshold |
+| `seed_knowledge.py` | 41 | Phase 3 | Explain how the RAG knowledge base is constructed |
+| `router.py` | 97 | Phase 4 | Explain the routing decision logic |
+| `rate_limiter.py` | 85 | Phase 4 | Justify the rate-limiting algorithm choice |
+| `logger.py` | 163 | Phase 4 | Defend the observability design |
+
+#### Self-assessment at Phase 0 start
+
+**My current understanding across all 12 files: 0/5**.
+
+This is not modesty — it's the literal starting point. By the end of Phase 6, every file in this table should have my understanding at 4/5 or 5/5, with the "What 'understood' means" column as the bar.
+
+#### What this changes about how each Phase works
+
+Each Phase no longer means "build something new from scratch". It means **two coordinated activities**:
+
+1. **In `learning_lab/`**: hand-write minimal demos of the Phase's concepts (skip Claude Code for this part)
+2. **In `NomNom-Backend/src/llm/`**: deeply review and refactor the corresponding production files, applying what I just learned
+
+Each Phase section below now includes two new subsections to make this concrete:
+- **Existing Code Touched This Phase** — which production files I'll be reviewing
+- **Refactor Plan (after Phase)** — what concrete changes I'll bring back to production
+
+#### No `NomNom_v1_spec.md` needed
+
+The original roadmap suggested writing a separate `NomNom_v1_spec.md`. **Skipped**. The product already exists and has its own product documentation (`docs/northstar/`). This roadmap is the only learning-track document needed — everything Phase-related lives here.
 
 ### 0.4 Build Capability Profile (30 minutes)
 
-Create `Chris_Capability_Profile.md`:
+Located at `docs/learning/01_capability_profile/Iona_Capability_Profile.md`.
+
+Track 7 layers, current vs. target, with evidence required at any score ≥ 3:
 
 ```markdown
-# Chris's LLM Harnessing Capability Profile
+# Iona's LLM Harnessing Capability Profile
 
 ## Layer 0: API Mastery
 - Current: 0/5
@@ -217,13 +235,40 @@ Update once per Phase.
 
 ### Prologue Acceptance
 
-- [ ] Workspace `~/Documents/NomNom_Learning/` is built with all subdirectories
-- [ ] Finished reading the 3 must-reads
-- [ ] `NomNom_v1_spec.md` written, including target users, MVP features, technical decisions, v2-v6 roadmap
-- [ ] `Chris_Capability_Profile.md` built, with current/target for each layer
+- [ ] Workspace verified: `docs/learning/` structure in place inside NomNom repo
+- [ ] Finished reading the 3 must-reads (with notes in `05_learning_notes/`)
+- [ ] NomNom Reality Check section (0.3) read — I can recite the 12-file inventory and which Phase touches which file
+- [ ] `Iona_Capability_Profile.md` built, with current/target for each layer
 - [ ] Can explain LLM Harnessing in 30 seconds
+- [ ] `CLAUDE.md` updated with dual-purpose framing
 
 ---
+
+## Existing Code × Phase Mapping (Global Index)
+
+A quick-reference table to know, at any moment in the journey, which production files I should be deeply reviewing in the current Phase.
+
+| File | Lines | Phase | What it does | What "5/5 understood" means |
+|---|---|---|---|---|
+| `client.py` | 154 | Phase 1 | Wraps `AsyncAnthropic` with retry/timeout/fallback | Defend the retry count (2), backoff (1s→2s), and recursive fallback design |
+| `prompt_engine.py` | 138 | Phase 1 | Prompt template system | Defend the template architecture; explain variable injection |
+| `prompts/` (folder) | — | Phase 1 | Actual prompt templates used in production | Explain each prompt's structure & which techniques it uses |
+| `parser.py` | 154 | Phase 2 | Parses Claude's structured output | Explain why dedicated parser vs. naked `json.loads()` |
+| `guardrails.py` | 141 | Phase 2 | Validates LLM output (semantic checks on food data) | List all validation rules + business reasoning for each |
+| `tools.py` | 88 | Phase 2/3 | Tool use definitions and dispatching | Walk through one full tool_use flow on the whiteboard |
+| `evaluator.py` | 158 | Phase 2 | Eval system for LLM output quality | Critique the current grader; identify what's code-based vs. model-based |
+| `embedding.py` | 94 | Phase 3 | Sentence-transformers embedding wrapper | Justify model choice (`all-MiniLM-L6-v2`) & 384-dim |
+| `cache.py` | 187 | Phase 3 | Semantic cache via pgvector | Defend cosine 0.15 threshold; explain cache-hit/miss logic |
+| `seed_knowledge.py` | 41 | Phase 3 | Seeds RAG knowledge base | Explain KB construction; chunking strategy |
+| `router.py` | 97 | Phase 4 | Routes requests (likely model tiering) | Explain decision logic; defend the routing rules |
+| `rate_limiter.py` | 85 | Phase 4 | API rate limiting | Justify algorithm (token bucket? leaky bucket?) |
+| `logger.py` | 163 | Phase 4 | LLM call observability | Defend the structured logging design |
+
+**Total**: ~1,500 lines of production LLM code.
+
+**Phase 5–6** don't map to existing files — they require **building new modules** (`workflow/` or `agent/` in Phase 5, MCP server in Phase 6). These are net-new development, not refactor work.
+
+**Reading this table during the journey**: at any time, ask "what Phase am I in?" → look up that row → those are the files to focus on. The Phase-by-Phase sections below give the detail.
 
 ## Phase 1: NomNom MVP — Make It Recognize Food (Week 1–2)
 
@@ -233,7 +278,13 @@ Update once per Phase.
 
 ### Phase 1 Main Line: Get It Working
 
-#### Week 1: API Basics + Make Claude See
+> **Time budget (10 working days)**:
+> - **Days 1–5**: Concept learning (in `learning_lab/`)
+> - **Days 6–7**: Code review of existing production files
+> - **Days 8–9**: Sandbox capstone (NomNom v0.5 hand-written)
+> - **Day 10**: Production refactor (apply learning to `NomNom-Backend/src/llm/`)
+
+#### Week 1: Concept Learning (in `learning_lab/`)
 
 **Day 1–2: API Quickstart + Model Selection**
 
@@ -245,29 +296,32 @@ Update once per Phase.
   - `tool_use`: Model wants to call a tool (this is the "should I continue?" signal in your agent loop)
   - `stop_sequence`: Hit a stop sequence you set (commonly used for structured output)
 - **Model family**: Opus (smartest, expensive) / Sonnet (balanced) / Haiku (fast, cheap)
-  - **NomNom decision**: Start with Sonnet — multimodal accuracy is acceptable, cost is manageable
-  - Phase 4 will revisit and tier models
+  - **NomNom decision context**: Production currently uses Sonnet — you'll defend or revise this in Phase 4
 - **Core parameters**: `temperature`, `max_tokens`, `stop_sequences`
-  - **NomNom decision**: Nutrition recognition needs stability; set temperature to 0 or 0.1
 
-**Day 3: Multi-Turn Conversation Basics**
+All practice goes in `learning_lab/phase_1/day1_2_api_basics.py`.
+
+**Day 3: Multi-Turn Conversation Basics + Streaming (side line)**
 
 - Key fact: API stores no state. Each request is independent.
 - Write two helpers: `add_user_message`, `add_assistant_message`
 - Write a CLI multi-turn chat script (don't connect to NomNom yet)
 - **Why learn this first**: Future agent loop skeleton is exactly these 30 lines of code
+- **Side line (afternoon)**: Streaming basics — `client.messages.stream()` and event types (`message_start`, `content_block_delta`, `message_stop`). Write a streaming version of the chat script.
 
-**Day 4–5: Multimodal — Make Claude See**
+Output: `learning_lab/phase_1/day3_multi_turn.py` and `day3_streaming.py`.
+
+**Day 4: Multimodal — Make Claude See**
 
 This is the core of NomNom.
 - Image block structure: base64 encoding + media_type
-- Write NomNom v0.1: Input food photo path → model outputs text description
+- Write a minimal CLI: input food photo path → model outputs text description
 - Key insight: **multimodal accuracy is extremely dependent on prompt quality** — simple prompts fail. Use step-by-step instructions and explicit analysis frameworks.
 - Try: Same photo with three prompt detail levels, compare output quality.
 
-#### Week 2: Basic Prompt Engineering + NomNom v0.5
+Output: `learning_lab/phase_1/day4_multimodal.py`.
 
-**Day 6–7: Deep Read of Prompt Engineering Documentation**
+**Day 5: Deep Read of Prompt Engineering Documentation**
 
 Read the [Anthropic Prompt Engineering documentation](https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/overview) in this order:
 1. Be clear and direct
@@ -278,34 +332,77 @@ Read the [Anthropic Prompt Engineering documentation](https://docs.claude.com/en
 6. Prefill Claude's response
 7. Chain complex prompts
 
-Use NomNom as the test bed for each technique:
-- "Use XML tags" → wrap image description task in `<food_image>`
-- "Give Claude a role" → "You are a registered nutritionist"
-- "Multishot" → give 1–2 food → nutrition data examples
+For each technique, write a 2-line note in `learning_lab/phase_1/day5_prompt_techniques.md`: what it is, when to use it.
 
-**Day 8–10: NomNom v0.5 (Phase 1 capstone)**
+**Side line (afternoon, optional)**: Brief look at OpenAI API for comparison — interface design differences (system position, tool use schema, streaming format). In interviews, articulating differences between two providers is 100x more professional than "I prefer Claude".
 
-Implement full v0.5:
-- CLI input food photo path
-- Output markdown-formatted: food name, estimated portion, macros, confidence notes
-- Use system prompt with nutritionist role
-- Use multishot with 2 examples
-- Use CoT to make the model analyze image first, then give numbers
+#### Week 2: Code Review + Sandbox Capstone + Production Refactor
 
-**Discipline**: Manually test 10 photos of different foods. Record which were accurate, which crashed. **This is the seed dataset for Phase 2 eval**.
+**Day 6: Code Review — `client.py` (154 lines)**
 
-### Phase 1 Side Line (~1 day)
+This is your first deep production code review. Goal: by end of day, you can defend every design choice in this file.
 
-What NomNom doesn't need but interviews require:
+Process:
+1. Open `NomNom-Backend/src/llm/client.py` in VS Code, read top to bottom
+2. For each line you can't fully justify, add a comment with `# Q: <your question>` and your best-guess explanation
+3. After reading, write `learning_lab/phase_1/day6_client_review.md` with:
+   - **What this file does** (one paragraph in your words)
+   - **Design choices I can now defend** (with reasoning)
+   - **Design choices I still don't fully understand** (questions to research)
+   - **Things I would change** (if any — and why)
 
-**Side 1: Streaming Basics (half day)**
-- `client.messages.stream()` and event types (`message_start`, `content_block_delta`, `message_stop`)
-- Write a streaming version chat script
-- Why learn it: Future agent loops and tool use are based on this event model
+Key questions to answer:
+- Why 2 retries, not 3 or 5?
+- Why exponential backoff (1s → 2s)? Why not constant or longer?
+- Why is fallback implemented recursively, not as a loop?
+- Why per-model `MODEL_CONFIG` dictionary with timeout + max_tokens?
+- What happens if both primary and fallback fail?
 
-**Side 2: Brief Look at OpenAI API (half day)**
-- Interface design differences (system position, tool use schema, streaming format)
-- In interviews, articulating differences between two providers is 100x more professional than "I prefer Claude"
+**Day 7: Code Review — `prompt_engine.py` (138 lines) + `prompts/` folder**
+
+Same process as Day 6, but for the prompt template system.
+
+For `prompt_engine.py`:
+- How are prompts loaded? From files? Embedded strings?
+- How are variables injected? f-strings? Jinja? Custom?
+- Why a class/module structure vs. plain function?
+
+For each file in `prompts/`:
+- Which prompt engineering techniques does it use? (XML tags? CoT? multishot? role?)
+- Is the structure clear and intentional, or accidental?
+- What would I change?
+
+Output: `learning_lab/phase_1/day7_prompt_engine_review.md` + a per-prompt technique audit.
+
+**Day 8–9: Sandbox Capstone — NomNom v0.5 hand-written**
+
+Build a **minimal CLI version of NomNom from scratch**, with no Claude Code assistance. Goal: prove I can write the prompt + API flow myself, not just review someone else's.
+
+- CLI: `python nomnom_v05.py <photo_path>`
+- Output: markdown-formatted nutrition data
+- Must use at least: system prompt with role + multishot + CoT + XML tags
+- Save under `learning_lab/phase_1/nomnom_v05_sandbox.py`
+
+**Discipline**: Manually test 10 photos of different foods. Record which were accurate, which crashed. **This 10-photo set is the seed dataset for Phase 2 eval**.
+
+Compare: how does your sandbox version differ from production `client.py` + `prompt_engine.py`? What did you do better? Worse?
+
+**Day 10: Production Refactor — apply learning to `NomNom-Backend/src/llm/`**
+
+Concrete changes to land in production:
+
+- **`prompts/` folder**: refactor the food analysis prompt to explicitly use XML tags + role + CoT + multishot, with a header comment explaining the design
+- **`client.py`**: add inline comments explaining retry/backoff decisions (don't change logic — just document what you can now defend)
+- **`prompt_engine.py`**: minor cleanups only if needed; no major changes unless something is clearly wrong
+
+Create `docs/iterations/10-llm-foundation-deepdive/` with:
+- `PLAN.md`: what I planned to refactor (from Day 6–7 reviews)
+- `SUMMARY.md`: what actually changed + before/after diff highlights
+- Commit the production changes with a clear message
+
+### Phase 1 Side Line — Already Embedded
+
+Streaming basics (Day 3 afternoon) and OpenAI API comparison (Day 5 afternoon) are now folded into the main-line days. No separate side-line block needed.
 
 ### Phase 1 Retrospective (30 minutes)
 
@@ -351,7 +448,13 @@ Update Capability Profile:
 
 ### Phase 2 Main Line: Stability Engineering
 
-#### Week 3: Output Control + Eval Onboarding
+> **Time budget (10 working days)**:
+> - **Days 1–5**: Concept learning (in `learning_lab/`)
+> - **Days 6–7**: Code review of `parser.py`, `guardrails.py`, `tools.py`, `evaluator.py`
+> - **Days 8–9**: Sandbox capstone (eval pipeline + v0 vs v1 comparison)
+> - **Day 10**: Production refactor — land eval pipeline + tool_choice in `src/llm/`
+
+#### Week 3: Concept Learning (in `learning_lab/`)
 
 **Day 1: The Output Control Trio**
 
@@ -360,7 +463,7 @@ Practice these three closely related techniques together:
 2. **Stop sequences**: Model halts when it generates a specified string
 3. **Prefill + Stop combo**: Classic structured output — prefill `` ```json ``, stop `` ``` ``, model only outputs the JSON in between
 
-**Apply to NomNom**: Use this trio to make v0.5 output strict JSON. Test on 20 photos, record parse failure rate.
+In `learning_lab/phase_2/day1_output_control.py`, write 3 small demos.
 
 **Day 2: First Eval Pipeline (core action)**
 
@@ -374,86 +477,101 @@ This is the first formal eval in the roadmap. Do it carefully.
 5. Use grader to score, compute average
 6. Modify prompt based on scores, repeat
 
-**Apply to NomNom**:
-- Dataset: 10 photos collected in Phase 1 + 20 more = 30 test photos
-- Manually annotate ground truth for each photo (food name, calorie range estimate)
-- Grader v1: Start code-based — JSON parse success = 10, fail = 0
+In sandbox: build a minimal eval framework around the Day 1 output control demos.
 
 **Day 3: Test Dataset Generation**
 
 - Hand-write vs. Claude-generated
 - **Use Haiku to bulk-generate test cases**: prompt + prefill `` ```json `` + stop `` ``` ``
-- Apply to NomNom: Have Haiku generate 50 "hard-to-recognize food" descriptions ("translucent Vietnamese spring rolls", "blurred far-shot cake") to help you brainstorm test scenarios
+- Practice: Have Haiku generate 50 "hard-to-recognize food" descriptions ("translucent Vietnamese spring rolls", "blurred far-shot cake") — this becomes part of your Phase 2 dataset.
 
 **Day 4: Code-Based Grading**
 
 - `validate_json()`: parse success returns 10
 - `validate_python()`: `ast.parse()`
 - `validate_regex()`: `re.compile()`
-- Apply to NomNom: Write a `validate_nutrition_json()` — check required fields, numeric value plausibility (calories > 0 and < 5000)
+- Build `learning_lab/phase_2/day4_code_graders.py` with a `validate_nutrition_json()` — check required fields, numeric value plausibility (calories > 0 and < 5000).
 
-**Day 5: Model-Based Grading (LLM-as-judge)**
+**Day 5: Model-Based Grading (LLM-as-judge) + Tool Use Basics**
 
+Morning: Model-based grading
 - Use Opus as grader to evaluate Sonnet's output
 - **Key technique**: Have the grader output strengths / weaknesses / reasoning / score together — don't just output score
 - Force grader output structured via JSON tool
-- Apply to NomNom: Write a grader for "nutrition estimation reasonableness"
 
-#### Week 4: Tool Use + Error Handling (Layer 3 + Layer 5 starter)
-
-**Day 6–7: Tool Use Basics**
-
+Afternoon: Tool Use basics (read-only)
 - Read Anthropic Tool Use documentation
 - Understand how `tools` parameters, `tool_use` blocks, and `tool_result` blocks flow back and forth
 - Learn JSON Schema syntax
+- Don't implement yet — Day 8 will use it
 
-**Day 8: Tool-Forced Structured Output (NomNom upgrade)**
+#### Week 4: Code Review + Sandbox Capstone + Production Refactor
 
-NomNom currently outputs JSON via prefill+stop. **Upgrade to tool_choice forcing**:
-- Define a schema describing the nutrition structure
-- Register the schema as a tool
-- Use `tool_choice = {"type": "tool", "name": "extract_nutrition"}` to force calling
-- The `input` Claude fills when calling the tool is JSON conforming to the schema
-- **Much more reliable than prefill** — this is NomNom v1.0's output approach
+**Day 6: Code Review — `parser.py` (154 lines) + `guardrails.py` (141 lines)**
 
-**Day 9: Tool Function Error Handling Design**
+For `parser.py`:
+- What does it handle that naked `json.loads()` doesn't? (Markdown fences? Whitespace? Multiple JSON blocks?)
+- Are there edge cases it misses?
+- Could it be replaced by tool_choice?
 
-The detail beginners overlook most:
-- **Core insight: error messages raised by tool functions are read by Claude**
-- Error messages should read like "instructions for use" — telling Claude what's wrong and how to fix it
+For `guardrails.py`:
+- What are the full validation rules?
+- Is each rule justified by a real failure mode you've seen, or speculative?
+- Are error messages written for Claude to read (so Claude can self-correct)?
 
-```python
-# Bad
-raise ValueError("invalid input")
+Write `learning_lab/phase_2/day6_parser_guardrails_review.md` with:
+- A full inventory of validation rules + justifications
+- A list of changes you'd make + reasoning
 
-# Good
-raise ValueError("date_format cannot be empty, expected format like '%Y-%m-%d'")
-```
+**Day 7: Code Review — `tools.py` (88 lines) + `evaluator.py` (158 lines)**
 
-NomNom doesn't use many tool functions yet at this Phase, but **the design pattern must be established now** — the key to agent robustness.
+For `tools.py`:
+- What tools are defined?
+- Is there an actual tool_use loop, or just single-shot calls?
+- How are tool errors fed back to Claude?
 
-**Day 10: NomNom v1.0 (Phase 2 capstone)**
+For `evaluator.py` — **this is the Layer 4 differentiator file. Spend extra time here**:
+- Is the grader code-based, model-based, or hybrid?
+- What's the test dataset? Where does it come from?
+- Is the evaluator actually running in production / CI, or is it dormant?
+- What would a strong eval pipeline look like vs. what's there now?
 
-Integrate everything from Phase 2:
-- tool_choice forcing structured output
-- 30-photo eval dataset
-- Code-based grader (JSON validity, numeric plausibility)
-- Model-based grader (recognition accuracy, estimation reasonableness)
-- Run v0.5 vs. v1.0 comparison, output report
+Write `learning_lab/phase_2/day7_tools_evaluator_review.md` — be thorough on evaluator. This file's review will guide your Day 10 refactor more than any other.
 
-**This comparison report is your portfolio's first eval case**. In interviews you can directly say: "I used an eval pipeline to drive NomNom's JSON parse failure from X% to 0% and recognition accuracy from Y to Z."
+**Day 8–9: Sandbox Capstone — Eval Pipeline + v0 vs v1 Comparison**
 
-### Phase 2 Side Line (~1 day)
+Build a **real eval pipeline from scratch** in `learning_lab/phase_2/eval_pipeline/`:
 
-**Side 1: Batch Tool Concept (half day)**
-- Claude calls multiple tools in parallel within a single request
-- NomNom doesn't need it (single-image recognition), but understand the concept
-- Use case: future multi-agent
+- 30-photo test dataset (10 from Phase 1 + 20 new, manually annotated with ground truth)
+- Code-based grader: JSON validity + numeric plausibility
+- Model-based grader: recognition accuracy + estimation reasonableness, with structured output (strengths/weaknesses/reasoning/score)
+- Combined score: `final_score = (model_score + code_score) / 2` (RecSys-style signal fusion)
+- **Comparison run**: NomNom v0.5 prompt (Phase 1) vs. v1.0 prompt (with tool_choice forcing)
+- Output: `eval_report_v05_vs_v10.md` with scores, parse failure rates, qualitative findings
 
-**Side 2: Combined Grading Approach (half day)**
-- `final_score = (model_score + code_score) / 2`
-- RecSys background is useful here — **this is multi-signal fusion ranking, same idea as hybrid search**
-- Apply to NomNom: try adding combined score
+This is your **portfolio's first eval case**. In interviews you can say: "I used an eval pipeline to drive NomNom's JSON parse failure from X% to 0% and recognition accuracy from Y to Z."
+
+**Day 10: Production Refactor — land eval pipeline + tool_choice in `src/llm/`**
+
+Concrete changes:
+- **`parser.py`**: migrate from prefill+stop to `tool_choice` for stricter structured output (since `tools.py` already exists). Or, if `parser.py` is doing something parser can't replace, document why.
+- **`guardrails.py`**: rewrite error messages to be "Claude-readable" — telling Claude what's wrong and how to fix it.
+- **`evaluator.py`**: this is the big change. Bring the sandbox eval pipeline into production:
+  - Add real grader functions (both code-based and model-based)
+  - Add a real test dataset (move from `learning_lab/` into `NomNom-Backend/tests/eval/datasets/`)
+  - Add a CLI command or pytest target so you can run eval before any prompt change
+- **`tools.py`**: minor — add error handling per Day 9 design pattern if missing.
+
+Create `docs/iterations/11-eval-pipeline/`:
+- `PLAN.md`: refactor plan from Day 6–7 reviews
+- `SUMMARY.md`: what changed, before/after metrics
+- Include `eval_comparison_v05_vs_v10.md` from Day 8–9 here
+
+### Phase 2 Side Line — Already Embedded
+
+Tool use basics (Day 5 afternoon) and combined grading approach (Day 8–9 capstone) are now folded into the main line.
+
+**Batch Tool concept (half-day, optional reading)** — Claude can call multiple tools in parallel within a single request. NomNom doesn't need it (single-image recognition), but understand the concept; useful for future multi-agent work.
 
 ### Phase 2 Retrospective
 
@@ -496,11 +614,17 @@ Update Capability Profile:
 
 ### Phase 3 Main Line: Full Augmentation Stack
 
-#### Week 5: Tool Use Advanced + RAG Onboarding
+> **Time budget (10 working days)**:
+> - **Days 1–5**: Concept learning (in `learning_lab/`)
+> - **Days 6–7**: Code review of `embedding.py`, `cache.py`, `seed_knowledge.py`, plus `tools.py` agent loop
+> - **Days 8–9**: Sandbox capstone (hybrid search + reranking + citations RAG pipeline)
+> - **Day 10**: Production refactor — land hybrid search + citations into `src/llm/`
+
+#### Week 5: Concept Learning (in `learning_lab/`)
 
 **Day 1: Multi-Tool + Agent Loop (Hand-Coded)**
 
-- Add multiple tools to NomNom: `extract_nutrition_from_image`, `lookup_food_database`, `calculate_daily_total`
+- Practice multiple tools: `extract_nutrition_from_image`, `lookup_food_database`, `calculate_daily_total`
 - **Hand-write a while loop for multi-turn tool calls — no frameworks**
   ```
   while True:
@@ -515,84 +639,119 @@ Update Capability Profile:
 - **One of the most important exercises in the roadmap. Must be written from scratch.**
 - After it works, ask Claude Code to review.
 
-**Day 2: PDF Support (NomNom Nutrition Label Parsing)**
+Output: `learning_lab/phase_3/day1_agent_loop.py`.
+
+**Day 2: PDF Support (Nutrition Label Parsing)**
 
 - Document block + media_type `application/pdf`
 - Claude reads text, charts, and tables from PDFs directly
-- NomNom application: User uploads a nutrition label PDF (e.g., protein powder packaging), system extracts nutrition data automatically
-- Write a `parse_nutrition_label_pdf(path)` function
+- Write a `parse_nutrition_label_pdf(path)` function in `learning_lab/phase_3/day2_pdf.py`
+- Test on 5 real product label PDFs
 
-**Day 3: RAG Concepts + Chunking Strategies**
+**Day 3: RAG Concepts + Chunking + Embeddings + Vector Search**
 
-- Why RAG: Nutrition knowledge base is too large to fit in context
-- Three chunking strategies: size-based, structure-based, semantic-based
-- NomNom data: Find a public nutrition manual (USDA FoodData Central PDF or doc) as RAG knowledge base
-- Implement size-based + overlap chunking
+Combined day — these are tightly linked concepts:
+- **Why RAG**: knowledge base too large for context
+- **Chunking strategies**: size-based, structure-based, semantic-based
+- **Embedding model concept** (Voyage AI, OpenAI, sentence-transformers options + tradeoffs)
+- **Cosine similarity math** + simplest vector store (numpy or FAISS)
+- Find a public nutrition manual (USDA FoodData Central) as RAG knowledge base
+- Implement size-based + overlap chunking + embedding + naive cosine search
 
-**Day 4: Embeddings + Vector Search**
+Output: `learning_lab/phase_3/day3_naive_rag.py` — a working end-to-end naive RAG.
 
-- Embedding model concept (use Voyage AI or open-source)
-- Cosine similarity math
-- Write the simplest vector store (numpy or FAISS)
-- NomNom: Chunk the nutrition knowledge and store in vector store
+**Day 4: BM25 + Hybrid Search + RRF + Reranking**
 
-**Day 5: Full RAG Flow (NomNom v2.0 Prototype)**
+This day = **your RecSys background pays off**.
+- **BM25 algorithm**: lexical search based on term frequency
+- Why hybrid: Semantic search sometimes misses exact term matches; lexical sometimes misses synonyms
+- **RRF (Reciprocal Rank Fusion)**: merge results from multiple sources — **exactly the multi-channel recall pattern in RecSys**
+- **Reranking**: Use LLM to rerank top-K candidates
 
-- 7-step RAG full flow: chunking → embedding → store → query → similarity search → assemble prompt → LLM
-- NomNom v2.0: User asks "how much protein per 100g of chicken breast?" → RAG retrieves nutrition knowledge → Claude answers
+Build `learning_lab/phase_3/day4_hybrid_search.py`:
+- Vector index + BM25 index
+- RRF merge
+- LLM rerank top 10 → top 3
 
-#### Week 6: Advanced RAG + Citations
+**Day 5: Contextual Retrieval + Citations**
 
-**Day 6: BM25 + Hybrid Search**
-
-- BM25 algorithm: lexical search based on term frequency
-- Why needed: Semantic search sometimes misses exact term matches
-- **RecSys background is force-multiplier here** — hybrid search is exactly the multi-channel recall pattern in RecSys
-- NomNom upgrade: vector + BM25 dual indexes
-
-**Day 7: Reciprocal Rank Fusion + Reranking**
-
-- RRF: Merge results from multiple search sources
-- Reranking: Use LLM to rerank candidate results
-- NomNom upgrade: retrieval → BM25 + vector → RRF merge → LLM reranking
-
-**Day 8: Contextual Retrieval (Advanced Technique)**
-
+Morning: Contextual Retrieval
 - Anthropic's technique: Add context to chunks before embedding via LLM
 - Use case: Long documents where chunks lack context, hurting retrieval accuracy
-- NomNom application: Nutrition manual sections cross-reference each other; adding context improves recall
+- Try on the nutrition manual — measure recall before/after
 
-**Day 9: Citations (NomNom Anti-Hallucination Killer)**
-
+Afternoon: Citations (RAG anti-hallucination killer)
 - `"citations": {"enabled": true}` + add title to source
 - Claude annotates each output with source location (PDF page or character position)
-- NomNom application: Each nutrition recommendation tagged "Source: USDA FoodData Central, p.45"
-- **This is the killer feature for RAG productization** — users can verify, dodging hallucination accusations
+- **This is the killer feature for RAG productization** — users can verify
+- Practice on a 5-question demo
 
-**Day 10: NomNom v2.0 (Phase 3 capstone)**
+#### Week 6: Code Review + Sandbox Capstone + Production Refactor
 
-Integration:
-- Multimodal food recognition (carry over v1.0)
-- Nutrition label PDF parsing (new)
-- Nutrition knowledge RAG system (new): hybrid search + reranking + citations
-- User can ask "is the oil in the stir-fry I just photographed too much?" — the system synthesizes recognition + knowledge base answer + sources
+**Day 6: Code Review — `embedding.py` (94 lines) + `cache.py` (187 lines)**
 
-**Write a RAG eval report**:
-- 30 nutrition-related questions as dataset
-- Retrieval accuracy (NDCG@5, MRR)
-- Answer quality (model-based grading)
-- Simple RAG vs. hybrid + reranking comparison
+For `embedding.py`:
+- What model is used? Why this choice (e.g., `all-MiniLM-L6-v2`, 384-dim)?
+- How are embeddings cached, if at all?
+- Is batch behavior optimized?
+- Cost/quality tradeoff vs. Voyage AI or OpenAI alternatives — which would you choose now?
 
-### Phase 3 Side Line (~half day)
+For `cache.py` — semantic cache:
+- Cosine 0.15 threshold — was this measured, or guessed? What's a "near miss"?
+- How is cache hit/miss logged?
+- Is there cache invalidation? TTL?
+- How does it interact with `embedding.py`?
 
-**Side 1: Code Execution Concept (30 minutes)**
-- Upload file → get file ID → Claude runs Python in Docker container
-- NomNom doesn't need it now, but **future "nutrition data visualization" might use it**
-- Know about Files API existence and usage
+Write `learning_lab/phase_3/day6_embedding_cache_review.md`:
+- Defend or refute the 0.15 threshold with reasoning (you may need to run a quick experiment with real cache hit data)
+- A justified opinion on the embedding model choice
+- Concrete improvements you'd ship
 
-**Side 2: Built-in Tools Complete List (45 minutes)**
+**Day 7: Code Review — `seed_knowledge.py` (41 lines) + `tools.py` (88 lines, agent loop angle)**
 
-The built-in tools Anthropic provides — no need to implement schemas or functions. Interview question "what built-in tools does Anthropic provide?" requires a complete list.
+For `seed_knowledge.py`:
+- What KB entries exist? How many?
+- Chunking strategy? Where did the source data come from?
+- Is the KB ever updated? How?
+
+For `tools.py` (revisit from Phase 2 angle):
+- Is there a real multi-tool agent loop, or single-shot tool use?
+- How does it handle tool errors? (Especially after Day 5's contextual retrieval — does the LLM get useful feedback when retrieval fails?)
+
+Output: `learning_lab/phase_3/day7_seed_knowledge_tools_review.md`.
+
+**Day 8–9: Sandbox Capstone — Advanced RAG pipeline + eval**
+
+Build a **complete advanced RAG pipeline from scratch** in `learning_lab/phase_3/advanced_rag/`:
+
+- Source: nutrition manual PDF (real)
+- Chunking: size-based with overlap + contextual retrieval (LLM adds context)
+- Index: vector + BM25
+- Query: hybrid search → RRF → top-10 → LLM rerank → top-3
+- Generation: prompt assembly with retrieved chunks + citations enabled
+- **Eval report**: 30 nutrition-related questions; measure NDCG@5, MRR, answer quality (model-graded)
+- **Comparison**: simple cosine retrieval vs. hybrid + reranking — quantify the lift
+
+Output: `learning_lab/phase_3/rag_eval_report.md` — your second portfolio artifact.
+
+**Day 10: Production Refactor — land RAG improvements in `src/llm/`**
+
+Concrete changes:
+- **`cache.py`**: refine the cosine threshold based on Day 6 analysis; add citation metadata to cache entries so cached responses include sources
+- **`seed_knowledge.py`**: expand KB if undersized; switch chunking to size-based-with-overlap if it isn't already; consider contextual retrieval
+- **`embedding.py`**: probably keep MiniLM (right tradeoff for scale), but add doc comment explaining why over alternatives
+- **New file (if needed)**: `pdf_parser.py` — production-grade nutrition label PDF parsing (from Day 2 sandbox)
+- **New file (if needed)**: `hybrid_search.py` — hybrid BM25 + vector + RRF + rerank pipeline
+- **Citations**: enable in the meal recommendation flow so users see which KB entries informed the suggestion
+
+Create `docs/iterations/12-rag-upgrade/`:
+- `PLAN.md` (from Day 6–7 reviews)
+- `SUMMARY.md` with before/after retrieval accuracy metrics
+- Include `rag_eval_report.md` from Day 8–9
+
+### Phase 3 Side Line — Built-in Tools (~half day, reading only)
+
+Knowing the built-in tools Anthropic provides is interview material. **Do not implement** — just understand.
 
 | Tool | Use | Useful for NomNom? |
 |---|---|---|
@@ -603,9 +762,9 @@ The built-in tools Anthropic provides — no need to implement schemas or functi
 
 **Web Search Tool key points**: `max_uses` limits total searches (default 5); `allowed_domains` restricts to trusted domains.
 
-**Text Editor Tool key points**: Schema is a stub (just name + type); Claude expands internally. Schema string is versioned with model. **Actual file ops you implement yourself** — schema only tells Claude the tool exists; you write the read/write code. This is one of the core mechanisms of products like Claude Code.
+**Text Editor Tool key points**: Schema is a stub (just name + type); Claude expands internally. **Actual file ops you implement yourself** — schema only tells Claude the tool exists; you write the read/write code. This is one of the core mechanisms of products like Claude Code.
 
-**This Phase doesn't implement these — just understand the concepts**. Phase 6 returns to make similar capabilities ecosystem-grade via MCP.
+Phase 6 returns to make similar capabilities ecosystem-grade via MCP.
 
 ### Phase 3 Retrospective
 
@@ -648,17 +807,24 @@ Update Capability Profile:
 
 ### Phase 4 Main Line: Performance and Cost Engineering (~1 week)
 
-#### Day 1–2: Prompt Caching
+> **Time budget (5 working days)**:
+> - **Days 1–2**: Concept learning (caching + tiering + streaming basics) in `learning_lab/`
+> - **Day 3**: Code review of `router.py`, `rate_limiter.py`, `logger.py`
+> - **Day 4**: Sandbox capstone — cost/latency tracking + baseline measurement
+> - **Day 5**: Production refactor — land caching + tiering + cost dashboard
 
+#### Day 1: Prompt Caching + Model Tiering Concepts
+
+Morning: Prompt Caching
 - Cache unchanged system prompts and tool schemas; reuse on repeated requests
 - Rules: cache lasts 1 hour; minimum 1024 tokens; max 4 breakpoints; any change before cached content invalidates the entire cache
 - Content processing order: tools → system prompt → messages
-- NomNom application: Cache long system prompt (nutritionist role + output schema) + tool schemas
 - Verify cache hits: observe `cache_creation_input_tokens` vs. `cache_read_input_tokens`
+- Practice: cache a long system prompt in `learning_lab/phase_4/day1_caching.py`
 
-#### Day 3: Model Tiering
+Afternoon: Model Tiering Framework
 
-Revisit Phase 1's "NomNom uses Sonnet" decision and refine:
+Build the decision framework for NomNom's task → model mapping:
 
 | Task | Recommended Model | Reason |
 |---|---|---|
@@ -669,34 +835,71 @@ Revisit Phase 1's "NomNom uses Sonnet" decision and refine:
 | Eval grader | Opus | Deep judgment |
 | Test dataset generation | Haiku | Fast, cheap |
 
-Implement: Route NomNom internal tasks to different models.
+In `learning_lab/phase_4/day1_tiering.md`, write the rationale for each row.
 
-#### Day 4: Streaming in NomNom
+#### Day 2: Streaming + Cost & Latency Tracking Concepts
 
-- Streaming basics from Phase 1
-- Apply to NomNom: After photo capture, real-time display "Recognizing... Querying nutrition database... Generating answer..."
+Morning: Streaming application
+- Streaming basics (from Phase 1 Day 3 side line)
+- Apply: real-time display "Recognizing... Querying nutrition database... Generating answer..."
 - Use `client.messages.stream()` + `text_stream` property
+- Practice in `learning_lab/phase_4/day2_streaming.py`
 
-#### Day 5: Cost & Latency Tracking
+Afternoon: Cost & Latency Tracking
+- What to log per call: tokens (input/output/cache), latency, model, cost (computed from pricing)
+- Simple dashboard concept: aggregate by task type, time window
+- **Side line concepts** (read-only, 30 min each):
+  - **Extended Thinking** — for complex reasoning (`thinking_budget` ≥ 1024). NomNom doesn't need it yet; v3 might. Just understand when to enable.
+  - **Fine-Grained Tool Calling** — streaming + tool use, disable JSON validation for speed. NomNom doesn't need it (batch task). Concept only.
 
-- Each request records: tokens (input/output/cache), latency, model, cost (computed from pricing)
-- Build a dashboard (CLI table or simple Streamlit)
-- Run NomNom v2.0 vs. v2.1 (optimized) comparison: how much cost/latency dropped
+#### Day 3: Code Review — `router.py`, `rate_limiter.py`, `logger.py`
 
-**This data is interview gold**: "I drove NomNom's average request cost from $0.05 to $0.018, p95 latency from 4.2s to 1.8s."
+For `router.py` (97 lines):
+- Is it model tiering, or some other kind of routing?
+- What's the decision logic — deterministic rules, LLM-driven, or both?
+- How does it interact with `client.py`'s fallback mechanism?
+- Is the routing as good as the Day 1 tiering table you wrote?
 
-### Phase 4 Side Line (~half day)
+For `rate_limiter.py` (85 lines):
+- What algorithm? Token bucket? Leaky bucket? Sliding window?
+- Per-user or global?
+- What happens on limit hit — fail, queue, throttle?
+- Are there metrics to know if the limit is right?
 
-**Side 1: Extended Thinking Concept (30 minutes)**
-- Enable for complex reasoning. `thinking_budget` minimum 1024.
-- NomNom v2.0 doesn't need it — nutrition recognition isn't deep reasoning
-- v3 "open questions" might (Phase 5)
-- When to enable: Prompt optimization can't reach target accuracy → enable thinking
+For `logger.py` (163 lines):
+- What's captured per call? Tokens? Latency? Model? **Cost?**
+- Structured (JSON) or string-based?
+- Where do logs go — file? DB? stdout?
+- Can you query "what's daily spend per task type"?
 
-**Side 2: Fine-Grained Tool Calling Concept (30 minutes)**
-- Streaming + tool use, disable JSON validation for speed
-- NomNom doesn't need it — batch task, not real-time
-- Understand the concept
+Write `learning_lab/phase_4/day3_router_limiter_logger_review.md`.
+
+#### Day 4: Sandbox Capstone — Cost & Latency Baseline
+
+In `learning_lab/phase_4/baseline_measurement/`:
+- Pick 20 representative requests across NomNom task types (image recognition, JSON extraction, RAG answer)
+- Measure pre-optimization: cost, latency (p50, p95), per task type
+- Generate `baseline_report.md` with the numbers
+
+This baseline is what your Day 5 refactor will improve against.
+
+#### Day 5: Production Refactor — land caching, tiering, cost dashboard
+
+Concrete changes:
+- **`router.py`**: refine routing rules per Day 1 tiering table — explicit mapping like "image recognition → Sonnet, JSON extraction → Haiku, meal recommendation → Sonnet". Document each choice.
+- **`client.py`** (revisit from Phase 1): add prompt caching for long system prompts (the nutritionist role + tool schemas)
+- **`logger.py`**: ensure `cost_usd` field per call. If missing, add it.
+- **New: cost dashboard**. Build a script or endpoint that shows daily spend + p50/p95 latency per task type. This becomes interview gold.
+
+After refactor, re-run Day 4 baseline measurement → produce **`docs/iterations/13-cost-and-latency/before_after_report.md`** with actual dollar/millisecond improvements.
+
+**Capstone artifact**: "NomNom Cost & Latency Optimization Report" — for example: "I drove NomNom's average request cost from $0.05 to $0.018, p95 latency from 4.2s to 1.8s." **This data is interview gold**.
+
+Create `docs/iterations/13-cost-and-latency/` with `PLAN.md` + `SUMMARY.md` + the before/after report.
+
+### Phase 4 Side Line — Already Embedded
+
+Extended Thinking and Fine-Grained Tool Calling are Day 2 afternoon reading.
 
 ### Phase 4 Retrospective
 
@@ -735,9 +938,16 @@ Update Capability Profile:
 
 ### Phase 5 Main Line: Workflow vs. Agent
 
-#### Week 8: 5 Patterns + Workflow Hands-On
+> **Time budget (10 working days)**:
+> - **Days 1–5**: Concept + sandbox — 5 patterns, workflow design, single-agent design (all in `learning_lab/`)
+> - **Days 6–8**: Multi-agent side project (`tech_comparison_agent`) — **separate from NomNom**, lives in `learning_lab/` only
+> - **Days 9–10**: Production refactor — bring workflow + single agent into `NomNom-Backend/src/llm/`
 
-**Day 1: Re-Read Building Effective Agents (2nd time)**
+> **Important**: Phase 5 has **no existing files to refactor** in the strict sense. The current `NomNom-Backend/src/llm/` doesn't have a workflow module or agent module. This Phase is mostly **net-new production code**, informed by sandbox practice.
+
+#### Week 8: Concept Learning + Sandbox (in `learning_lab/`)
+
+**Day 1: Re-Read Building Effective Agents (2nd time) + 5 Patterns**
 
 First time was Phase 0 framework view. Second time focuses on the 5 patterns:
 1. **Prompt Chaining**: Break complex tasks into sequential steps
@@ -746,17 +956,17 @@ First time was Phase 0 framework view. Second time focuses on the 5 patterns:
 4. **Orchestrator-Workers**: Dynamically split tasks, dispatch, aggregate
 5. **Evaluator-Optimizer**: Producer outputs result → evaluator scores → reproduce if not enough
 
-Companion: Run each pattern from [anthropic-cookbook](https://github.com/anthropics/anthropic-cookbook).
+Companion: Run each pattern from [anthropic-cookbook](https://github.com/anthropics/anthropic-cookbook) in `learning_lab/phase_5/day1_5_patterns/`.
 
-**Day 2: NomNom v3.0 Design — Workflow for "What to Eat Today"**
+**Day 2: Workflow Design — "What to Eat Today"**
 
 User story: "I'm on a weight-loss diet; recommend a 600-calorie lunch."
 
-**Implement with workflow** (not agent):
+**Design with workflow** (not agent), in `learning_lab/phase_5/day2_workflow_design.md`:
 ```
 Step 1: Routing (intent recognition)
-  - "what did I eat" → use v2 pipeline
-  - "what should I eat" → use new pipeline
+  - "what did I eat" → existing v2 pipeline
+  - "what should I eat" → new pipeline
 
 Step 2 (new pipeline): Prompt Chaining
   - Sub-step 1: Extract constraints (calorie target, dietary preferences, allergies)
@@ -768,9 +978,11 @@ Step 2 (new pipeline): Prompt Chaining
 
 **Key discipline**: Each step is an independent LLM call (not one mega-prompt). This is the essence of prompt chaining.
 
-**Day 3: Implement NomNom v3.0 Workflow**
+**Day 3: Workflow Sandbox Implementation**
 
-Implement the design from Day 2. Use suitable models per step (routing → Haiku, generation → Sonnet, evaluator → Opus).
+Implement the Day 2 design in `learning_lab/phase_5/day3_workflow_sandbox/`. Use suitable models per step (routing → Haiku, generation → Sonnet, evaluator → Opus).
+
+This is the **reference implementation** — you'll port a cleaned-up version to production on Day 9.
 
 **Day 4: Single Agent — When Workflow Isn't Enough?**
 
@@ -778,13 +990,13 @@ Discover workflow's limitation: User asks "I have eggs, onions, potatoes, and le
 - Workflow's fixed steps can't handle this — may need to list ingredient combos, then judge nutrition, then consider cook time
 - **Use single agent**: Let Claude decide tool call order autonomously
 
-Implement NomNom v3.1 single agent mode (for freestyle cooking questions):
-- Give the agent tools: `check_pantry`, `search_recipes`, `calculate_nutrition`, `estimate_cooking_time`
-- Agent loop lets Claude self-compose the calls
+Implement single-agent mode sandbox in `learning_lab/phase_5/day4_agent_sandbox/`:
+- Tools: `check_pantry`, `search_recipes`, `calculate_nutrition`, `estimate_cooking_time`
+- Agent loop lets Claude self-compose the calls (reuse the loop pattern from Phase 3 Day 1)
 
-**Day 5: Workflow vs. Agent Decision Framework (Your Interview Power Phrase)**
+**Day 5: Workflow vs. Agent Decision Framework + Notes**
 
-Write a `workflow_vs_agent_decision.md`:
+Write `docs/learning/05_learning_notes/workflow_vs_agent_decision.md`:
 
 ```markdown
 # My Decision Framework
@@ -795,13 +1007,15 @@ Ask in this order:
 3. Need LLM autonomous path decisions? → Single agent
 4. Single agent not enough? → Then consider Multi-agent
 
-NomNom v3.0 "weight-loss lunch recommendation" → workflow (steps fixed)
-NomNom v3.1 "fridge leftovers" → single agent (path uncertain)
+NomNom "weight-loss lunch recommendation" → workflow (steps fixed)
+NomNom "fridge leftovers" → single agent (path uncertain)
 ```
 
-#### Week 9: Multi-Agent Special Topic (Side Line, but Deep)
+**This document is interview gold** — it's exactly the kind of judgment-based answer that distinguishes senior from junior LLM engineers.
 
-> **Important: NomNom truly doesn't need multi-agent**. But interviews ask, so this Phase covers it deeply with an independent small project.
+#### Week 9: Multi-Agent Side Project + Production Refactor
+
+> Days 6–8 deeply learn multi-agent via a side project (not NomNom). Days 9–10 bring the workflow + agent work into NomNom production.
 
 **Day 6: Multi-Agent Concepts**
 
@@ -823,11 +1037,15 @@ Read:
 4. Cost explosion
 5. Eval is extremely hard
 
-**Day 7: Hands-On — Independent Small Project `tech_comparison_agent`**
+Notes in `docs/learning/05_learning_notes/multi_agent_dialectic.md`.
+
+**Day 7: Hands-On Side Project — `tech_comparison_agent`**
 
 **This is for interviews, not NomNom.**
 
 Task: User inputs "compare PyTorch vs. TensorFlow for production", system outputs a comparison report.
+
+Location: `learning_lab/phase_5/tech_comparison_agent/`. This is a **standalone side project** — has its own README, runs independently of NomNom.
 
 Architecture:
 ```
@@ -863,19 +1081,42 @@ Design 4-dimensional eval for the Day 7 demo:
 
 **This table will tell you the real value boundary of multi-agent** — workflow may win on some cases. This is engineering reality.
 
-**Day 9–10: NomNom v3.0 + v3.1 Polish + Overall Demo**
+Save report as `learning_lab/phase_5/tech_comparison_agent/multi_agent_vs_workflow_report.md`.
 
-Wrap up by getting Week 8's NomNom v3.0 (workflow) and v3.1 (single agent) running end-to-end.
-Make a 5-minute demo video showing all three modes:
-- v2.0: recognition + RAG (augmentation)
-- v3.0: weight-loss recommendation (workflow)
-- v3.1: fridge leftovers (single agent)
+**Day 9: Production Refactor — workflow integration**
+
+Bring the Day 2–3 workflow design into `NomNom-Backend/src/llm/`:
+
+- **New module**: `NomNom-Backend/src/llm/workflow/` containing:
+  - `routing.py`: classifies user requests (what did I eat? what should I eat?)
+  - `meal_recommendation_workflow.py`: the 5-sub-step chain
+  - `__init__.py`
+- **Integrate with existing recommendations**: locate the current meal recommendation entry point in NomNom and route through the new workflow when the request is "what should I eat"-style
+- **Eval**: run the workflow against the Day 3 sandbox tests to confirm parity
+
+Create `docs/iterations/14-meal-recommendation-workflow/` with `PLAN.md` + `SUMMARY.md`.
+
+**Day 10: Production Refactor — single-agent feature**
+
+Bring the Day 4 single-agent design into production as a new feature:
+
+- **New module**: `NomNom-Backend/src/llm/agent/fridge_assistant.py`
+- **Tools**: `check_pantry`, `search_recipes`, `calculate_nutrition`, `estimate_cooking_time` — implement against real DB/RAG where possible
+- **Add a new API endpoint** in `NomNom-Backend/src/api/` for the fridge-leftovers feature
+- **Add to iOS** is out of scope for this Phase (Phase 5 is about LLM logic, not iOS work)
+
+Create `docs/iterations/15-fridge-leftovers-agent/` with `PLAN.md` + `SUMMARY.md`.
+
+**Final artifact**: a 5-minute demo video showing all three NomNom modes:
+- Recognition + RAG (Phase 1–3 work)
+- Workflow-based meal recommendation (Day 9)
+- Agent-based fridge leftovers (Day 10)
 
 **This demo video becomes your deep-dive material for interviews**.
 
-### Phase 5 Side Line (Embedded in Multi-Agent Special Topic)
+### Phase 5 Side Line — Embedded
 
-Multi-agent week is the side line, deep-learned.
+Multi-agent (Days 6–8) is the side line. The `tech_comparison_agent` lives separately in `learning_lab/`, separately demoed for interview purposes.
 
 ### Phase 5 Retrospective
 
@@ -918,7 +1159,14 @@ Update Capability Profile:
 
 ### Phase 6 Main Line: MCP + Ecosystem-ization
 
-#### Day 1–2: MCP Concepts + Trio
+> **Time budget (5 working days)**:
+> - **Day 1**: MCP concepts + sandbox MCP server in `learning_lab/`
+> - **Day 2**: Production MCP server — build `nomnom_mcp_server.py` in NomNom
+> - **Day 3**: Claude Code integration + verification
+> - **Day 4**: Final `src/llm/` whole-module audit (the most important production work of this Phase)
+> - **Day 5**: Documentation pass + Claude Code study + capability profile final update
+
+#### Day 1: MCP Concepts + Sandbox Server (in `learning_lab/`)
 
 **MCP (Model Context Protocol)** = Anthropic-promoted protocol for standardized agent connectivity to external tools/data.
 
@@ -931,17 +1179,26 @@ The trio:
 
 **MCP Inspector**: `mcp dev server.py` launches a browser debugger.
 
-#### Day 3: Make NomNom an MCP Server
+Sandbox practice in `learning_lab/phase_6/day1_sandbox_mcp/`:
+- Build a toy MCP server (3 fake tools, 1 resource, 1 prompt)
+- Verify it with MCP Inspector
+- Get comfortable with the protocol before touching NomNom
 
-Implement `nomnom_mcp_server.py`:
-- Tool: `analyze_food_image(path)` - food recognition + nutrition
-- Tool: `lookup_nutrition(food_name)` - knowledge base query
-- Tool: `recommend_meal(constraints)` - meal recommendation
-- Resource: `nomnom://foods/{food_id}` - expose recognized food data
-- Resource: `nomnom://history` - user history (if available)
-- Prompt: `daily_summary` - pre-built daily summary template
+#### Day 2: Production MCP Server — `nomnom_mcp_server.py`
 
-#### Day 4: Claude Code Integration
+Implement the real NomNom MCP server. Location: `NomNom-Backend/src/llm/mcp/nomnom_mcp_server.py` (or wherever fits NomNom's structure).
+
+Expose:
+- **Tool**: `analyze_food_image(path)` - food recognition + nutrition (wraps existing analyze logic)
+- **Tool**: `lookup_nutrition(food_name)` - knowledge base query (wraps existing RAG)
+- **Tool**: `recommend_meal(constraints)` - meal recommendation (wraps Phase 5 workflow)
+- **Resource**: `nomnom://foods/{food_id}` - expose recognized food data
+- **Resource**: `nomnom://history` - user history (if available)
+- **Prompt**: `daily_summary` - pre-built daily summary template
+
+The MCP server is a **thin adapter** — it should not reimplement any logic. It calls into existing `src/llm/` modules.
+
+#### Day 3: Claude Code Integration + Verification
 
 Connect NomNom MCP server to Claude Code:
 ```
@@ -950,7 +1207,50 @@ claude mcp add nomnom <startup-command>
 
 Now you can use NomNom's features directly in Claude Code. **This is the real shape of productization** — your product becomes a service in the Claude ecosystem.
 
-#### Day 5: Studying Claude Code Itself (Reference Implementation)
+Verification checklist:
+- [ ] Claude Code can list NomNom tools
+- [ ] `analyze_food_image` works with a local photo
+- [ ] `lookup_nutrition` returns RAG-backed answers with citations
+- [ ] `recommend_meal` invokes the workflow
+- [ ] Resources can be browsed
+
+Create `docs/iterations/16-mcp-server/` with `PLAN.md` + `SUMMARY.md` + setup instructions.
+
+#### Day 4: Whole-Module `src/llm/` Audit (Most Important Production Day)
+
+This is the **single most important day of the entire 10-week journey**. Step back and re-evaluate the whole `src/llm/` module.
+
+Per-file checklist (revisit each of the 12 files):
+
+| File | Q1: Do I now understand it fully? | Q2: Any leftover opacity? | Q3: Any change I want to make? |
+|---|---|---|---|
+| `client.py` | (after Phase 1) | | |
+| `prompt_engine.py` | (after Phase 1) | | |
+| `prompts/` | (after Phase 1) | | |
+| `parser.py` | (after Phase 2) | | |
+| `guardrails.py` | (after Phase 2) | | |
+| `tools.py` | (after Phase 2/3) | | |
+| `evaluator.py` | (after Phase 2) | | |
+| `embedding.py` | (after Phase 3) | | |
+| `cache.py` | (after Phase 3) | | |
+| `seed_knowledge.py` | (after Phase 3) | | |
+| `router.py` | (after Phase 4) | | |
+| `rate_limiter.py` | (after Phase 4) | | |
+| `logger.py` | (after Phase 4) | | |
+
+For any file with "leftover opacity": **today is the day to resolve it**. After today, every file must be 4/5 or 5/5.
+
+Make the changes. Commit each as a separate small commit so the audit is traceable.
+
+Create `docs/iterations/17-final-audit/SUMMARY.md` summarizing what changed and what didn't.
+
+#### Day 5: Documentation Pass + Claude Code Study + Capability Profile Final
+
+**Morning: Documentation pass**
+
+Update `docs/northstar/ARCHITECTURE.md` to reflect the post-learning state of `src/llm/`. Add a **"Design Decisions"** section that captures the rationale for each key file's design — this section didn't exist before; it does now because you can defend each choice.
+
+**Afternoon: Study Claude Code as a reference implementation**
 
 Now with full LLM Harnessing knowledge, look back at Claude Code, the industrial-grade autonomous coding agent. Each mechanism corresponds to concepts you've learned:
 
@@ -964,21 +1264,27 @@ Now with full LLM Harnessing knowledge, look back at Claude Code, the industrial
 | Memory (project / local / user) | Layer 5: Multi-tier context management |
 | MCP servers | Layer 3: Standardized tool use |
 
-**Advanced techniques**:
+**Advanced techniques to try**:
 - **Git worktrees + multiple Claude Code instances in parallel**: For complex tasks, give different sub-tasks different worktrees
 - **Custom slash commands**: Write markdown templates in `.claude/commands/` to crystallize high-frequency workflows
 - **Three-step prompting**: (1) find files (2) produce a plan (3) implement
 
-### Phase 6 Side Line (~half day)
+**End of day: Capability Profile final update + 30-min walkthrough recording**
 
-**Side 1: Claude Agent SDK (half day)**
+Update `Iona_Capability_Profile.md` to its final state. Every layer should hit its target.
+
+Record a **30-minute walkthrough video** taking a viewer from `client.py` through `nomnom_mcp_server.py`, explaining every design choice. **This is the deep-dive that wins technical interviews.**
+
+### Phase 6 Side Line — Reading List
+
+**Claude Agent SDK** (half day, optional)
 - Anthropic's official agent library
 - Claude Code is built around this
 - Run a quick demo to see the difference vs. your hand-written agent loop
 
-**Side 2: LangGraph (Optional, OK to Skip)**
+**LangGraph** (skip — only learn if a future job needs it)
 - Third-party graph-based agent workflow framework
-- Skip reason: You've mastered Anthropic's native tooling; LangGraph isn't required
+- Skip reason: You've mastered Anthropic's native tooling
 - Learn it when joining a project that already uses it
 
 ### Phase 6 Retrospective

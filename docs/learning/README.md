@@ -14,8 +14,6 @@
 │   └── roadmap_reference.md               ← Capability stack version (interview reference)
 ├── 01_capability_profile/                 ← My capability profile
 │   └── Chris_Capability_Profile.md        ← Updated at end of each Phase
-├── 02_nomnom_spec/                        ← NomNom product spec
-│   └── NomNom_v1_spec.md                  ← Created in Phase 0, updated as Phases evolve
 ├── 03_phase_retrospectives/               ← End-of-Phase retros
 │   ├── phase_1_retro.md
 │   ├── phase_2_retro.md
@@ -36,7 +34,6 @@
 |---|---|---|
 | `00_roadmap/` | Learning roadmaps (from Claude's design) | Almost never changes |
 | `01_capability_profile/` | Self-assessment + evidence for the 7-layer capability stack | End of each Phase |
-| `02_nomnom_spec/` | NomNom product definition, v1-v6 evolution | When Phases evolve |
 | `03_phase_retrospectives/` | Per-Phase retros (what learned, decisions, next steps) | End of each Phase |
 | `04_code/` | Actual code | Daily |
 | `05_learning_notes/` | Deep concept notes — your own synthesis of key topics (API, prompt engineering, RAG, agent design, etc.) | When you crystallize a concept |
@@ -52,6 +49,7 @@
 > Update this section after completing each Phase.
 
 ---
+
 
 ## Workflow Conventions
 
@@ -127,7 +125,7 @@
 
 ## Acceptance Milestones
 
-- [ ] **Phase 0** (Week 0): Roadmap read, directory built, spec and capability profile drafted
+- [ ] **Phase 0** (Week 0): Roadmap read, directory built, reality check done, capability profile drafted
 - [ ] **Phase 1** (Week 1-2): NomNom v0.5 — CLI food recognition working
 - [ ] **Phase 2** (Week 3-4): NomNom v1.0 — 100% valid JSON output + complete eval pipeline
 - [ ] **Phase 3** (Week 5-6): NomNom v2.0 — RAG + PDF + Citations

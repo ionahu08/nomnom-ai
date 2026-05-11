@@ -51,7 +51,6 @@ See `docs/iterations/09-food-diary/SUMMARY.md` for retrospective.
 | `docs/iterations/` | Per-iteration PLAN.md, PHASES.md, SUMMARY.md, BUGLOG.md |
 | `docs/learning/00_roadmap/roadmap_main_nomnom.md` | 10-week LLM Harnessing learning plan |
 | `docs/learning/01_capability_profile/Iona_Capability_Profile.md` | Iona's skill level tracking across 7 layers |
-| `docs/learning/02_nomnom_spec/NomNom_v1_spec.md` | Learning version of "v1 done" — what counts as Phase 0-6 complete |
 | `docs/learning/05_learning_notes/` | Deep concept notes (API, agents, LLM OS, production) |
 | `learning_lab/` | Sandbox for Phase 1-6 hands-on concept practice (separate from production code) |
 | `.claude/rules/dev-rules.md` | Standards and conventions |

@@ -45,10 +45,12 @@ class AuthService: ObservableObject {
     }
 
     func logout() {
+        print("[AuthService] Logging out...")
         KeychainService.delete(key: tokenKey)
         UserDefaults.standard.removeObject(forKey: emailKey)
         api.setToken(nil)
         isAuthenticated = false
+        print("[AuthService] isAuthenticated = \(isAuthenticated)")
     }
 
     private func saveToken(_ token: String, email: String) {

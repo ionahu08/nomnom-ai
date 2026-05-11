@@ -35,7 +35,7 @@ class APIClient {
         #if targetEnvironment(simulator)
         self.baseURL = baseURL ?? "http://localhost:8000"
         #else
-        self.baseURL = baseURL ?? "https://upgrades-defend-values-precious.trycloudflare.com"
+        self.baseURL = baseURL ?? "https://dir-dramatically-finishing-workstation.trycloudflare.com"
         #endif
     }
 
