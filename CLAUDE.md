@@ -38,7 +38,10 @@ See `docs/iterations/09-food-diary/SUMMARY.md` for retrospective.
 
 ## Current Learning Phase
 
-**Phase 0** (Week 0, May 10–17, 2026): Cognitive map + v1 spec definition.
+**Phase 1** (Week 1–2, May 17–31, 2026): API basics + prompt engineering +
+deep review of `client.py`, `prompt_engine.py`, `prompts/`.
+
+Phase 0 retrospective: `docs/learning/03_phase_retrospectives/phase_0_retro.md`
 
 
 ## Key Docs

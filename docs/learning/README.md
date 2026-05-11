@@ -125,7 +125,7 @@
 
 ## Acceptance Milestones
 
-- [ ] **Phase 0** (Week 0): Roadmap read, directory built, reality check done, capability profile drafted
+- [x] **Phase 0** (Week 0): Roadmap read, directory built, reality check done, capability profile drafted
 - [ ] **Phase 1** (Week 1-2): NomNom v0.5 — CLI food recognition working
 - [ ] **Phase 2** (Week 3-4): NomNom v1.0 — 100% valid JSON output + complete eval pipeline
 - [ ] **Phase 3** (Week 5-6): NomNom v2.0 — RAG + PDF + Citations

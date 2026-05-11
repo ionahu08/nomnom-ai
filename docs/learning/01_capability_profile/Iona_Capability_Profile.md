@@ -31,13 +31,14 @@
 
 **What's in this layer**: API messages structure, model selection (Opus/Sonnet/Haiku), parameters (temperature, max_tokens, stop_sequences), `stop_reason` field, streaming events, multi-turn conversation management, prompt caching, cost tracking, model tiering decisions.
 
-- **Current**: 0/5 (never made an API call)
+- **Current**: 1/5 
 - **Target**: 4/5
 - **Why this target**: Foundation skill — needs to be solid but doesn't need to be a differentiator. 4/5 is "I can write any API call from memory and debug others' API code."
 - **Phase progression**:
   - Phase 1 → 3/5 (Quickstart + multi-turn + streaming working)
   - Phase 4 → 4/5 (prompt caching + model tiering verified with cost data)
 - **Evidence**: _(empty — fill as Phases complete)_
+  - Read API foundations notes; understand messages/system/max_tokens, retry/fallback patterns from reviewing client.py
 
 ---
 
@@ -45,13 +46,14 @@
 
 **What's in this layer**: Clear & direct prompts, multishot examples, Chain of Thought, XML tags, system prompts/roles, prefill response, prompt chaining.
 
-- **Current**: 0/5
+- **Current**: 1/5
 - **Target**: 4/5
 - **Why this target**: Universal foundation. Every project uses it. 4/5 = "I can stack techniques deliberately and explain why each one matters." Not 5/5 because pure prompt engineering is increasingly commoditized — it's no longer enough to be a differentiator on its own.
 - **Phase progression**:
   - Phase 1 → 3/5 (NomNom v0.5 uses at least 4 techniques)
   - Phase 2 → 4/5 (combined with eval — I can measure prompt impact, not just write prompts)
 - **Evidence**: _(empty)_
+  - Read Anthropic Prompt Engineering docs overview, agent patterns paper; familiar with XML tags, CoT, multishot conceptually (not yet practiced)
 
 ---
 
