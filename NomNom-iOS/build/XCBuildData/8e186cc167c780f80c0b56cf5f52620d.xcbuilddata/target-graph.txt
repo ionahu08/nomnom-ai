@@ -1,2 +1,0 @@
-Target dependency graph (1 target)
-Target 'NomNom' in project 'NomNom' (no dependencies)

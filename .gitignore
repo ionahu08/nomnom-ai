@@ -10,3 +10,18 @@ __pycache__/
 
 # Xcode
 *.xcworkspace/xcuserdata/
+
+# User upload storage (runtime, not for git)
+uploads/
+
+# Learning lab sandbox cleanup
+learning_lab/**/.env
+learning_lab/**/__pycache__/
+
+# Xcode build artifacts (should never be committed)
+NomNom-iOS/build/
+**/build/
+
+# Xcode user state (per-user, not for git)
+**/xcuserdata/
+*.xcuserstate
