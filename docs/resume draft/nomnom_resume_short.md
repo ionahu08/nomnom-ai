@@ -1,4 +1,4 @@
-# NomNom — AI-Powered Food Tracking App
+# NomNom — AI-Powered Health Tracking App
 **Machine Learning Engineer | Python/FastAPI + SwiftUI iOS**
 
 ---
