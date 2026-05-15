@@ -25,3 +25,4 @@ NomNom-iOS/build/
 # Xcode user state (per-user, not for git)
 **/xcuserdata/
 *.xcuserstate
+*.egg-info/
