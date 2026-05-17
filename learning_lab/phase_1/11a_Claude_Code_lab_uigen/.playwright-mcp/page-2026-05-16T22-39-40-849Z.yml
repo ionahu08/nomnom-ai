@@ -1,0 +1,106 @@
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e5]:
+      - heading "React Component Generator" [level=1] [ref=e7]
+      - generic [ref=e9]:
+        - generic [ref=e14]:
+          - generic [ref=e51]:
+            - generic [ref=e54]: Create a simple product card component with an image, title, description, and a price display. Use a clean, modern design with rounded corners and subtle shadows.
+            - img [ref=e57]
+          - generic [ref=e60]:
+            - img [ref=e63]
+            - generic [ref=e68]:
+              - generic [ref=e71]: Creating App.jsx
+              - separator [ref=e72]
+              - generic [ref=e75]: Creating ProductCard.jsx
+              - separator [ref=e76]
+              - generic [ref=e77]:
+                - paragraph [ref=e78]: "Done! Created a clean product card component with:"
+                - list [ref=e79]:
+                  - listitem [ref=e80]: Rounded corners and subtle shadow with hover effect
+                  - listitem [ref=e81]: Image with zoom animation on hover
+                  - listitem [ref=e82]: Title, description, and price display
+                  - listitem [ref=e83]: "\"Add to Cart\" button"
+                  - listitem [ref=e84]: Responsive design using Tailwind CSS
+        - generic [ref=e22]:
+          - textbox "Describe the React component you want to create..." [ref=e23]
+          - button [disabled] [ref=e24]:
+            - img [ref=e25]
+    - separator [ref=e28]
+    - generic [ref=e30]:
+      - generic [ref=e31]:
+        - tablist [ref=e33]:
+          - tab "Preview" [ref=e34]
+          - tab "Code" [active] [selected] [ref=e35]
+        - generic [ref=e36]:
+          - button "Sign In" [ref=e37]
+          - button "Sign Up" [ref=e38]
+      - generic [ref=e86]:
+        - generic [ref=e92]:
+          - generic [ref=e93]:
+            - generic [ref=e94] [cursor=pointer]:
+              - img [ref=e95]
+              - img [ref=e97]
+              - generic [ref=e99]: components
+            - generic [ref=e102] [cursor=pointer]:
+              - img [ref=e103]
+              - generic [ref=e108]: ProductCard.jsx
+          - generic [ref=e110] [cursor=pointer]:
+            - img [ref=e111]
+            - generic [ref=e116]: App.jsx
+        - separator [ref=e117]
+        - code [ref=e122]:
+          - generic [ref=e123]:
+            - generic [ref=e125]:
+              - generic [ref=e128]: "1"
+              - generic [ref=e130]: "2"
+              - generic [ref=e131]:
+                - generic [ref=e132] [cursor=pointer]: 
+                - generic [ref=e133]: "3"
+              - generic [ref=e134]:
+                - generic [ref=e135] [cursor=pointer]: 
+                - generic [ref=e136]: "4"
+              - generic [ref=e137]:
+                - generic [ref=e138] [cursor=pointer]: 
+                - generic [ref=e139]: "5"
+              - generic [ref=e140]:
+                - generic [ref=e141] [cursor=pointer]: 
+                - generic [ref=e142]: "6"
+              - generic [ref=e143]:
+                - generic [ref=e144] [cursor=pointer]: 
+                - generic [ref=e145]: "7"
+              - generic [ref=e147]: "8"
+              - generic [ref=e151]: "9"
+              - generic [ref=e153]: "10"
+              - generic [ref=e157]: "11"
+              - generic [ref=e159]: "12"
+              - generic [ref=e161]: "13"
+              - generic [ref=e163]: "14"
+              - generic [ref=e165]: "15"
+              - generic [ref=e167]: "16"
+              - generic [ref=e169]: "17"
+            - generic [ref=e253]:
+              - generic [ref=e255]: import ProductCard from '@/components/ProductCard';
+              - generic [ref=e258]: "export default function App() {"
+              - generic [ref=e260]: return (
+              - generic [ref=e262]: <div className="min-h-screen bg-gray-50 p-8">
+              - generic [ref=e264]: <div className="max-w-md mx-auto">
+              - generic [ref=e266]: <ProductCard
+              - generic [ref=e268]: image="https://images.unsplash.com/
+              - generic [ref=e270]: photo-1505740420928-5e560c06d30e?w=500&
+              - generic [ref=e272]: h=500&fit=crop"
+              - generic [ref=e274]: title="Premium Wireless Headphones"
+              - generic [ref=e276]: description="High-quality sound with
+              - generic [ref=e278]: active noise cancellation and 30-hour
+              - generic [ref=e280]: battery life"
+              - generic [ref=e282]: "price={199.99}"
+              - generic [ref=e284]: />
+              - generic [ref=e286]: </div>
+              - generic [ref=e288]: </div>
+              - generic [ref=e290]: );
+              - generic [ref=e292]: "}"
+            - textbox "Editor content" [ref=e295]
+  - alert [ref=e50]
+  - generic [ref=e296]:
+    - alert
+    - alert

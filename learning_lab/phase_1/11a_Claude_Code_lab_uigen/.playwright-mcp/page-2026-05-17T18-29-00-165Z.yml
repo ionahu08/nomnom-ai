@@ -1,0 +1,79 @@
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e5]:
+      - heading "React Component Generator" [level=1] [ref=e7]
+      - generic [ref=e9]:
+        - generic [ref=e14]:
+          - generic [ref=e51]:
+            - generic [ref=e54]: Create a simple product card component with an image, title, description, and a price display. Use a clean, modern design with rounded corners and subtle shadows.
+            - img [ref=e57]
+          - generic [ref=e60]:
+            - img [ref=e63]
+            - generic [ref=e68]:
+              - generic [ref=e71]: Creating App.jsx
+              - separator [ref=e72]
+              - generic [ref=e75]: Creating ProductCard.jsx
+              - separator [ref=e76]
+              - generic [ref=e77]:
+                - paragraph [ref=e78]: "Done! Created a clean product card component with:"
+                - list [ref=e79]:
+                  - listitem [ref=e80]: Rounded corners and subtle shadow with hover effect
+                  - listitem [ref=e81]: Image with zoom animation on hover
+                  - listitem [ref=e82]: Title, description, and price display
+                  - listitem [ref=e83]: "\"Add to Cart\" button"
+                  - listitem [ref=e84]: Responsive design using Tailwind CSS
+          - generic [ref=e297]:
+            - generic [ref=e300]: Create a contact form with email, name, and message fields. Include validation feedback and a submit button. Use a modern, clean design with proper spacing and focus states.
+            - img [ref=e303]
+          - generic [ref=e401]:
+            - img [ref=e404]
+            - generic [ref=e409]:
+              - generic [ref=e412]: Editing App.jsx
+              - separator [ref=e413]
+              - generic [ref=e416]: Creating ContactForm.jsx
+              - separator [ref=e417]
+              - generic [ref=e418]:
+                - paragraph [ref=e419]: "Done! Created a contact form with:"
+                - list [ref=e420]:
+                  - listitem [ref=e421]: Name, email, and message fields
+                  - listitem [ref=e422]: Real-time validation feedback with error messages
+                  - listitem [ref=e423]: Email format validation
+                  - listitem [ref=e424]: Minimum message length validation
+                  - listitem [ref=e425]: Clear focus states with blue ring on valid fields, red on errors
+                  - listitem [ref=e426]: Success message that displays for 5 seconds after submission
+                  - listitem [ref=e427]: Proper spacing and modern design with rounded corners
+                  - listitem [ref=e428]: Errors clear when user starts typing
+        - generic [ref=e22]:
+          - textbox "Describe the React component you want to create..." [ref=e23]
+          - button [disabled] [ref=e24]:
+            - img [ref=e25]
+    - separator [ref=e28]
+    - generic [ref=e30]:
+      - generic [ref=e31]:
+        - tablist [ref=e33]:
+          - tab "Preview" [active] [selected] [ref=e34]
+          - tab "Code" [ref=e35]
+        - generic [ref=e36]:
+          - button "Sign In" [ref=e37]
+          - button "Sign Up" [ref=e38]
+      - iframe [ref=e463]:
+        - generic [ref=f3e5]:
+          - heading "Get in Touch" [level=2] [ref=f3e6]
+          - generic [ref=f3e7]:
+            - generic [ref=f3e8]:
+              - generic [ref=f3e9]: Name
+              - textbox "Name" [ref=f3e10]:
+                - /placeholder: Your name
+            - generic [ref=f3e11]:
+              - generic [ref=f3e12]: Email
+              - textbox "Email" [ref=f3e13]:
+                - /placeholder: your.email@example.com
+            - generic [ref=f3e14]:
+              - generic [ref=f3e15]: Message
+              - textbox "Message" [ref=f3e16]:
+                - /placeholder: Your message here...
+            - button "Send Message" [ref=f3e17] [cursor=pointer]
+  - alert [ref=e50]
+  - generic [ref=e296]:
+    - alert
+    - alert
