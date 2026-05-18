@@ -26,3 +26,4 @@ NomNom-iOS/build/
 **/xcuserdata/
 *.xcuserstate
 *.egg-info/
+.claude/agent-memory/
