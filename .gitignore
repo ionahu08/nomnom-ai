@@ -27,3 +27,9 @@ NomNom-iOS/build/
 *.xcuserstate
 *.egg-info/
 .claude/agent-memory/
+
+# Claude Code lab artifacts (Next.js project at 11a_Claude_Code_lab_uigen)
+learning_lab/**/.playwright-mcp/
+learning_lab/**/.next/
+learning_lab/**/logs.txt
+learning_lab/**/node_modules/
