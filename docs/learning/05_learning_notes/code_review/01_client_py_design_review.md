@@ -79,6 +79,32 @@ The method raises `last_error` (whatever the last exception was). If fallback is
 
 **Reasoning:** The most recent error is usually most relevant for debugging.
 
+## Follow-up Questions: Retry vs. Fallback Strategy
+
+### Why fallback to Haiku instead of 3 retries?
+
+Retry bets on the same fault recovering; fallback bets on a different model being available. Fallback doesn't depend on the same failure source, so its expected success rate is higher than incremental retries.
+
+If Sonnet times out, retrying Sonnet again likely hits the same timeout. Switching to Haiku (faster, different implementation) has a much better chance of succeeding.
+
+### What if Haiku also fails?
+
+Code lines 139–148: Haiku is terminal, raises `last_error`. This is acceptable because Haiku is already the last resort; further fallback only delays the error.
+
+At that point, the user gets a clear error instead of hanging or waiting indefinitely.
+
+### Why not use Haiku as primary if you care about cost/latency?
+
+Sonnet primary + Haiku fallback is a **quality-first strategy**. NomNom food recognition needs accuracy more than cost savings, but fallback provides graceful degradation rather than total failure.
+
+If we made Haiku primary, food analyses would be faster and cheaper, but potentially less accurate (missing nutritional details, misidentifying dishes). Fallback to Sonnet is the opposite: primary model is high-quality, fallback is fast.
+
+### Why no jitter on backoff?
+
+Currently deterministic 1s → 2s. Jitter would help if NomNom had thundering herd risk (1000 concurrent users retrying). At current scale (single-user app), jitter is unnecessary complexity.
+
+**Future improvement:** When scale grows and concurrent requests become common, add randomization to spread retries.
+
 ## Design Choices I Still Don't Understand
 
 - Would jitter on the exponential backoff help? (Currently 1s → 2s is deterministic; adding randomness would spread retries even more, but the code doesn't do this.)
