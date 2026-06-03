@@ -2,290 +2,255 @@
 
 ## What This File Does
 
-This module renders prompts. It provides a core `render_prompt()` function that generates templated prompts, plus 3 specialized wrapper functions that generate different prompts for different use cases (food analysis, meal recommendations, weekly recap). It exists so that product people only need to update the .j2 files without changing any Python code.
+This module renders prompts. It provides a core `render_prompt()` function that loads Jinja2 templates and injects variables, plus 3 specialized wrapper functions for different prompts (food analysis, meal recommendations, weekly recap). It exists so prompts live in separate `.j2` files instead of being hardcoded in Python.
 
-## Understanding Jinja2 (In Simple Terms)
+## Understanding Jinja2 (Background)
 
-**What is Jinja2?**
+Jinja2 is Python's most popular template engine. It takes a template file (with placeholders) + variables, and combines them into a final string.
 
-Jinja2 = Python's most popular "template engine." It takes a template file (with placeholders) + variables, and combines them into a final string.
+**Core syntax:**
 
-**Example without Jinja2:**
-
-```python
-# Hardcoded in Python
-prompt = f"Analyze this food. Diet: {diet}. Calories: {calories}."
-```
-
-Problems:
-- Long prompts (hundreds of lines) become messy in Python code
-- Every prompt change requires changing Python code + redeploy
-- Hard to add conditionals (e.g., "if vegetarian, add this text")
-
-**Example with Jinja2:**
-
-File: `prompts/analyze_food.j2` (plain text, not Python):
-```jinja2
-Analyze this food image.
-
-User's diet preference: {{ diet }}
-Calorie target: {{ calorie_target }}
-
-{% if vegetarian %}
-Only recommend vegetarian options.
-{% endif %}
-
-Cat persona:
-{% include "cat_personas.j2" %}
-```
-
-Python code:
-```python
-prompt = render_prompt(
-    "analyze_food.j2",
-    diet="weight loss",
-    calorie_target=600,
-    vegetarian=True
-)
-# Returns: fully rendered string ready for Claude
-```
-
-**Jinja2 Core Syntax:**
-
-| Syntax | Meaning | Example |
-|--------|---------|---------|
-| `{{ variable }}` | Variable substitution | `{{ diet }}` → "weight loss" |
-| `{% if condition %} ... {% endif %}` | Conditional block | Only include text if condition is true |
-| `{% include "file.j2" %}` | Include another template | `{% include "cat_personas.j2" %}` |
+| Syntax | Meaning |
+|---|---|
+| `{{ variable }}` | Variable substitution |
+| `{% if condition %} ... {% elif %} ... {% else %} ... {% endif %}` | Conditional block |
+| `{% include "file.j2" %}` | Include another template |
 
 ## How It Works at Runtime
-
-**Flow: User upload → Prompt generation → Claude call**
 
 ```
 [1] User uploads food photo in iOS app
     ↓
-[2] FastAPI backend receives request
+[2] FastAPI backend calls: render_analyze_food_prompt(cat_style="sassy")
     ↓
-[3] Backend calls: render_analyze_food_prompt(cat_style="sassy")
-    ↓
-[4] prompt_engine internally:
+[3] prompt_engine internally:
     - Jinja2 loads prompts/analyze_food.j2
-    - Injects cat_style="sassy" variable
-    - Processes: {% include "cat_personas.j2" %}
-    - Selects the "sassy" personality block from cat_personas.j2
-    - Combines everything into one complete string
+    - Injects cat_style="sassy"
+    - Processes {% include "cat_personas.j2" %}
+    - The if/elif chain in cat_personas.j2 matches "sassy"
+    - Returns the combined string
     ↓
-[5] Returns fully rendered prompt string
+[4] String passed to: client.create_message_with_retry(...)
     ↓
-[6] String passed to: client.create_message_with_retry(messages=[{content: prompt}])
+[5] client.py sends to Anthropic API (Haiku)
     ↓
-[7] client.py sends to Anthropic API
-    ↓
-[8] Claude returns food analysis
+[6] Claude returns food analysis JSON
 ```
 
-**Key insight:** The 4 .j2 files (analyze_food.j2, cat_personas.j2, recommend_meal.j2, weekly_recap.j2) are **handwritten by developers**, not generated. Jinja2 just renders them.
+## Templates in `prompts/` (Real Inventory)
 
-## Before and After: The Problem It Solves
+### `analyze_food.j2` — Food photo analysis (for Haiku)
 
-**Without prompt_engine.py (hardcoded prompts in Python):**
-```python
-def get_analyze_food_prompt(cat_style):
-    if cat_style == "sassy":
-        persona = "You are a sassy, judgmental cat with a sharp tongue..."
-    elif cat_style == "grumpy":
-        persona = "You are a grumpy cat who criticizes everything..."
-    
-    prompt = f"""{persona}
-    
-Analyze the food photo. Respond with ONLY JSON:
-{{"food_name": "...", "calories": ..., "cat_roast": "..."}}"""
-    return prompt
-```
+**Purpose:** Extract nutrition data + personality commentary from food photos
 
-Problems:
-- Has to update Python code every time you want to change wording
-- Every change requires code review and redeployment
-- Product people can't edit without a developer
-- Hard to A/B test different phrasings (need to write new code each time)
-- Prompt logic mixed with Python logic (hard to maintain)
+**Variables used:** `{{ cat_style }}` (injected via include)
 
-**With prompt_engine.py (Jinja2 templates):**
-```python
-prompt = render_analyze_food_prompt(cat_style="sassy")
-```
-
-Benefits:
-- Separate Python code from .j2 files (clean separation of concerns)
-- Product people can edit .j2 templates directly without touching code
-- Prompt changes deploy instantly (no redeployment needed)
-- Easy to A/B test different phrasings (just edit the template and refresh)
-- Prompts are version-controlled separately from Python logic
-- Reusable templates (cat_personas.j2 included in multiple prompts, DRY principle)
-
-## Design Choices I Can Defend
-
-### Why Jinja2 templates instead of hardcoding?
-
-Prompts are **product assets, not code**. They change 10x more frequently than code. Hardcoding forces product iteration through the Python development cycle (code change → review → test → deploy). Jinja2 templates decouple prompt changes from code changes.
-
-**Philosophy:** Prompts should live in their own files so non-engineers can iterate on them independently.
-
-### Why specialized wrapper functions like `render_analyze_food_prompt()`?
-
-These functions serve as an **API contract**. Instead of callers needing to know `render_prompt("analyze_food.j2", cat_style=...)`, they call `render_analyze_food_prompt(cat_style=...)`.
-
-Benefits:
-- **Type safety:** Function signature shows required parameters
-- **IDE autocomplete:** Editor knows what parameters exist
-- **Prevent bugs:** Can't typo the template name or forget required parameters
-- **Self-documenting:** New engineer reads the function name and knows exactly what it does
-
-**Philosophy:** Explicit contracts prevent mistakes.
-
-### Why include `cat_personas.j2` inside `analyze_food.j2`?
-
-Multiple prompts will need the same cat personalities (analyze_food, recommend_meal, weekly_recap). Without extracting, you'd duplicate the 5 cat personas across 4 files. Every time you want to update a persona, you'd change it in 4 places (risk of getting out of sync).
-
-By including `cat_personas.j2`, changes in one place automatically propagate everywhere.
-
-**Philosophy:** DRY principle — single source of truth for reused content.
-
-### Why Jinja2 specifically?
-
-Jinja2 is lightweight, widely used in web frameworks (Flask, Django), and easy to learn. It supports:
-- Variable substitution: `{{ variable }}`
-- Conditionals: `{% if condition %}`
-- Loops: `{% for item in list %}`
-- Template inclusion: `{% include "file.j2" %}`
-
-This lets you keep prompts readable while adding just enough logic.
-
-### Why functions, not a class?
-
-The module uses **functions, not a class**, because:
-
-1. **No state needed.** Each render call is independent: load template → inject variables → return string. Functions are sufficient.
-
-2. **Simplicity.** `render_analyze_food_prompt(cat_style="sassy")` is simpler than instantiating a class: `engine = PromptEngine(); engine.render_analyze_food_prompt(...)`.
-
-3. **Global Jinja2 environment.** The `jinja_env` is created once at module load and reused. This is fine as a module-level constant — no need to wrap it in a class.
-
-4. **Factory pattern.** Think of it as a lightweight factory: `render_prompt()` is the core, and `render_*_prompt()` functions are convenience factories for specific use cases.
-
-**When you'd use a class instead:**
-- If you needed different Jinja2 configurations per instance
-- If you needed to cache rendered templates per instance
-- If the object stored state (e.g., render history, metrics)
-
-**Philosophy:** Keep it simple — use the simplest structure that solves the problem.
-
-## Analysis of prompts/ Folder
-
-The 4 prompt templates use industry-standard prompt engineering techniques. Here's what each does:
-
-### `analyze_food.j2` — Food Photo Analysis
+**Structure:**
+- Comment header (2 lines)
+- `{% include "cat_personas.j2" %}` at the top (establishes personality)
+- JSON output schema (7 fields: food_name, calories, protein_g, carbs_g, fat_g, food_category, cuisine_origin, cat_roast)
+- Rules: concise names, realistic calories (300-1200)
+- 2 few-shot examples (Big Mac & fries, Caesar salad)
 
 **Prompt engineering techniques:**
-- **Role assignment:** "You are a {{ cat_style }} cat"
-- **Structured output:** Enforces JSON format (no markdown, specific fields)
-- **Few-shot examples:** Shows 2 real food examples with expected output
-- **Clear rules:** "Be accurate with nutrition. Calories realistic (300-1200). Entertain, don't be cruel."
-- **Guardrails:** Bounds on calorie ranges, concise naming rules
+- Role assignment via cat_personas include
+- Structured JSON output format (enforces consistency)
+- Few-shot examples (2 diverse examples: high-cal fast food + low-cal healthy)
+- Guardrails (calorie bounds, concise naming)
 
-**Structure:** ✅ **Intentional and clear**
-- Role comes from cat_personas.j2 (reusable across prompts)
-- Output format is crystal clear (JSON structure shown)
-- Examples teach the model without ambiguity
-- Rules prevent common failures (unrealistic calories, cruelty)
-
-**What I would change:** Nothing major. This is well-designed for its purpose (fast, reliable food analysis). Could add "nutrition values must sum to realistic totals" but might be unnecessary complexity.
+**Design insight:** `{{ cat_style }}` appears twice — once in the persona, once in the JSON schema field. This is defense in depth: the include establishes overall tone, the field reference reinforces it at the specific place that needs it (cat_roast).
 
 ---
 
-### `cat_personas.j2` — Personality Definitions
+### `cat_personas.j2` — Personality definitions
+
+**Purpose:** Define 5 cat personalities that inject tone into other prompts
+
+**Variables used:** `{{ cat_style }}` (conditional selector)
+
+**Structure:** `{% if/elif/else %}` chain with 5 personalities:
+- `sassy` — sharp, witty, judgmental
+- `grumpy` — curmudgeonly, dry humor
+- `wholesome` — encouraging, supportive
+- `concerned` — worried about health
+- `neutral` (default) — observant, non-judgmental
+
+**Defensive design:** Any unrecognized `cat_style` silently falls back to neutral. No crash, no error — graceful degradation.
 
 **Prompt engineering techniques:**
-- **Conditional role switching:** Each `cat_style` gets a different personality
-- **Concrete voice examples:** Each persona has a "Think:" example showing speech pattern
-- **Default fallback:** Unrecognized cat_style falls back to "neutral"
-
-**Structure:** ✅ **Intentional and well-organized**
-- Personalities are mutually exclusive (clean separation)
-- Each has consistent voice + concrete example
-- Default prevents crashes on unexpected input
-
-**What I would change:**
-- Add a comment explaining the tone spectrum: sassy (critical) → wholesome (supportive) → helps users pick personality
-- Consider adding personas: "playful" (mischievous) or "lazy" (indifferent) if product wants more variety
+- Conditional role switching (one role per style)
+- Concrete voice examples ("Think: ...") for each personality
+- Default fallback for robustness
 
 ---
 
-### `recommend_meal.j2` — Meal Recommendation
+### `recommend_meal.j2` — Meal recommendation
+
+**Purpose:** Suggest meals based on nutrition targets, preferences, restrictions, and meal history
+
+**Variables used:** `today_calories`, `today_protein`, `today_carbs`, `today_fat`, `target_calories`, `target_protein`, `target_carbs`, `target_fat`, `missing_calories`, `missing_protein`, `missing_carbs`, `missing_fat`, `dietary_restrictions`, `cuisine_preferences`, `allergies`, `recent_meals` (list), `kb_entries` (list)
+
+**Structure:**
+- Role: "friendly nutrition assistant"
+- User Profile section (current macros, targets, missing amounts, restrictions, preferences, allergies)
+- Recent Meals section (loop over recent_meals)
+- Nutrition Knowledge Base section (loop over kb_entries)
+- Instructions: suggest 2-3 meals, explain why, include fun fact
+- Tone: conversational, encouraging
 
 **Prompt engineering techniques:**
-- **Context marshaling:** Provides all relevant data (macros, preferences, restrictions, past meals, knowledge base)
-- **Structured data organization:** Uses markdown **headers** to organize sections
-- **Loops:** Iterates over recent_meals and kb_entries (Jinja2 `{% for %}`)
-- **Safe defaults:** `{{ dietary_restrictions if dietary_restrictions else 'None' }}` prevents empty/null errors
-- **Explicit output format:** "Format as: 1. suggestions, 2. why, 3. fun fact"
-- **Tone:** Conversational and encouraging (warmer than analyze_food's roasting)
+- Context marshaling (comprehensive data provided)
+- Structured data organization (markdown headers for clarity)
+- Loops for dynamic content (recent_meals, kb_entries)
+- Safe defaults (`{{ dietary_restrictions if dietary_restrictions else 'None' }}` prevents null errors)
+- Explicit output format (numbered bullets)
+- Warm tone (encouraging vs. sarcastic)
 
-**Structure:** ✅ **Intentional and clear**
-- Data hierarchy is readable (User Profile → Recent Meals → KB)
-- Expectations are explicit (2-3 options, reasoning, fun fact)
-- Tone matches the use case (helping, not judging)
-
-**What I would change:**
-- Add constraint: "Keep suggestions realistic (easy to prepare, available ingredients)"
-- Add priority: "Prioritize suggestions that fill the largest nutrition gap first"
-- Add edge case: "If user has 0 recent meals (new user), suggest meal variety and common beginner mistakes to avoid"
+**What could be improved:**
+- Add constraint: "Keep suggestions realistic (easy to prepare, available)"
+- Add priority: "Fill the largest nutrition gap first"
+- Handle edge case: "If user is new (0 recent meals), suggest meal variety"
 
 ---
 
-### `weekly_recap.j2` — Weekly Summary
+### `weekly_recap.j2` — Weekly summary
+
+**Purpose:** Generate entertaining weekly food habit summaries
+
+**Variables used:** `week_start`, `week_end`, `total_meals_logged`, `avg_calories`, `best_day`, `best_day_calories`, `worst_day`, `worst_day_calories`, `most_eaten_category`, `avg_protein`, `avg_carbs`, `avg_fat`, `cat_style`, `meals` (list)
+
+**Structure:**
+- Header (week start/end)
+- Statistics section (8 metrics)
+- Meals This Week section (loop over meals)
+- 5-step narrative arc:
+  1. Open with witty observation
+  2. Call out patterns
+  3. Celebrate wins
+  4. Nudge toward improvement
+  5. Encourage for next week
+- Secondary output: "Actionable Nudge" (specific, easy suggestion)
 
 **Prompt engineering techniques:**
-- **Narrative arc:** 5-step structure (open with wit → patterns → wins → nudge → encourage)
-- **Dynamic personality:** Uses `{{ cat_style }}` to vary tone across recaps
-- **Statistical context:** Raw data (meals, macros, best/worst days) provides grounding
-- **Loops:** Lists all meals logged that week
-- **Tone guidance:** "Be funny, be honest, but be kind"
-- **Secondary output:** "Actionable Nudge" (specific, easy suggestion for next week)
+- Narrative arc (5-step structure guides coherent output)
+- Dynamic personality (`{{ cat_style }}` varies tone)
+- Statistical grounding (raw metrics provided)
+- Loops for recent content
+- Tone guidance ("Be funny, be honest, be kind")
+- Secondary output (actionable next step)
 
-**Structure:** ✅ **Intentional and clear**
-- The 5-step arc guides output without being rigid
-- Cat style variation keeps it fresh across weeks
-- Statistics ground the narrative in data
-
-**What I would change:**
-- Add length constraint: "Keep recap to 3-5 paragraphs (not essays)"
-- Add edge case: "If user logged only 1 meal all week, be encouraging, not critical"
-- Clarify alignment: The "Actionable Nudge" sometimes contradicts the recap tone. Could align them: if recap is playful, nudge should be playful too
+**What could be improved:**
+- Add length constraint: "3-5 paragraphs (not essays)"
+- Handle edge case: "If only 1 meal logged all week, be encouraging, not critical"
+- Clarify tone alignment between recap and Actionable Nudge
 
 ---
 
-## Summary: Prompt Engineering Techniques Used
+## Summary: Prompt Engineering Techniques Across All 4
 
 | Technique | Used? | Where |
 |-----------|-------|-------|
 | **Role assignment** | ✅ | All 4 (cat personas, nutrition assistant, food critic) |
-| **Few-shot examples** | ✅ | analyze_food.j2 |
+| **Few-shot examples** | ✅ | analyze_food.j2 (2 examples) |
 | **Structured output format** | ✅ | All 4 (JSON, markdown, bullets) |
 | **Context marshaling** | ✅ | recommend_meal.j2, weekly_recap.j2 |
 | **Loops/iteration** | ✅ | recommend_meal.j2, weekly_recap.j2 |
 | **Conditionals** | ✅ | cat_personas.j2, recommend_meal.j2 |
 | **Tone/style guidance** | ✅ | All 4 |
-| **Guardrails/constraints** | ✅ | analyze_food.j2 (calorie bounds) |
+| **Guardrails/constraints** | ✅ | analyze_food.j2 (calorie bounds 300-1200) |
+| **Default fallbacks** | ✅ | cat_personas.j2 (neutral default), recommend_meal.j2 (safe defaults) |
 
-**Overall:** The prompts are well-designed, intentional, and professional. They use industry-standard techniques. No major red flags.
+**Overall assessment:** The prompts are well-designed, intentional, and professional. They use industry-standard techniques with no major red flags.
 
-## Design Choices I Still Don't Understand
+---
 
-- How does Jinja2 handle escaping/security if prompts contain user-generated content? (e.g., if a user's food name gets injected into a template, could that cause issues?)
-- Should there be validation to ensure all required context keys are provided before rendering? (Currently it just errors if a key is missing.)
+## Design Choices I Can Defend
+
+### Why Jinja2 templates instead of hardcoded f-strings in .py?
+
+Prompts are product assets, not code. They change more frequently than Python logic. Hardcoding forces every prompt iteration through the code deployment cycle. Template files decouple prompt changes from code changes — a non-engineer (or me, fast) can edit a `.j2` without touching `.py`.
+
+### Why specialized wrappers like `render_analyze_food_prompt()`?
+
+These functions act as an API contract. Callers see the explicit signature (`cat_style="sassy"`) instead of needing to remember the template filename + variable names. This prevents typos, enables IDE autocomplete, and makes the call site self-documenting.
+
+### Why include `cat_personas.j2` instead of inlining 5 personas in each template?
+
+DRY. Multiple templates likely want the same cat personalities. Without extraction, every change to a persona would need to be repeated across each template that uses it. Extraction = single source of truth.
+
+### Why does `analyze_food.j2` target Haiku, not Sonnet?
+
+Image-to-JSON food analysis is a simple, high-frequency, latency-sensitive task. Haiku's strengths (fast, cheap, sufficient quality for structured output) match this use case. Combined with `MODEL_CONFIG` in `client.py` (Haiku timeout=20s, max_tokens=400), the design is optimized for low latency at high call frequency.
+
+### Why exactly 2 few-shot examples in `analyze_food.j2` (not 1 or 5)?
+
+- 1 example: not enough diversity, model may overfit
+- 5 examples: token bloat (Haiku max_tokens=400 for output)
+- 2 examples: meaningful axes — one high-calorie fast food (Big Mac), one low-calorie healthy (Caesar salad). Together they anchor both ends of the realistic range.
+
+### Why does `{% include "cat_personas.j2" %}` come at the TOP of the template?
+
+Persona/role should frame the entire downstream output. Putting it at the end risks Claude treating the persona as an afterthought decoration rather than the guiding tone.
+
+### Why is `{{ cat_style }}` referenced AGAIN in the JSON schema (in `cat_roast` field)?
+
+Reinforces the field-level constraint. Even though `cat_personas.j2` establishes the role, repeating `{{ cat_style }}` at the specific field that needs it (cat_roast) reduces the risk of Claude generating that field in a default/neutral tone. Critical constraints restated near where they apply have higher compliance rates.
+
+### Why functions, not a class?
+
+No persistent state needed. Each `render_*` call is stateless: load template → inject variables → return string. A module-level `jinja_env` constant handles the Jinja2 setup once. Class would add structure without benefit at this scale.
+
+---
+
+## Open Questions / Things I Don't Fully Understand
+
+- How does Jinja2 handle injection safety if a user-generated string ends up in a template variable? (e.g., if a malicious `cat_style` contained `{% raw %}` markers, would it confuse rendering?)
+- Should there be runtime validation that all required template variables are provided before render? (Currently a missing variable raises an error from Jinja2, not a friendly error from prompt_engine.)
 
 ## Things I Would Change
 
-None yet. The design cleanly separates concerns and enables fast product iteration.
+- Nothing critical for current scale. The design cleanly separates prompt iteration from code iteration, which is the main goal.
+- **Future consideration:** If `recommend_meal.j2` / `weekly_recap.j2` also start using cat personas, the `{% include "cat_personas.j2" %}` pattern will be more clearly justified.
+
+---
+
+## Follow-up Q&A (Interview Prep)
+
+### Q: What happens if a developer adds a new cat_style "playful" in iOS UI but forgets to add `{% elif cat_style == "playful" %}` in cat_personas.j2?
+
+A: The `{% if/elif/else %}` chain falls through to `{% else %}`, which is the "neutral" persona. No crash, no error — just silent degradation to neutral. This is defensive design: prod doesn't break, but the bug is also harder to catch because there's no log/warning.
+
+### Q: Why does `cat_style` appear twice in `analyze_food.j2` (once via include, once in the JSON schema)?
+
+A: Defense in depth. The include establishes the overall persona framing. The JSON schema reference reinforces it at the specific field (cat_roast) that needs to use the persona. Without the second reference, Claude might treat `cat_roast` as a generic field and lose the persona voice.
+
+### Q: Why is `analyze_food.j2` designed for Haiku rather than Sonnet?
+
+A: It's a simple structured task (image → JSON). Haiku is faster, cheaper, and 400 max_tokens is enough for the schema. NomNom calls this on every food photo upload — high frequency = cost optimization matters.
+
+### Q: How would you test if a prompt change in `analyze_food.j2` actually improved results?
+
+A: This is what Phase 2's eval pipeline (`evaluator.py` + test dataset) is for. Before merging a `.j2` change, run the eval suite: structured parse rate, accuracy on test photos, regression check. Without this, prompt changes are vibes-based. **(Phase 2 will deepen this.)**
+
+---
+
+## Capability Profile Update (after Day 7)
+
+- **Layer 1 (Prompt Engineering):** 1/5 → 3/5
+  - Evidence: Defended prompt template architecture, articulated 7 design choices with reasoning
+- **Layer 2 (Output Control):** 1/5 → 2/5
+  - Evidence: Identified field-level constraint reinforcement pattern (cat_style in both persona and JSON schema)
+
+---
+
+## Phase 1 Status
+
+- ✅ Day 6: client.py review (Layer 0 — API resilience)
+- ✅ Day 7: prompt_engine.py review (Layer 1 — prompt engineering infrastructure)
+- ⏳ Next: Phase 2 (parser.py, guardrails.py, evaluator.py, tools.py)
+
+## Phase 6 Follow-up TODOs
+
+- Deep audit of recommend_meal.j2 + weekly_recap.j2
+- Verify Jinja2 injection safety
+- Confirm if all 4 templates use cat_personas (validates DRY justification)
