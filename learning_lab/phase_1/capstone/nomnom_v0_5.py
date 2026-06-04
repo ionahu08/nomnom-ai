@@ -58,6 +58,49 @@ No error handling, no logging, just focused learning.
 #
 # ============================================================================
 
+# ============================================================================
+# 🔍 FLOW TRACE Q&A: Understanding Data Flow
+# ============================================================================
+#
+# Q1: Where did `--cat-style grumpy` go?
+# A: argparse → args.cat_style → main() → analyze_food_photo(cat_style="grumpy")
+#    → render_analyze_food_prompt(cat_style="grumpy") ← cat-style parameter flows here
+#
+# Q2: What did render_analyze_food_prompt(cat_style="grumpy") return?
+# A: A fully rendered prompt STRING (1185 chars) with grumpy cat persona embedded.
+#    Flow: Jinja2 loads analyze_food.j2 → includes cat_personas.j2 →
+#    matches {% elif cat_style == "grumpy" %} → returns complete prompt text
+#
+# Q3: Where did Claude's response come from?
+# A: Step 4 calls client.create_message_with_retry() from client.py
+#    - Sends image + rendered prompt to Claude API
+#    - Handles retry logic (2 attempts with exponential backoff)
+#    - Enforces timeout (20s for Haiku)
+#    - Falls back to Sonnet if Haiku fails
+#    - Returns response object with JSON from Claude
+#
+# Q4: What structure does nomnom_output.json have?
+# A: 8 fields matching the JSON schema in analyze_food.j2:
+#    {
+#      "food_name": "...",
+#      "calories": number,
+#      "protein_g": number,
+#      "carbs_g": number,
+#      "fat_g": number,
+#      "food_category": "...",
+#      "cuisine_origin": "...",
+#      "cat_roast": "..."
+#    }
+#
+# KEY INSIGHTS:
+# - Nutrition data stayed the same across cat-styles (same analysis)
+# - Only cat_roast field changed (different prompt, different tone)
+# - cat_style parameter → prompt_engine.py (Jinja2 templating)
+# - Personality came from TEMPLATE, not from Claude's logic
+# - Same image, different templates = different Claude responses
+#
+# ============================================================================
+
 import sys
 import os
 import json
@@ -67,7 +110,11 @@ from pathlib import Path
 
 # === IMPORTS FROM PRODUCTION CODE ===
 # Add src to path so we can import the modules we learned about
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "NomNom-Backend" / "src"))
+# Calculate path: from this file -> go up 3 levels -> NomNom-Backend/src
+script_dir = Path(__file__).parent  # learning_lab/phase_1/capstone/
+repo_root = script_dir.parent.parent.parent  # NomNom/
+src_path = repo_root / "NomNom-Backend" / "src"
+sys.path.insert(0, str(src_path))
 
 # Import client.py — the LLM wrapper with retry/timeout/fallback logic
 from llm.client import LLMClient
