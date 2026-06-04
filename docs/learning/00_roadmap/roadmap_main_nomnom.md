@@ -270,11 +270,33 @@ A quick-reference table to know, at any moment in the journey, which production 
 
 **Reading this table during the journey**: at any time, ask "what Phase am I in?" → look up that row → those are the files to focus on. The Phase-by-Phase sections below give the detail.
 
-## Phase 1: NomNom MVP — Make It Recognize Food (Week 1–2)
+## Phase 1: NomNom MVP — Make It Recognize Food (Week 1–2) ✅ COMPLETE
+
+**Completion Date:** June 4, 2026
 
 > **NomNom current state**: Nothing yet
-> **State after Phase**: CLI script — input a food photo path, output JSON nutrition data
+> **State after Phase**: Comprehensive understanding of LLM API, prompt engineering, and reliability patterns
 > **Core question**: "How do I get Claude to understand the image and output the format I want?"
+> **Answer**: Via templated prompts (Jinja2), reliable API calls (retry/timeout/fallback), and multimodal image input
+
+### Phase 1 Completion Summary
+
+**What was built:**
+- 15 Jupyter notebooks: API fundamentals, prompt engineering, output control, augmentation, agents
+- 3 project directories: MCP server, Claude Code labs, hooks
+- 2 deep code reviews: client.py (reliability), prompt_engine.py (templating)
+- NomNom v0.5 sandbox capstone: Full LLM pipeline demonstration
+
+**Key insight learned:**
+Prompts are product assets (10x change frequency) — should be separated from infrastructure code via templating. This architectural decision enables non-engineers (product, PMs) to iterate without touching Python.
+
+**Capability progression:**
+- Layer 0 (API): 1/5 → 4/5 ✅
+- Layer 1 (Prompt Eng): 1/5 → 3/5 ✅
+- Layer 2-5: 0/5 → 1-2/5 (foundation laid)
+
+**Snapshot:** `docs/learning/01_capability_profile/Iona_Capability_Profile_phase1_20260604.md`
+**Retrospective:** `docs/learning/03_phase_retrospectives/phase_1_retro.md`
 
 ### Phase 1 Main Line: Get It Working
 

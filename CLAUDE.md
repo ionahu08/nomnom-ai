@@ -38,10 +38,20 @@ See `docs/iterations/09-food-diary/SUMMARY.md` for retrospective.
 
 ## Current Learning Phase
 
-**Phase 1** (Week 1–2, May 17–31, 2026): API basics + prompt engineering +
-deep review of `client.py`, `prompt_engine.py`, `prompts/`.
+**Phase 1** ✅ COMPLETE (May 17–June 4, 2026)
+- 15 Jupyter notebooks: API fundamentals, prompt engineering, output control, augmentation, agents
+- 3 project directories: MCP server, Claude Code labs, hooks
+- 2 deep code reviews: client.py (reliability patterns), prompt_engine.py (templating)
+- Capstone: NomNom v0.5 sandbox script with experimentation
+- **Key insight:** Prompts are product assets (10x change frequency vs. code)
 
-Phase 0 retrospective: `docs/learning/03_phase_retrospectives/phase_0_retro.md`
+**Phase 1 retrospectives:** 
+- `docs/learning/03_phase_retrospectives/phase_0_retro.md`
+- `docs/learning/03_phase_retrospectives/phase_1_retro.md`
+
+**Phase 2** (Week 3–4, starting June 5, 2026): Make NomNom Not Crash
+- Focus: parser.py, guardrails.py, evaluator.py, tools.py
+- Goal: Output control + structured output validation + guardrails
 
 
 ## Key Docs
