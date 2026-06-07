@@ -31,14 +31,18 @@
 
 **What's in this layer**: API messages structure, model selection (Opus/Sonnet/Haiku), parameters (temperature, max_tokens, stop_sequences), `stop_reason` field, streaming events, multi-turn conversation management, prompt caching, cost tracking, model tiering decisions.
 
-- **Current**: 1/5 
+- **Current**: 1/5 → **4/5** ✅ (Phase 1 Complete)
 - **Target**: 4/5
 - **Why this target**: Foundation skill — needs to be solid but doesn't need to be a differentiator. 4/5 is "I can write any API call from memory and debug others' API code."
 - **Phase progression**:
-  - Phase 1 → 3/5 (Quickstart + multi-turn + streaming working)
+  - Phase 1 → 4/5 ✅ (15 notebooks: API fundamentals, multi-turn, streaming, multimodal. Understand token cost O(n²), stop_reason, usage tracking. Reviewed client.py retry/timeout/fallback.)
   - Phase 4 → 4/5 (prompt caching + model tiering verified with cost data)
-- **Evidence**: _(empty — fill as Phases complete)_
-  - Read API foundations notes; understand messages/system/max_tokens, retry/fallback patterns from reviewing client.py
+- **Evidence**: ✅ Phase 1 Complete
+  - Completed 15 Jupyter notebooks covering messages structure, model selection, streaming, multimodal input
+  - Understand multi-turn state management and O(n²) token cost dynamics
+  - Reviewed client.py reliability patterns (retry, timeout, fallback, per-model config)
+  - Experimented with real Claude API calls in NomNom v0.5 capstone
+  - Can explain stop_reason, usage tracking, model tiering trade-offs
 
 ---
 

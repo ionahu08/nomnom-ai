@@ -1,0 +1,97 @@
+{
+  "version": "phase_2_day3_generated",
+  "count": 30,
+  "source": "Claude-generated (Haiku) hard-to-recognize food descriptions",
+  "test_cases": [
+    {
+      "description": "A blurry photo of a brown round shape, possibly a burger or meatball, on a white plate"
+    },
+    {
+      "description": "White fluffy stuff in a bowl, could be whipped cream, meringue, or some kind of mousse"
+    },
+    {
+      "description": "Rice with vegetables, some are recognizable some aren't, mixed together in unclear proportions"
+    },
+    {
+      "description": "Food cut into tiny pieces, can't identify what it was originally, looks tan and mushy"
+    },
+    {
+      "description": "Several different foods on one plate, hard to separate, very crowded and overlapping"
+    },
+    {
+      "description": "Translucent noodles in a clear broth, unknown origin, possibly Vietnamese or Chinese"
+    },
+    {
+      "description": "Very dark photo of something, can't see clearly, might be roasted meat or vegetables"
+    },
+    {
+      "description": "Half-eaten sandwich, mostly bread visible, filling is obscured and partially consumed"
+    },
+    {
+      "description": "Something beige that was cooked too long, unappetizing appearance, mushy texture visible"
+    },
+    {
+      "description": "Mushy brown stuff, could be stew, chili, or mashed beans, consistency unclear"
+    },
+    {
+      "description": "Beige powder or grain with unclear texture, possibly flour, sugar, or ground spice"
+    },
+    {
+      "description": "A shapeless blob of orange-brown substance, overcooked or processed, origin unknown"
+    },
+    {
+      "description": "Translucent cubes floating in murky liquid, possibly tofu or some kind of jelly"
+    },
+    {
+      "description": "Pale yellowish strings or noodles tangled together, too cooked to identify clearly"
+    },
+    {
+      "description": "A plate with brown, green, and white items mixed chaotically, no clear separation"
+    },
+    {
+      "description": "Small round objects in a dark sauce, could be meatballs, olives, or mushrooms"
+    },
+    {
+      "description": "Elongated beige thing with unclear texture, possibly a burrito, pastry, or wrapped item"
+    },
+    {
+      "description": "Translucent white blocks with holes, possibly mozzarella, tofu, or some type of cake"
+    },
+    {
+      "description": "A muddy-colored pile of something stringy and matted together, possibly noodles or shredded vegetables"
+    },
+    {
+      "description": "Underexposed photo shows dark shapes on a dark plate, barely distinguishable"
+    },
+    {
+      "description": "Grayish substance with chunks mixed in, looks like it was overcooked significantly"
+    },
+    {
+      "description": "Flattened beige disc with unclear toppings, could be a pancake, flatbread, or veggie patty"
+    },
+    {
+      "description": "Translucent leafy wraps filled with unrecognizable stuffing, possibly Asian cuisine"
+    },
+    {
+      "description": "Clear broth with floating white specks and thin noodles, Asian origin unclear"
+    },
+    {
+      "description": "A heap of pale yellow threads or strips, possibly egg noodles or shredded vegetable"
+    },
+    {
+      "description": "Overexposed photo of what appears to be white food, details completely washed out"
+    },
+    {
+      "description": "Brown crusty outside with unknown filling, cut in half but interior still unclear"
+    },
+    {
+      "description": "Multiple spheres of different sizes and colors piled together, exact identity unknown"
+    },
+    {
+      "description": "Khaki-colored unidentifiable mass with visible steam, texture too obscured to determine"
+    },
+    {
+      "description": "Semi-transparent cubes in thick sauce with unidentifiable chunks and vegetables mixed throughout"
+    }
+  ]
+}
