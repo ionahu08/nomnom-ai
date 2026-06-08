@@ -9,7 +9,10 @@ and you MUST use a tool to do it. No plain text allowed."
 Result: Claude is guaranteed to return valid JSON matching our schema.
 """
 
+import logging
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 # Anthropic tool_use schema for food analysis
 # This tells Claude: "You must call the analyze_food_tool with these exact fields"
@@ -41,11 +44,39 @@ ANALYZE_FOOD_TOOL = {
             },
             "food_category": {
                 "type": "string",
-                "description": "Category like 'salad', 'fast food', 'dessert', 'home-cooked', 'sandwich', 'soup'",
+                "enum": [
+                    "salad",
+                    "fast food",
+                    "dessert",
+                    "home-cooked",
+                    "sandwich",
+                    "soup",
+                    "pasta",
+                    "rice bowl",
+                    "beverage",
+                    "snack",
+                    "breakfast",
+                    "other",
+                ],
+                "description": "Food category",
             },
             "cuisine_origin": {
                 "type": "string",
-                "description": "Cuisine origin like 'Japanese', 'Italian', 'American', 'Mexican', 'Indian'",
+                "enum": [
+                    "Japanese",
+                    "Italian",
+                    "American",
+                    "Mexican",
+                    "Indian",
+                    "Chinese",
+                    "Thai",
+                    "Mediterranean",
+                    "Vietnamese",
+                    "Korean",
+                    "French",
+                    "other",
+                ],
+                "description": "Cuisine origin",
             },
             "cat_roast": {
                 "type": "string",
@@ -85,4 +116,5 @@ def get_tools_for_task(task_type: str) -> list[dict[str, Any]]:
         # Recaps don't use tool_use, just text generation
         return []
     else:
+        logger.warning(f"Unknown task_type: {task_type} — returning no tools")
         return []
