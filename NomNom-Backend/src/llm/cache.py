@@ -39,8 +39,9 @@ class SemanticCache:
     """
 
     # Similarity threshold for cache hit (0-1 scale)
-    # 0.95 = very similar (same meal, slight angle change)
-    SIMILARITY_THRESHOLD = 0.95
+    # 0.82 = empirically tuned for food descriptions (Phase 3 Day 3 benchmarking)
+    # Balances recall (find real duplicates) vs precision (avoid false matches)
+    SIMILARITY_THRESHOLD = 0.82
 
     @staticmethod
     async def get_cached_analysis(
@@ -71,25 +72,44 @@ class SemanticCache:
             # We want similarity > 0.95, so distance < 0.05
             distance_threshold = 1.0 - SemanticCache.SIMILARITY_THRESHOLD
 
+            # Query for closest match and compute distance explicitly
             stmt = (
-                select(FoodLog)
+                select(
+                    FoodLog,
+                    FoodLog.embedding.cosine_distance(query_embedding).label("distance"),
+                )
                 .where(FoodLog.embedding.is_not(None))
                 .order_by(FoodLog.embedding.cosine_distance(query_embedding))
                 .limit(1)
             )
 
             result = await db.execute(stmt)
-            food_log = result.scalar_one_or_none()
+            row = result.one_or_none()
 
-            if food_log is None:
+            if row is None:
+                logger.debug("No cached items found")
+                cache_stats.record_miss()
                 return None
 
-            # Calculate actual similarity
-            # Note: pgvector cosine_distance returns the actual distance
-            # We don't have direct access to that here, but we ordered by it
-            # For a strict threshold check, we'd need to compute it explicitly
-            # For now, return the closest match regardless (it's a reasonable default)
-            logger.info(f"Cache hit: {food_log.food_name}")
+            food_log, distance = row
+
+            # Check threshold: pgvector distance = 1 - cosine_similarity
+            # We want similarity >= SIMILARITY_THRESHOLD
+            # Which means distance <= (1 - SIMILARITY_THRESHOLD)
+            distance_threshold = 1.0 - SemanticCache.SIMILARITY_THRESHOLD
+            if distance > distance_threshold:
+                cosine_similarity = 1.0 - distance
+                logger.info(
+                    f"Cache miss: similarity {cosine_similarity:.3f} below threshold {SemanticCache.SIMILARITY_THRESHOLD}"
+                )
+                cache_stats.record_miss()
+                return None
+
+            # Threshold passed - return cached result
+            cosine_similarity = 1.0 - distance
+            logger.info(
+                f"Cache hit: {food_log.food_name} (similarity: {cosine_similarity:.3f})"
+            )
             cache_stats.record_hit()
 
             return FoodAnalysisResponse(

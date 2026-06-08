@@ -33,7 +33,10 @@ parser = FoodAnalysisParser()
 
 
 async def analyze_food_photo(
-    image_bytes: bytes, cat_style: str = "sassy", db: Optional[AsyncSession] = None
+    image_bytes: bytes,
+    cat_style: str = "sassy",
+    db: Optional[AsyncSession] = None,
+    food_description: Optional[str] = None,
 ) -> FoodAnalysisResponse:
     """
     Analyze a food photo using the production LLM harness.
@@ -44,12 +47,13 @@ async def analyze_food_photo(
     - Structured output via tool_use (forced JSON)
     - Validation (catches hallucinations)
     - Comprehensive logging
-    - Semantic cache (if db provided)
+    - Semantic cache (if db provided and food_description available)
 
     Args:
         image_bytes: JPEG image data as bytes
         cat_style: Cat personality ("sassy", "grumpy", "wholesome", "concerned", "neutral")
         db: Optional database session for semantic cache
+        food_description: Optional food description for semantic cache lookup before analysis
 
     Returns:
         FoodAnalysisResponse with validated nutritional data
@@ -87,9 +91,8 @@ async def analyze_food_photo(
             }
         ]
 
-        # Step 4: Check semantic cache (if db provided)
-        if db is not None:
-            food_description = "food photo"
+        # Step 4: Check semantic cache (if db provided and food description available)
+        if db is not None and food_description:
             cached_analysis = await SemanticCache.get_cached_analysis(db, food_description)
             if cached_analysis is not None:
                 logger.info(
