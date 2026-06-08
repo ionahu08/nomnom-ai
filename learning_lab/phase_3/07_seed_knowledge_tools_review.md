@@ -8,28 +8,74 @@
 
 ## Table of Contents
 
-1. **[File Overview](#file-overview)**
-   - 1.1 [seed_knowledge.py: Knowledge Base Seeding](#seed_knowledgepy-knowledge-base-seeding)
-   - 1.2 [tools.py: Structured Output via Tool Definitions](#toolspy-structured-output-via-tool-definitions)
-   - 1.3 [How They Work Together](#how-they-work-together)
+1. **[System Context: How All 4 Files Work Together](#system-context-how-all-4-files-work-together)**
 
-2. **[seed_knowledge.py Analysis (41 lines)](#seed_knowledgepy-analysis-41-lines)**
-   - 2.1 [Knowledge Base Coverage: What's Seeded?](#1-knowledge-base-coverage-whats-seeded)
-   - 2.2 [Chunking Strategy & Source Data](#2-chunking-strategy--source-data)
-   - 2.3 [Update Frequency & Maintenance](#3-update-frequency--maintenance)
-   - 2.4 [Error Handling & Logging](#4-error-handling--logging)
+2. **[File Overview](#file-overview)**
+   - 2.1 [seed_knowledge.py: Knowledge Base Seeding](#seed_knowledgepy-knowledge-base-seeding)
+   - 2.2 [tools.py: Structured Output via Tool Definitions](#toolspy-structured-output-via-tool-definitions)
+   - 2.3 [How They Work Together](#how-they-work-together)
 
-3. **[tools.py Analysis (89 lines)](#toolspy-analysis-89-lines)**
-   - 3.1 [Tool Schema Design: ANALYZE_FOOD_TOOL](#1-tool-schema-design-analyze_food_tool)
-   - 3.2 [Multi-Tool Support: Is It Real?](#2-multi-tool-support-is-it-real)
-   - 3.3 [Error Handling & Feedback](#3-error-handling--feedback)
-   - 3.4 [Agent Loop Integration](#4-agent-loop-integration)
+3. **[seed_knowledge.py Analysis (41 lines)](#seed_knowledgepy-analysis-41-lines)**
+   - 3.1 [Knowledge Base Coverage: What's Seeded?](#1-knowledge-base-coverage-whats-seeded)
+   - 3.2 [Chunking Strategy & Source Data](#2-chunking-strategy--source-data)
+   - 3.3 [Update Frequency & Maintenance](#3-update-frequency--maintenance)
+   - 3.4 [Error Handling & Logging](#4-error-handling--logging)
 
-4. **[Summary & Grade](#summary--grade)**
+4. **[tools.py Analysis (89 lines)](#toolspy-analysis-89-lines)**
+   - 4.1 [Tool Schema Design: ANALYZE_FOOD_TOOL](#1-tool-schema-design-analyze_food_tool)
+   - 4.2 [Multi-Tool Support: Is It Real?](#2-multi-tool-support-is-it-real)
+   - 4.3 [Error Handling & Feedback](#3-error-handling--feedback)
+   - 4.4 [Agent Loop Integration](#4-agent-loop-integration)
 
-5. **[Concrete Improvements for Day 10](#concrete-improvements-for-day-10)**
+5. **[Summary & Grade](#summary--grade)**
 
-6. **[Next: Days 8-9 Capstone](#next-days-8-9-capstone)**
+6. **[Concrete Improvements for Day 10](#concrete-improvements-for-day-10)**
+
+7. **[Next: Days 8-9 Capstone](#next-days-8-9-capstone)**
+
+---
+
+## System Context: How All 4 Files Work Together
+
+**The Problem:** How do we avoid re-analyzing the same meal twice?
+
+**The Solution:** Semantic cache with 4 components working together.
+
+```
+INITIALIZATION (one-time at deployment):
+  seed_knowledge.py
+  └─ Load 5,000 foods from USDA into database
+
+RUNTIME (every time user analyzes a meal):
+  User uploads photo
+    ↓
+  cache.py + embedding.py (check for similar meals)
+    ├─ embedding.py: "Grilled chicken" → [0.45, 0.62, ...]
+    ├─ Search pgvector: found similar before?
+    └─ IF YES: Return cached result (save API call!)
+    
+  tools.py (analyze if no cache hit)
+    ├─ Claude receives ANALYZE_FOOD_TOOL schema
+    ├─ Claude MUST return: {food_name, calories, protein, ...}
+    └─ Structure guaranteed valid
+    
+  cache.py + embedding.py (store for next time)
+    ├─ embedding.py: Convert → vector
+    └─ Store vector in pgvector
+    
+  Result: Day 1 costs $0.001, Day 2 costs $0 (cache hit)
+```
+
+**File Collaboration:**
+
+| File | Role |
+|------|------|
+| **seed_knowledge.py** | Load nutrition KB (USDA data) at deployment |
+| **tools.py** | Force Claude to return structured JSON |
+| **embedding.py** | Convert text → vectors for similarity search |
+| **cache.py** | Store/retrieve results, avoid redundant calls |
+
+**Impact:** 70% of users eat repetitive meals → 70% cache hits → 70% fewer API calls
 
 ---
 
