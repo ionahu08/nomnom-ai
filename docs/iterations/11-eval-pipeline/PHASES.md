@@ -2,6 +2,24 @@
 
 **Overview:** Building and validating production eval pipeline (Days 1-10 of Phase 2)
 
+**Learning Artifacts (preserved in repo):**
+```
+learning_lab/phase_2/
+├── 01_output_control.py          ← Day 1: Prefill, stop_sequences, tool_choice
+├── 02_eval_pipeline.py           ← Day 2: 6-step workflow (v1 vs v2 comparison)
+├── 03_dataset_generation.py      ← Day 3: Claude-generated 30 edge cases
+├── 04_code_graders.py            ← Day 4: 3-level code-based validation
+├── 05_model_grading.py           ← Day 5: Opus-as-judge + signal fusion
+├── 06_parser_guardrails_review.md ← Day 6-7: Code review documentation
+├── 07_tools_evaluator_review.md   ← Day 6-7: Code review documentation
+├── 08_capstone_v1_tool_choice.py  ← Day 8: v1.0 evaluation (tool_choice)
+├── 09_capstone_comparison_report.py ← Day 9: Full pipeline + comparison report
+└── Generated outputs:
+    ├── 08_capstone_v1_results.json
+    ├── 09_capstone_comparison_report.md
+    └── 09_capstone_comparison_metrics.json
+```
+
 ---
 
 ## Phase 1: Foundation — Output Control Techniques (Days 1-2)

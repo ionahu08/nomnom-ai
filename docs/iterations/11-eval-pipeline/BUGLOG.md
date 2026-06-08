@@ -260,6 +260,22 @@ report += f"Another line with {variable}"
 
 ---
 
+## Learning Artifacts (Days 1-5)
+
+All Days 1-5 learning is captured in executable scripts in `learning_lab/phase_2/`:
+
+| File | Purpose | Key Learning |
+|------|---------|--------------|
+| `01_output_control.py` | Demo 3 techniques | Prefill vs stop_sequences vs combo |
+| `02_eval_pipeline.py` | 6-step workflow | v1 prompt → v2 improved (9.0 → 9.4/10) |
+| `03_dataset_generation.py` | Dataset generation | Use Claude to bulk-generate edge cases |
+| `04_code_graders.py` | 3-level validation | JSON → schema → semantic checks |
+| `05_model_grading.py` | Opus-as-judge | Signal fusion (RecSys pattern) |
+
+These scripts are **not just exercises** — they're the foundation for Days 8-10 capstone and production work.
+
+---
+
 ## Testing Coverage
 
 ### What Was Tested

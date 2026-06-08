@@ -9,11 +9,15 @@
 ## Phase 2 Summary
 
 **What was accomplished:**
-- Days 1-2: Output control techniques (prefill, prefill+stop, tool_choice)
-- Days 3-5: Eval pipeline (dataset generation, code grading, model-based grading, signal fusion)
-- Days 6-7: Code reviews (parser.py, guardrails.py, tools.py, evaluator.py)
-- Days 8-9: Capstone comparison (tool_choice vs prefill+stop on 30 edge cases)
-- Day 10: Production refactor (tool_choice integration, error message improvements)
+- **Days 1-5:** Concept learning (learning_lab/phase_2/01-05_*.py scripts)
+  - 01_output_control.py: Three techniques (prefill, prefill+stop, tool_choice)
+  - 02_eval_pipeline.py: 6-step eval workflow with v1/v2 prompt comparison
+  - 03_dataset_generation.py: Claude-generated 30 edge cases
+  - 04_code_graders.py: 3-level code-based grading (JSON, schema, semantic)
+  - 05_model_grading.py: Opus-based quality judgment + signal fusion
+- **Days 6-7:** Code reviews (parser.py, guardrails.py, tools.py, evaluator.py)
+- **Days 8-9:** Capstone comparison (tool_choice vs prefill+stop on 30 edge cases)
+- **Day 10:** Production refactor (tool_choice integration, error message improvements)
 
 **Key metrics:**
 - tool_choice success rate: 100% (30/30 edge cases)
