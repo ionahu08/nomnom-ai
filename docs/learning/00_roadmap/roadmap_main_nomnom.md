@@ -460,13 +460,21 @@ Update Capability Profile:
 
 ---
 
-## Phase 2: Make NomNom Not Crash (Week 3–4)
+## Phase 2: Make NomNom Not Crash (Week 3–4) ✅ COMPLETE
+
+**Status:** ✅ Complete (June 5–8, 2026)
 
 > **NomNom current state**: Recognizes food, but output is unstable (JSON occasionally crashes, no accuracy data, errors are silent)
 > **State after Phase**: 100% valid JSON output, quantified accuracy metrics, ability to A/B test different prompts
 > **Core question**: "How do I make the product stable enough to ship?"
 
 > **Critical turning point**: This is the watershed from "personal project" to "engineering project". Eval isn't an afterthought — it's the core infrastructure of LLM engineering.
+
+**Key Results:**
+- ✅ tool_choice integrated (100% success rate on 30 edge cases)
+- ✅ Eval pipeline built (code-based + model-based grading, staging pattern)
+- ✅ Error messages improved (Claude-readable)
+- ✅ Iteration docs created (docs/iterations/11-eval-pipeline/)
 
 ### Phase 2 Main Line: Stability Engineering
 
@@ -614,11 +622,18 @@ Update Capability Profile:
 
 ### Phase 2 Acceptance
 
-**Product Acceptance (NomNom v1.0)**:
-- [ ] tool_choice forces JSON output, 100% parse success on 30 test photos
-- [ ] Complete eval pipeline code: dataset + code grader + model grader + report output
-- [ ] v0.5 vs. v1.0 comparison report written, articulates what improved and why
-- [ ] Can articulate the design logic of the model-based grader (why not just output score)
+**Product Acceptance (NomNom v1.0)** ✅ ALL CRITERIA MET:
+- ✅ tool_choice forces JSON output, 100% parse success on 30 test photos
+- ✅ Complete eval pipeline code: dataset + code grader + model grader + report output
+- ✅ v0.5 vs. v1.0 comparison report written, articulates what improved and why
+- ✅ Can articulate the design logic of the model-based grader (why not just output score)
+
+**Evidence:**
+- `learning_lab/phase_2/08_capstone_v1_tool_choice.py` — v1.0 implementation
+- `learning_lab/phase_2/09_capstone_comparison_report.py` — full eval + reporting
+- `09_capstone_comparison_report.md` — comprehensive analysis
+- `docs/iterations/11-eval-pipeline/` — iteration documentation
+- Production changes in `NomNom-Backend/src/` (tool_choice + error messages)
 
 **Capability Acceptance**:
 - [ ] Can sketch the 6-step eval workflow on a whiteboard
@@ -628,11 +643,19 @@ Update Capability Profile:
 
 ---
 
-## Phase 3: Make NomNom Smarter (Week 5–6)
+## Phase 3: Make NomNom Smarter (Week 5–6) 🚀 STARTING
 
-> **NomNom current state**: Stable food recognition with nutrition output
+**Status:** 🚀 In progress (Starting June 9, 2026)
+
+> **NomNom current state**: Stable food recognition with nutrition output (Phase 2 complete)
 > **State after Phase**: Can parse nutrition label PDFs, can answer questions using a nutrition knowledge base, with cited sources
 > **Core question**: "How do I get Claude to use my own private data?"
+
+**Coming up:**
+- Days 1–5: Multi-tool agents, PDF parsing, embeddings, RAG concepts
+- Days 6–7: Code reviews (embedding.py, cache.py, seed_knowledge.py)
+- Days 8–9: RAG pipeline capstone with reranking + citations
+- Day 10: Production integration
 
 ### Phase 3 Main Line: Full Augmentation Stack
 

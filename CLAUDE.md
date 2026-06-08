@@ -49,9 +49,16 @@ See `docs/iterations/09-food-diary/SUMMARY.md` for retrospective.
 - `docs/learning/03_phase_retrospectives/phase_0_retro.md`
 - `docs/learning/03_phase_retrospectives/phase_1_retro.md`
 
-**Phase 2** (Week 3–4, starting June 5, 2026): Make NomNom Not Crash
+**Phase 2** ✅ COMPLETE (June 5–8, 2026)
 - Focus: parser.py, guardrails.py, evaluator.py, tools.py
 - Goal: Output control + structured output validation + guardrails
+- **Outcome:** tool_choice integrated, eval pipeline built (30 edge cases), error messages improved
+- **Key metrics:** 100% tool_choice success rate, 98.3/100 avg code score, 93.3% semantic validity
+- **Iteration docs:** `docs/iterations/11-eval-pipeline/`
+
+**Phase 3** (Week 5–6, starting June 9, 2026): Semantic Search + Caching
+- Focus: embedding.py, cache.py, seed_knowledge.py, recommendation_service.py
+- Goal: Build RAG pipeline + semantic cache for meal recommendations
 
 
 ## Key Docs
