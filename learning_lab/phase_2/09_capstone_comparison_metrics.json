@@ -1,0 +1,452 @@
+{
+  "v0_5_baseline": {
+    "version": "v0.5_prefill_stop",
+    "test_cases": 5,
+    "average_score": 9.4,
+    "notes": "Based on Day 2 manual eval. Not run on 30-case dataset.",
+    "success_rate": 0.95,
+    "estimated_schema_valid_pct": 90,
+    "estimated_semantic_valid_pct": 100
+  },
+  "v1_0_stats": {
+    "total_cases": 30,
+    "average_score": 98.33333333333333,
+    "valid_schema_count": 30,
+    "valid_schema_pct": 100.0,
+    "valid_semantic_count": 28,
+    "valid_semantic_pct": 93.33333333333333,
+    "success_rate": 1.0,
+    "success_rate_pct": 100.0
+  },
+  "model_graded_samples": [
+    {
+      "description": "A blurry photo of a brown round shape, possibly a burger or meatball, on a white plate",
+      "code_score": 100,
+      "model_score": 7,
+      "model_grade": {
+        "success": true,
+        "score": 7,
+        "strengths": [
+          "Appropriately acknowledges uncertainty with 'Unknown' designation",
+          "Provides reasonable estimates that could apply to either a burger patty or large meatball",
+          "Macro ratios are balanced and realistic for protein-based foods"
+        ],
+        "weaknesses": [
+          "Could have provided a range of values given the uncertainty",
+          "Doesn't specify serving size or weight which affects accuracy"
+        ],
+        "reasoning": "The analysis provides reasonable estimates that align well with typical values for a medium-sized burger patty or 3-4 oz meatball portion, with appropriate uncertainty acknowledged in the food identification.",
+        "details": {
+          "food_identification_quality": "good",
+          "calorie_estimate_quality": "good",
+          "macro_estimate_quality": "good",
+          "strengths": [
+            "Appropriately acknowledges uncertainty with 'Unknown' designation",
+            "Provides reasonable estimates that could apply to either a burger patty or large meatball",
+            "Macro ratios are balanced and realistic for protein-based foods"
+          ],
+          "weaknesses": [
+            "Could have provided a range of values given the uncertainty",
+            "Doesn't specify serving size or weight which affects accuracy"
+          ],
+          "reasoning": "The analysis provides reasonable estimates that align well with typical values for a medium-sized burger patty or 3-4 oz meatball portion, with appropriate uncertainty acknowledged in the food identification.",
+          "score": 7
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown - possibly burger or meatball",
+        "calories": 250,
+        "protein_g": 15,
+        "carbs_g": 12,
+        "fat_g": 14
+      }
+    },
+    {
+      "description": "White fluffy stuff in a bowl, could be whipped cream, meringue, or some kind of mousse",
+      "code_score": 100,
+      "model_score": 7,
+      "model_grade": {
+        "success": true,
+        "score": 7,
+        "strengths": [
+          "Appropriately acknowledges uncertainty in identification",
+          "Provides reasonable macro estimates that align with typical whipped cream/mousse profiles",
+          "Fat-dominant macro profile is consistent with cream-based products"
+        ],
+        "weaknesses": [
+          "Could have provided a range of values given the uncertainty between different possible foods",
+          "Serving size not specified which makes accuracy difficult to assess"
+        ],
+        "reasoning": "The analysis provides reasonable estimates for what appears to be a cream-based dessert topping, with macros that appropriately reflect high fat content typical of whipped cream or mousse, though meringue would have very different macros.",
+        "details": {
+          "food_identification_quality": "good",
+          "calorie_estimate_quality": "good",
+          "macro_estimate_quality": "good",
+          "strengths": [
+            "Appropriately acknowledges uncertainty in identification",
+            "Provides reasonable macro estimates that align with typical whipped cream/mousse profiles",
+            "Fat-dominant macro profile is consistent with cream-based products"
+          ],
+          "weaknesses": [
+            "Could have provided a range of values given the uncertainty between different possible foods",
+            "Serving size not specified which makes accuracy difficult to assess"
+          ],
+          "reasoning": "The analysis provides reasonable estimates for what appears to be a cream-based dessert topping, with macros that appropriately reflect high fat content typical of whipped cream or mousse, though meringue would have very different macros.",
+          "score": 7
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown - white fluffy substance (possibly whipped cream, meringue, or mousse)",
+        "calories": 150,
+        "protein_g": 1,
+        "carbs_g": 12,
+        "fat_g": 11
+      }
+    },
+    {
+      "description": "Rice with vegetables, some are recognizable some aren't, mixed together in unclear proportions",
+      "code_score": 100,
+      "model_score": 7,
+      "model_grade": {
+        "success": true,
+        "score": 7,
+        "strengths": [
+          "Appropriately conservative estimates given unclear proportions",
+          "Macros add up correctly (8g\u00d74 + 65g\u00d74 + 3g\u00d79 = 319 calories, close to 350)",
+          "Reasonable assumption of approximately 1.5-2 cups of rice with vegetables"
+        ],
+        "weaknesses": [
+          "Could have provided a range given the uncertainty in proportions",
+          "Fat content might be underestimated if vegetables were stir-fried or oil was used"
+        ],
+        "reasoning": "The analysis provides reasonable estimates for a mixed rice and vegetable dish with appropriate acknowledgment of uncertainty, though the fat content seems slightly low for a typical preparation.",
+        "details": {
+          "food_identification_quality": "good",
+          "calorie_estimate_quality": "good",
+          "macro_estimate_quality": "good",
+          "strengths": [
+            "Appropriately conservative estimates given unclear proportions",
+            "Macros add up correctly (8g\u00d74 + 65g\u00d74 + 3g\u00d79 = 319 calories, close to 350)",
+            "Reasonable assumption of approximately 1.5-2 cups of rice with vegetables"
+          ],
+          "weaknesses": [
+            "Could have provided a range given the uncertainty in proportions",
+            "Fat content might be underestimated if vegetables were stir-fried or oil was used"
+          ],
+          "reasoning": "The analysis provides reasonable estimates for a mixed rice and vegetable dish with appropriate acknowledgment of uncertainty, though the fat content seems slightly low for a typical preparation.",
+          "score": 7
+        }
+      },
+      "tool_input": {
+        "food_name": "Rice with mixed vegetables (unclear proportions)",
+        "calories": 350,
+        "protein_g": 8,
+        "carbs_g": 65,
+        "fat_g": 3
+      }
+    },
+    {
+      "description": "Food cut into tiny pieces, can't identify what it was originally, looks tan and mushy",
+      "code_score": 100,
+      "model_score": 6,
+      "model_grade": {
+        "success": true,
+        "score": 6,
+        "strengths": [
+          "Appropriately acknowledged uncertainty in food identification",
+          "Provided reasonable middle-ground estimates given limited information",
+          "All required nutritional information is present"
+        ],
+        "weaknesses": [
+          "No serving size specified for the nutritional values",
+          "The macro distribution seems arbitrary without knowing the actual food type",
+          "Could have provided a range rather than specific values given the uncertainty"
+        ],
+        "reasoning": "While Claude appropriately handled the ambiguous description by not guessing wildly, the specific nutritional values appear somewhat arbitrary without a serving size or food type, though they fall within plausible ranges for many common foods.",
+        "details": {
+          "food_identification_quality": "good",
+          "calorie_estimate_quality": "fair",
+          "macro_estimate_quality": "fair",
+          "strengths": [
+            "Appropriately acknowledged uncertainty in food identification",
+            "Provided reasonable middle-ground estimates given limited information",
+            "All required nutritional information is present"
+          ],
+          "weaknesses": [
+            "No serving size specified for the nutritional values",
+            "The macro distribution seems arbitrary without knowing the actual food type",
+            "Could have provided a range rather than specific values given the uncertainty"
+          ],
+          "reasoning": "While Claude appropriately handled the ambiguous description by not guessing wildly, the specific nutritional values appear somewhat arbitrary without a serving size or food type, though they fall within plausible ranges for many common foods.",
+          "score": 6
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown - tan and mushy food cut into tiny pieces",
+        "calories": 150,
+        "protein_g": 8,
+        "carbs_g": 18,
+        "fat_g": 3
+      }
+    },
+    {
+      "description": "Several different foods on one plate, hard to separate, very crowded and overlapping",
+      "code_score": 100,
+      "model_score": 7,
+      "model_grade": {
+        "success": true,
+        "score": 7,
+        "strengths": [
+          "Reasonable calorie estimate for a full mixed plate",
+          "Macros add up correctly (32*4 + 95*4 + 28*9 = 760 calories, close to 850 accounting for rounding)",
+          "Appropriately acknowledges uncertainty with unclear separation"
+        ],
+        "weaknesses": [
+          "Could benefit from attempting to identify likely food categories even if overlapping",
+          "Macro distribution seems generic rather than based on specific food types"
+        ],
+        "reasoning": "The analysis provides a reasonable estimate for a crowded mixed plate with appropriate uncertainty acknowledgment, though it could attempt more specific identification despite the overlap.",
+        "details": {
+          "food_identification_quality": "good",
+          "calorie_estimate_quality": "good",
+          "macro_estimate_quality": "good",
+          "strengths": [
+            "Reasonable calorie estimate for a full mixed plate",
+            "Macros add up correctly (32*4 + 95*4 + 28*9 = 760 calories, close to 850 accounting for rounding)",
+            "Appropriately acknowledges uncertainty with unclear separation"
+          ],
+          "weaknesses": [
+            "Could benefit from attempting to identify likely food categories even if overlapping",
+            "Macro distribution seems generic rather than based on specific food types"
+          ],
+          "reasoning": "The analysis provides a reasonable estimate for a crowded mixed plate with appropriate uncertainty acknowledgment, though it could attempt more specific identification despite the overlap.",
+          "score": 7
+        }
+      },
+      "tool_input": {
+        "food_name": "Mixed plate with multiple overlapping foods (unclear separation)",
+        "calories": 850,
+        "protein_g": 32,
+        "carbs_g": 95,
+        "fat_g": 28
+      }
+    },
+    {
+      "description": "Translucent noodles in a clear broth, unknown origin, possibly Vietnamese or Chinese",
+      "code_score": 100,
+      "model_score": 7.5,
+      "model_grade": {
+        "success": true,
+        "score": 7.5,
+        "strengths": [
+          "Reasonable identification of dish type based on description",
+          "Calorie estimate aligns well with typical glass noodle soups",
+          "Carbohydrate content appropriately high for noodle-based dish",
+          "Low fat content consistent with clear broth preparations"
+        ],
+        "weaknesses": [
+          "Could specify likely noodle type (glass/rice vermicelli)",
+          "Protein might be slightly underestimated if broth contains meat"
+        ],
+        "reasoning": "The analysis provides reasonable estimates for a standard serving of Asian glass noodle soup, with macros that align well with the typical composition of translucent rice or mung bean noodles in clear broth.",
+        "details": {
+          "food_identification_quality": "good",
+          "calorie_estimate_quality": "good",
+          "macro_estimate_quality": "good",
+          "strengths": [
+            "Reasonable identification of dish type based on description",
+            "Calorie estimate aligns well with typical glass noodle soups",
+            "Carbohydrate content appropriately high for noodle-based dish",
+            "Low fat content consistent with clear broth preparations"
+          ],
+          "weaknesses": [
+            "Could specify likely noodle type (glass/rice vermicelli)",
+            "Protein might be slightly underestimated if broth contains meat"
+          ],
+          "reasoning": "The analysis provides reasonable estimates for a standard serving of Asian glass noodle soup, with macros that align well with the typical composition of translucent rice or mung bean noodles in clear broth.",
+          "score": 7.5
+        }
+      },
+      "tool_input": {
+        "food_name": "Translucent noodles in clear broth (Vietnamese or Chinese style)",
+        "calories": 250,
+        "protein_g": 8,
+        "carbs_g": 42,
+        "fat_g": 3
+      }
+    },
+    {
+      "description": "Very dark photo of something, can't see clearly, might be roasted meat or vegetables",
+      "code_score": 100,
+      "model_score": 6,
+      "model_grade": {
+        "success": true,
+        "score": 6,
+        "strengths": [
+          "Appropriately acknowledges uncertainty in identification",
+          "Provides reasonable middle-ground estimates that could apply to either meat or vegetables",
+          "All required nutritional information is present"
+        ],
+        "weaknesses": [
+          "Wide variance possible - 250 calories could be way off depending on actual food",
+          "Macro split seems to lean toward meat despite uncertainty",
+          "Could have provided a range or separate estimates for meat vs vegetables scenarios"
+        ],
+        "reasoning": "The analysis handles the ambiguous photo reasonably well by acknowledging uncertainty, though the nutritional estimates appear to hedge toward a meat dish which may not be appropriate given the equal possibility of vegetables.",
+        "details": {
+          "food_identification_quality": "good",
+          "calorie_estimate_quality": "fair",
+          "macro_estimate_quality": "fair",
+          "strengths": [
+            "Appropriately acknowledges uncertainty in identification",
+            "Provides reasonable middle-ground estimates that could apply to either meat or vegetables",
+            "All required nutritional information is present"
+          ],
+          "weaknesses": [
+            "Wide variance possible - 250 calories could be way off depending on actual food",
+            "Macro split seems to lean toward meat despite uncertainty",
+            "Could have provided a range or separate estimates for meat vs vegetables scenarios"
+          ],
+          "reasoning": "The analysis handles the ambiguous photo reasonably well by acknowledging uncertainty, though the nutritional estimates appear to hedge toward a meat dish which may not be appropriate given the equal possibility of vegetables.",
+          "score": 6
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown - Very dark roasted item (possibly meat or vegetables)",
+        "calories": 250,
+        "protein_g": 20,
+        "carbs_g": 8,
+        "fat_g": 14
+      }
+    },
+    {
+      "description": "Half-eaten sandwich, mostly bread visible, filling is obscured and partially consumed",
+      "code_score": 100,
+      "model_score": 7,
+      "model_grade": {
+        "success": true,
+        "score": 7,
+        "strengths": [
+          "Correctly identified the food as a half-eaten sandwich",
+          "Reasonable calorie estimate for half a sandwich",
+          "Macronutrient distribution is plausible for a typical sandwich",
+          "All required nutritional information is provided"
+        ],
+        "weaknesses": [
+          "Estimates are necessarily imprecise without knowing the specific filling type",
+          "Could have noted the uncertainty given the obscured/partially consumed filling"
+        ],
+        "reasoning": "The analysis provides reasonable estimates for a half sandwich with unknown filling, though the specific values would vary significantly depending on whether it contains meat, cheese, vegetables, or other ingredients.",
+        "details": {
+          "food_identification_quality": "excellent",
+          "calorie_estimate_quality": "good",
+          "macro_estimate_quality": "good",
+          "strengths": [
+            "Correctly identified the food as a half-eaten sandwich",
+            "Reasonable calorie estimate for half a sandwich",
+            "Macronutrient distribution is plausible for a typical sandwich",
+            "All required nutritional information is provided"
+          ],
+          "weaknesses": [
+            "Estimates are necessarily imprecise without knowing the specific filling type",
+            "Could have noted the uncertainty given the obscured/partially consumed filling"
+          ],
+          "reasoning": "The analysis provides reasonable estimates for a half sandwich with unknown filling, though the specific values would vary significantly depending on whether it contains meat, cheese, vegetables, or other ingredients.",
+          "score": 7
+        }
+      },
+      "tool_input": {
+        "food_name": "Half-eaten sandwich",
+        "calories": 250,
+        "protein_g": 9,
+        "carbs_g": 35,
+        "fat_g": 8
+      }
+    },
+    {
+      "description": "Something beige that was cooked too long, unappetizing appearance, mushy texture visible",
+      "code_score": 100,
+      "model_score": 4,
+      "model_grade": {
+        "success": true,
+        "score": 4,
+        "strengths": [
+          "Provided all required nutritional components",
+          "Macros add up to reasonable calorie total (300 calories matches approximately 15g protein x 4 + 35g carbs x 4 + 8g fat x 9 = 272 calories)"
+        ],
+        "weaknesses": [
+          "Failed to identify the specific food despite clear visual cues",
+          "Generic estimates without considering what overcooked beige food this likely represents",
+          "No attempt to narrow down food category based on texture and appearance descriptors"
+        ],
+        "reasoning": "Claude provided generic nutritional estimates without attempting to identify what specific overcooked, beige, mushy food this might be (like overcooked pasta, oatmeal, or rice), making the analysis less useful and potentially inaccurate.",
+        "details": {
+          "food_identification_quality": "poor",
+          "calorie_estimate_quality": "fair",
+          "macro_estimate_quality": "fair",
+          "strengths": [
+            "Provided all required nutritional components",
+            "Macros add up to reasonable calorie total (300 calories matches approximately 15g protein x 4 + 35g carbs x 4 + 8g fat x 9 = 272 calories)"
+          ],
+          "weaknesses": [
+            "Failed to identify the specific food despite clear visual cues",
+            "Generic estimates without considering what overcooked beige food this likely represents",
+            "No attempt to narrow down food category based on texture and appearance descriptors"
+          ],
+          "reasoning": "Claude provided generic nutritional estimates without attempting to identify what specific overcooked, beige, mushy food this might be (like overcooked pasta, oatmeal, or rice), making the analysis less useful and potentially inaccurate.",
+          "score": 4
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown",
+        "calories": 300,
+        "protein_g": 15,
+        "carbs_g": 35,
+        "fat_g": 8
+      }
+    },
+    {
+      "description": "Mushy brown stuff, could be stew, chili, or mashed beans, consistency unclear",
+      "code_score": 100,
+      "model_score": 7,
+      "model_grade": {
+        "success": true,
+        "score": 7,
+        "strengths": [
+          "Appropriately acknowledges uncertainty in food identification",
+          "Provides reasonable middle-ground estimates that could apply to multiple similar foods",
+          "Macronutrient ratios are plausible for legume-based or meat-based brown dishes"
+        ],
+        "weaknesses": [
+          "Could have specified a serving size assumption",
+          "Wide range of possible foods makes precise estimation difficult"
+        ],
+        "reasoning": "The analysis provides sensible estimates that would reasonably apply to a typical serving of stew, chili, or mashed beans, with macros reflecting a balanced protein-carb profile typical of these dishes.",
+        "details": {
+          "food_identification_quality": "good",
+          "calorie_estimate_quality": "good",
+          "macro_estimate_quality": "good",
+          "strengths": [
+            "Appropriately acknowledges uncertainty in food identification",
+            "Provides reasonable middle-ground estimates that could apply to multiple similar foods",
+            "Macronutrient ratios are plausible for legume-based or meat-based brown dishes"
+          ],
+          "weaknesses": [
+            "Could have specified a serving size assumption",
+            "Wide range of possible foods makes precise estimation difficult"
+          ],
+          "reasoning": "The analysis provides sensible estimates that would reasonably apply to a typical serving of stew, chili, or mashed beans, with macros reflecting a balanced protein-carb profile typical of these dishes.",
+          "score": 7
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown mushy brown mixture (possibly stew, chili, or mashed beans)",
+        "calories": 250,
+        "protein_g": 12,
+        "carbs_g": 28,
+        "fat_g": 6
+      }
+    }
+  ],
+  "sample_size": 10
+}

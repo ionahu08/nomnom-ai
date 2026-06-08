@@ -1,0 +1,864 @@
+{
+  "version": "v1.0_tool_choice",
+  "stats": {
+    "total_cases": 30,
+    "average_score": 98.33333333333333,
+    "valid_schema_count": 30,
+    "valid_schema_pct": 100.0,
+    "valid_semantic_count": 28,
+    "valid_semantic_pct": 93.33333333333333,
+    "success_rate": 1.0,
+    "success_rate_pct": 100.0
+  },
+  "comparison": null,
+  "results": [
+    {
+      "description": "A blurry photo of a brown round shape, possibly a burger or meatball, on a white plate",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown - possibly burger or meatball",
+        "calories": 250,
+        "protein_g": 15,
+        "carbs_g": 12,
+        "fat_g": 14
+      },
+      "v1_success": true
+    },
+    {
+      "description": "White fluffy stuff in a bowl, could be whipped cream, meringue, or some kind of mousse",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown - white fluffy substance (possibly whipped cream, meringue, or mousse)",
+        "calories": 150,
+        "protein_g": 1,
+        "carbs_g": 12,
+        "fat_g": 11
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Rice with vegetables, some are recognizable some aren't, mixed together in unclear proportions",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Rice with mixed vegetables (unclear proportions)",
+        "calories": 350,
+        "protein_g": 8,
+        "carbs_g": 65,
+        "fat_g": 3
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Food cut into tiny pieces, can't identify what it was originally, looks tan and mushy",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown - tan and mushy food cut into tiny pieces",
+        "calories": 150,
+        "protein_g": 8,
+        "carbs_g": 18,
+        "fat_g": 3
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Several different foods on one plate, hard to separate, very crowded and overlapping",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Mixed plate with multiple overlapping foods (unclear separation)",
+        "calories": 850,
+        "protein_g": 32,
+        "carbs_g": 95,
+        "fat_g": 28
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Translucent noodles in a clear broth, unknown origin, possibly Vietnamese or Chinese",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Translucent noodles in clear broth (Vietnamese or Chinese style)",
+        "calories": 250,
+        "protein_g": 8,
+        "carbs_g": 42,
+        "fat_g": 3
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Very dark photo of something, can't see clearly, might be roasted meat or vegetables",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown - Very dark roasted item (possibly meat or vegetables)",
+        "calories": 250,
+        "protein_g": 20,
+        "carbs_g": 8,
+        "fat_g": 14
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Half-eaten sandwich, mostly bread visible, filling is obscured and partially consumed",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Half-eaten sandwich",
+        "calories": 250,
+        "protein_g": 9,
+        "carbs_g": 35,
+        "fat_g": 8
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Something beige that was cooked too long, unappetizing appearance, mushy texture visible",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown",
+        "calories": 300,
+        "protein_g": 15,
+        "carbs_g": 35,
+        "fat_g": 8
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Mushy brown stuff, could be stew, chili, or mashed beans, consistency unclear",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown mushy brown mixture (possibly stew, chili, or mashed beans)",
+        "calories": 250,
+        "protein_g": 12,
+        "carbs_g": 28,
+        "fat_g": 6
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Beige powder or grain with unclear texture, possibly flour, sugar, or ground spice",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Beige powder or grain (possibly flour, sugar, or ground spice) - Unknown",
+        "calories": 340,
+        "protein_g": 8,
+        "carbs_g": 70,
+        "fat_g": 1
+      },
+      "v1_success": true
+    },
+    {
+      "description": "A shapeless blob of orange-brown substance, overcooked or processed, origin unknown",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown",
+        "calories": 250,
+        "protein_g": 8,
+        "carbs_g": 28,
+        "fat_g": 10
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Translucent cubes floating in murky liquid, possibly tofu or some kind of jelly",
+      "score": 75,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": false
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": false,
+          "note": "Unusual: 50.0 kcal (typical range 100-1000). May be correct (e.g., large meal) or error."
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown translucent cubes in murky liquid (possibly tofu or jelly)",
+        "calories": 50,
+        "protein_g": 5,
+        "carbs_g": 3,
+        "fat_g": 2
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Pale yellowish strings or noodles tangled together, too cooked to identify clearly",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Overcooked pasta/noodles - unidentified type",
+        "calories": 220,
+        "protein_g": 8,
+        "carbs_g": 43,
+        "fat_g": 1
+      },
+      "v1_success": true
+    },
+    {
+      "description": "A plate with brown, green, and white items mixed chaotically, no clear separation",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Mixed plate with brown, green, and white items (likely grains, vegetables, and protein)",
+        "calories": 450,
+        "protein_g": 18,
+        "carbs_g": 52,
+        "fat_g": 15
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Small round objects in a dark sauce, could be meatballs, olives, or mushrooms",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Small round objects in dark sauce (likely meatballs)",
+        "calories": 280,
+        "protein_g": 18,
+        "carbs_g": 8,
+        "fat_g": 18
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Elongated beige thing with unclear texture, possibly a burrito, pastry, or wrapped item",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Elongated wrapped item - possibly burrito or pastry",
+        "calories": 450,
+        "protein_g": 15,
+        "carbs_g": 52,
+        "fat_g": 18
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Translucent white blocks with holes, possibly mozzarella, tofu, or some type of cake",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown translucent white blocks with holes",
+        "calories": 150,
+        "protein_g": 12,
+        "carbs_g": 8,
+        "fat_g": 8
+      },
+      "v1_success": true
+    },
+    {
+      "description": "A muddy-colored pile of something stringy and matted together, possibly noodles or shredded vegetables",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown stringy matted food - possibly noodles or shredded vegetables",
+        "calories": 150,
+        "protein_g": 5,
+        "carbs_g": 25,
+        "fat_g": 3
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Underexposed photo shows dark shapes on a dark plate, barely distinguishable",
+      "score": 75,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": false
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": false,
+          "calories_value": 0.0,
+          "macros_positive": false,
+          "macro_values": {
+            "protein_g": 0.0,
+            "carbs_g": 0.0,
+            "fat_g": 0.0
+          },
+          "macro_calorie_consistency": true,
+          "portion_reasonable": false,
+          "note": "Unusual: 0.0 kcal (typical range 100-1000). May be correct (e.g., large meal) or error."
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown",
+        "calories": 0,
+        "protein_g": 0,
+        "carbs_g": 0,
+        "fat_g": 0
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Grayish substance with chunks mixed in, looks like it was overcooked significantly",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown - grayish substance with chunks, appears overcooked",
+        "calories": 200,
+        "protein_g": 15,
+        "carbs_g": 8,
+        "fat_g": 10
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Flattened beige disc with unclear toppings, could be a pancake, flatbread, or veggie patty",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown - Unclear beige disc (possible pancake, flatbread, or veggie patty)",
+        "calories": 250,
+        "protein_g": 8,
+        "carbs_g": 35,
+        "fat_g": 8
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Translucent leafy wraps filled with unrecognizable stuffing, possibly Asian cuisine",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Asian leafy wraps with unknown filling",
+        "calories": 120,
+        "protein_g": 6,
+        "carbs_g": 14,
+        "fat_g": 4
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Clear broth with floating white specks and thin noodles, Asian origin unclear",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Clear broth with noodles, Asian origin",
+        "calories": 150,
+        "protein_g": 6,
+        "carbs_g": 24,
+        "fat_g": 2
+      },
+      "v1_success": true
+    },
+    {
+      "description": "A heap of pale yellow threads or strips, possibly egg noodles or shredded vegetable",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Egg noodles or shredded vegetables (pale yellow threads)",
+        "calories": 150,
+        "protein_g": 5,
+        "carbs_g": 28,
+        "fat_g": 1.5
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Overexposed photo of what appears to be white food, details completely washed out",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown",
+        "calories": 150,
+        "protein_g": 5,
+        "carbs_g": 20,
+        "fat_g": 4
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Brown crusty outside with unknown filling, cut in half but interior still unclear",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown - crusty pastry/bread with unknown filling",
+        "calories": 280,
+        "protein_g": 8,
+        "carbs_g": 32,
+        "fat_g": 12
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Multiple spheres of different sizes and colors piled together, exact identity unknown",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown",
+        "calories": 150,
+        "protein_g": 5,
+        "carbs_g": 25,
+        "fat_g": 2
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Khaki-colored unidentifiable mass with visible steam, texture too obscured to determine",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown",
+        "calories": 250,
+        "protein_g": 8,
+        "carbs_g": 35,
+        "fat_g": 6
+      },
+      "v1_success": true
+    },
+    {
+      "description": "Semi-transparent cubes in thick sauce with unidentifiable chunks and vegetables mixed throughout",
+      "score": 100,
+      "levels": {
+        "json_valid": true,
+        "schema_valid": true,
+        "semantic_valid": true
+      },
+      "details": {
+        "json_error": null,
+        "all_fields_present": true,
+        "all_types_correct": true,
+        "semantic_checks": {
+          "calories_in_range": true,
+          "macros_positive": true,
+          "macro_calorie_consistency": true,
+          "portion_reasonable": true
+        }
+      },
+      "tool_input": {
+        "food_name": "Unknown - semi-transparent cubes in thick sauce with vegetables",
+        "calories": 280,
+        "protein_g": 12,
+        "carbs_g": 28,
+        "fat_g": 12
+      },
+      "v1_success": true
+    }
+  ]
+}
