@@ -67,23 +67,23 @@ class FoodAnalysisGuardrails:
         # Check calories
         if not (FoodAnalysisGuardrails.CALORIE_MIN <= analysis.calories <= FoodAnalysisGuardrails.CALORIE_MAX):
             raise GuardrailViolation(
-                f"Calories {analysis.calories} out of range [{FoodAnalysisGuardrails.CALORIE_MIN}, {FoodAnalysisGuardrails.CALORIE_MAX}]"
+                f"Calories: {analysis.calories} kcal is unrealistic (typical range: 50-2000 kcal per meal). Re-estimate this food."
             )
 
         # Check macros
-        for macro_name, macro_value in [
-            ("protein", analysis.protein_g),
-            ("carbs", analysis.carbs_g),
-            ("fat", analysis.fat_g),
+        for macro_name, macro_value, typical_max in [
+            ("protein", analysis.protein_g, 150),
+            ("carbs", analysis.carbs_g, 200),
+            ("fat", analysis.fat_g, 100),
         ]:
             if not (FoodAnalysisGuardrails.MACRO_MIN <= macro_value <= FoodAnalysisGuardrails.MACRO_MAX):
                 raise GuardrailViolation(
-                    f"{macro_name.title()} {macro_value}g out of range [{FoodAnalysisGuardrails.MACRO_MIN}, {FoodAnalysisGuardrails.MACRO_MAX}]"
+                    f"{macro_name.title()}: {macro_value}g is unrealistic (typical range: 0-{typical_max}g per meal). Re-estimate."
                 )
 
         # Check food name
         if not analysis.food_name or not analysis.food_name.strip():
-            raise GuardrailViolation("Food name is empty")
+            raise GuardrailViolation("Food name: Must identify what the food is. Provide a specific name (e.g., 'grilled chicken salad').")
 
         if not (
             FoodAnalysisGuardrails.FOOD_NAME_MIN_LEN
@@ -91,12 +91,12 @@ class FoodAnalysisGuardrails:
             <= FoodAnalysisGuardrails.FOOD_NAME_MAX_LEN
         ):
             raise GuardrailViolation(
-                f"Food name length {len(analysis.food_name)} out of range [{FoodAnalysisGuardrails.FOOD_NAME_MIN_LEN}, {FoodAnalysisGuardrails.FOOD_NAME_MAX_LEN}]"
+                f"Food name: '{analysis.food_name}' is too long ({len(analysis.food_name)} chars). Shorten to 200 chars max."
             )
 
         # Check roast
         if not analysis.cat_roast or not analysis.cat_roast.strip():
-            raise GuardrailViolation("Cat roast is empty")
+            raise GuardrailViolation("Cat roast: Must include a funny, witty comment about the food (1-2 sentences).")
 
         if not (
             FoodAnalysisGuardrails.ROAST_MIN_LEN
@@ -104,7 +104,7 @@ class FoodAnalysisGuardrails:
             <= FoodAnalysisGuardrails.ROAST_MAX_LEN
         ):
             raise GuardrailViolation(
-                f"Roast length {len(analysis.cat_roast)} out of range [{FoodAnalysisGuardrails.ROAST_MIN_LEN}, {FoodAnalysisGuardrails.ROAST_MAX_LEN}]"
+                f"Cat roast: '{analysis.cat_roast[:50]}...' is too long ({len(analysis.cat_roast)} chars). Keep it to 500 chars max (1-2 sentences)."
             )
 
         # Check for toxic content in roast
@@ -112,7 +112,7 @@ class FoodAnalysisGuardrails:
         for phrase in FoodAnalysisGuardrails.FORBIDDEN_PHRASES:
             if phrase in roast_lower:
                 raise GuardrailViolation(
-                    f"Roast contains forbidden phrase: '{phrase}'"
+                    f"Cat roast: Contains forbidden content. Make it funny, not harmful. Avoid: '{phrase}'"
                 )
 
         # Check calorie distribution (basic sanity check)

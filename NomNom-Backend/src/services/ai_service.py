@@ -118,6 +118,7 @@ async def analyze_food_photo(
             max_tokens=route.max_tokens,
             fallback_model=route.fallback_model,
             tools=tools,
+            tool_choice={"type": "tool", "name": "analyze_food"},  # Force tool use for structured output
             temperature=route.temperature,
         )
 
