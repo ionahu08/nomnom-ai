@@ -54,7 +54,7 @@ class EmbeddingService:
 
         # Get event loop and run model inference in executor
         # (synchronous encode() doesn't block async handlers)
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         model = self._load_model()
 
         try:
