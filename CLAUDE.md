@@ -65,9 +65,17 @@ See `docs/iterations/09-food-diary/SUMMARY.md` for retrospective.
 - **Iteration docs:** `docs/iterations/12-semantic-cache-production/`
 - **Retrospective:** `docs/learning/03_phase_retrospectives/phase_3_retro.md`
 
-**Phase 4** 🚀 STARTING (Week 7, June 10+ 2026): Request Routing + Rate Limiting + Logging
+**Phase 4** ✅ COMPLETE (June 10, 2026): Cost & Latency Optimization
 - Focus: router.py, rate_limiter.py, logger.py
-- Goal: Infrastructure for production reliability and observability
+- **Outcome:** 4 critical bugs fixed, cost tracking accurate, all tests passing
+- **Key metrics:** ANALYZE_FOOD→Sonnet (quality), cache pricing fixed (accuracy), 29/29 tests ✓
+- **Daily cost:** $1.45 → $2.17 (Sonnet for better food vision), offset by Phase 5 caching
+- **Iteration docs:** `docs/iterations/13-cost-and-latency/`
+- **Retrospective:** `docs/learning/03_phase_retrospectives/phase_4_retro.md`
+
+**Phase 5** 🚀 STARTING (Week 8, June 11+ 2026): Prompt Caching & Streaming
+- Focus: Implement prompt caching to offset Sonnet cost increase
+- Goal: 60%+ cache hit rate, reduce daily cost to $1.80-2.00/day
 
 
 ## Key Docs
