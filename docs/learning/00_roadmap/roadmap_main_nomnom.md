@@ -643,19 +643,26 @@ Update Capability Profile:
 
 ---
 
-## Phase 3: Make NomNom Smarter (Week 5–6) 🚀 STARTING
+## Phase 3: Make NomNom Smarter (Week 5–6) ✅ COMPLETE
 
-**Status:** 🚀 In progress (Starting June 9, 2026)
+**Status:** ✅ Complete (June 9–8, 2026)
 
 > **NomNom current state**: Stable food recognition with nutrition output (Phase 2 complete)
-> **State after Phase**: Can parse nutrition label PDFs, can answer questions using a nutrition knowledge base, with cited sources
-> **Core question**: "How do I get Claude to use my own private data?"
+> **State after Phase**: RAG pipeline + semantic cache functional; can find similar meals and avoid redundant API calls
+> **Core question**: "How do I get Claude to use my own private data efficiently?"
 
-**Coming up:**
-- Days 1–5: Multi-tool agents, PDF parsing, embeddings, RAG concepts
-- Days 6–7: Code reviews (embedding.py, cache.py, seed_knowledge.py)
-- Days 8–9: RAG pipeline capstone with reranking + citations
-- Day 10: Production integration
+**What was built:**
+- Days 1–5: Multi-tool agents, PDF parsing, naive RAG, hybrid search (BM25+RRF), contextual retrieval + citations
+- Days 6–7: Production code reviews (embedding.py, cache.py, seed_knowledge.py, tools.py)
+- Days 8–9: Advanced RAG capstone with evaluation metrics (NDCG@5, MRR)
+- Day 10: Production integration (7 bugs fixed, 5 files updated, semantic cache now functional)
+
+**Key Results:**
+- ✅ Semantic cache fixed (hardcoded bug removed, threshold enforced, tuned to 0.82)
+- ✅ RAG pipeline implemented (hybrid search + RRF + contextual retrieval)
+- ✅ Evaluation metrics integrated (NDCG@5, MRR for ranking quality)
+- ✅ Iteration docs created (docs/iterations/12-semantic-cache-production/)
+- ✅ Production integration complete (4 commits, all files compile, no deprecation warnings)
 
 ### Phase 3 Main Line: Full Augmentation Stack
 
@@ -844,11 +851,19 @@ Update Capability Profile:
 
 ---
 
-## Phase 4: Make NomNom Cheap and Fast (Week 7)
+## Phase 4: Make NomNom Cheap and Fast (Week 7) 🚀 STARTING
 
-> **NomNom current state**: Feature-rich but slow and expensive
+**Status:** 🚀 Starting June 10, 2026
+
+> **NomNom current state**: Feature-rich but slow and expensive (Phase 3 complete)
 > **State after Phase**: Faster response, lower cost, better user experience
 > **Core question**: "How do I make the product affordable enough for users?"
+
+**Coming up:**
+- Days 1–2: Prompt caching, model tiering, streaming concepts
+- Day 3: Code reviews (router.py, rate_limiter.py, logger.py)
+- Day 4: Capstone (cost/latency baseline + optimization)
+- Day 5: Production integration
 
 ### Phase 4 Main Line: Performance and Cost Engineering (~1 week)
 
