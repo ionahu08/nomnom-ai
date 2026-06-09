@@ -31,18 +31,20 @@
 
 **What's in this layer**: API messages structure, model selection (Opus/Sonnet/Haiku), parameters (temperature, max_tokens, stop_sequences), `stop_reason` field, streaming events, multi-turn conversation management, prompt caching, cost tracking, model tiering decisions.
 
-- **Current**: 1/5 → **4/5** ✅ (Phase 1 Complete)
+- **Current**: 1/5 → **4/5** ✅ (Phase 1 Complete) → **4/5** ✅ (Phase 3 Stable)
 - **Target**: 4/5
 - **Why this target**: Foundation skill — needs to be solid but doesn't need to be a differentiator. 4/5 is "I can write any API call from memory and debug others' API code."
 - **Phase progression**:
   - Phase 1 → 4/5 ✅ (15 notebooks: API fundamentals, multi-turn, streaming, multimodal. Understand token cost O(n²), stop_reason, usage tracking. Reviewed client.py retry/timeout/fallback.)
+  - Phase 3 → 4/5 (stable; no new API concepts learned; focus was augmentation/caching/RAG)
   - Phase 4 → 4/5 (prompt caching + model tiering verified with cost data)
-- **Evidence**: ✅ Phase 1 Complete
+- **Evidence**: ✅ Phase 1-3 Complete
   - Completed 15 Jupyter notebooks covering messages structure, model selection, streaming, multimodal input
   - Understand multi-turn state management and O(n²) token cost dynamics
   - Reviewed client.py reliability patterns (retry, timeout, fallback, per-model config)
   - Experimented with real Claude API calls in NomNom v0.5 capstone
   - Can explain stop_reason, usage tracking, model tiering trade-offs
+  - Phase 3: Maintained solid API fundamentals while focusing on RAG/caching layers
 
 ---
 
@@ -50,14 +52,19 @@
 
 **What's in this layer**: Clear & direct prompts, multishot examples, Chain of Thought, XML tags, system prompts/roles, prefill response, prompt chaining.
 
-- **Current**: 1/5
+- **Current**: 1/5 → **3/5** ✅ (Phase 2 Complete) → **3/5** ✅ (Phase 3 Stable)
 - **Target**: 4/5
 - **Why this target**: Universal foundation. Every project uses it. 4/5 = "I can stack techniques deliberately and explain why each one matters." Not 5/5 because pure prompt engineering is increasingly commoditized — it's no longer enough to be a differentiator on its own.
 - **Phase progression**:
   - Phase 1 → 3/5 (NomNom v0.5 uses at least 4 techniques)
-  - Phase 2 → 4/5 (combined with eval — I can measure prompt impact, not just write prompts)
-- **Evidence**: _(empty)_
-  - Read Anthropic Prompt Engineering docs overview, agent patterns paper; familiar with XML tags, CoT, multishot conceptually (not yet practiced)
+  - Phase 2 → 3/5 (combined with eval — I can measure prompt impact, not just write prompts)
+  - Phase 3 → 3/5 (deferred to Phase 4 focus on prompt caching + tiering; Phase 3 focus was RAG augmentation)
+  - Phase 4 → will advance (prompt caching + tier-specific prompts)
+- **Evidence**: ✅ Phase 1-3 Complete
+  - Read Anthropic Prompt Engineering docs
+  - Analyzed production prompts in NomNom
+  - Understand prompt engineering as iterative process (eval → measure → improve)
+  - Phase 3: Focused on RAG augmentation (retrieval design, contextual enrichment), not prompt optimization
 
 ---
 
@@ -65,12 +72,19 @@
 
 **What's in this layer**: Stop sequences, prefill + stop combo for structured output, `tool_choice` forced structured output.
 
-- **Current**: 0/5
+- **Current**: 0/5 → **4/5** ✅ (Phase 2 Complete) → **4/5** ✅ (Phase 3 Stable)
 - **Target**: 4/5
 - **Why this target**: Critical "make LLM behave like a function" skill. 4/5 = "I know when to use prefill vs tool_choice and can defend the choice."
 - **Phase progression**:
-  - Phase 2 → 4/5 (NomNom v1.0 outputs 100% valid JSON via tool_choice)
-- **Evidence**: _(empty)_
+  - Phase 2 → 4/5 ✅ (NomNom v1.0 outputs 100% valid JSON via tool_choice)
+  - Phase 3 → 4/5 (stable; tool_choice integration foundational for all RAG work)
+- **Evidence**: ✅ Phase 2-3 Complete
+  - Master three output control techniques (prefill, stop sequences, prefill+stop)
+  - Implement tool_choice for guaranteed structure
+  - Parse tool_use responses correctly
+  - Validate with Pydantic schemas
+  - Apply domain guardrails (calorie bounds, toxicity, semantic checks)
+  - Phase 3: Tool_choice assumed in all agent orchestration and RAG pipelines
 
 ---
 
@@ -78,29 +92,49 @@
 
 **What's in this layer**: Tool use (basics + multi-tool + error handling), image multimodal, PDF support, citations, RAG full stack (chunking, embeddings, vector search, BM25, hybrid search, RRF, reranking, contextual retrieval), built-in tools (web search, text editor, code execution), MCP (tools + resources + prompts), batch tool.
 
-- **Current**: 0/5
+- **Current**: 0/5 → 1/5 (Phase 2) → **4/5** ✅ (Phase 3 Complete)
 - **Target**: **5/5** ⭐
-- **Why this target**: This is NomNom's main battlefield — multimodal food recognition, nutrition label PDF parsing, RAG over a nutrition knowledge base, citations for trust. By Phase 6, NomNom touches every concept in this layer. **Bonus**: my RecSys background may transfer well to the RAG sub-domain (hybrid search ≡ multi-channel recall, reranking ≡ learning-to-rank) — I'll know if this transfer is real when I get to Phase 3.
+- **Why this target**: This is NomNom's main battlefield — multimodal food recognition, nutrition label PDF parsing, RAG over a nutrition knowledge base, citations for trust. By Phase 6, NomNom touches every concept in this layer. **Bonus**: my RecSys background transfers well to the RAG sub-domain (hybrid search ≡ multi-channel recall, RRF ≡ learning-to-rank) — confirmed in Phase 3.
 - **Phase progression**:
-  - Phase 1 → 2/5 (multimodal image recognition)
-  - Phase 2 → 3/5 (tool use basics + error handling)
-  - Phase 3 → 5/5 (full RAG stack + PDF + citations — saturated)
-  - Phase 6 → 5/5 maintained (MCP layer added)
-- **Evidence**: _(empty)_
+  - Phase 1 → 1/5 (multimodal image recognition basics)
+  - Phase 2 → 1/5 (tool use basics + error handling in eval context)
+  - Phase 3 → **4/5** ✅ (full RAG stack: chunking, embeddings, vector search, BM25, hybrid search, RRF, contextual retrieval, citations, semantic caching, production integration)
+  - Phase 4 → will maintain/enhance (prompt caching optimization, rate limiting)
+- **Evidence**: ✅ Phase 3 Complete
+  - **Chunking**: understand trade-offs (precision vs. recall, fixed-size vs. semantic)
+  - **Embeddings**: model selection, dimensionality, local vs. API (chose all-MiniLM-L6-v2)
+  - **Vector search**: cosine similarity, threshold tuning (empirically: 0.95 → 0.82), normalization
+  - **BM25 + Hybrid**: keyword search + semantic fusion with RRF (RecSys pattern application)
+  - **Contextual retrieval**: "From: Title, Section: X" enrichment before embedding
+  - **Citations**: Claude annotations [1], [2], [3] for trust + verification
+  - **Semantic caching**: pgvector integration, threshold enforcement, cache lifecycle (Phase 3 Day 10 production bugs fixed)
+  - **RAG evaluation**: NDCG@5, MRR ranking metrics without labeled data
+  - **Production integration**: Fixed 7 bugs (hardcoded queries, threshold enforcement, error handling)
 
 ---
 
 ## Layer 4: Reliability Engineering ⭐ (My differentiator)
 
-**What's in this layer**: 6-step eval workflow, test dataset generation, code-based grading, model-based grading (LLM-as-judge), combined grading, multi-agent eval.
+**What's in this layer**: 6-step eval workflow, test dataset generation, code-based grading, model-based grading (LLM-as-judge), combined grading, multi-agent eval, semantic caching as reliability, error handling, observability.
 
-- **Current**: 1/5 (statistics/ML background gives a head start on eval thinking)
+- **Current**: 1/5 → **4/5** ✅ (Phase 2 Complete) → **4/5** ✅ (Phase 3 Enhanced)
 - **Target**: **5/5** ⭐
-- **Why this target**: **This is my chosen differentiator layer.** Most LLM engineers write prompts on intuition; few have the statistical rigor to build a real eval pipeline. My statistics/ML background means I naturally think in terms of metrics, grading rubrics, and signal fusion. By Phase 2 I should already be ahead of the average LLM-engineer candidate here; by Phase 5 I should be a clear standout.
+- **Why this target**: **This is my chosen differentiator layer.** Most LLM engineers write prompts on intuition; few have the statistical rigor to build a real eval pipeline. My statistics/ML background means I naturally think in terms of metrics, grading rubrics, and signal fusion. By Phase 2 I was ahead of the average LLM-engineer candidate here; by Phase 5 I will be a clear standout.
 - **Phase progression**:
-  - Phase 2 → 4/5 (complete eval pipeline + v0.5 vs v1.0 comparison report)
-  - Phase 5 → 5/5 (multi-agent eval design + workflow vs multi-agent A/B experiment)
-- **Evidence**: _(empty — but expect the strongest evidence portfolio here)_
+  - Phase 2 → **4/5** ✅ (complete eval pipeline + v0.5 vs v1.0 comparison report)
+  - Phase 3 → **4/5** (enhanced with semantic cache reliability, KB maintenance, observability)
+  - Phase 5 → **5/5** (multi-agent eval design + workflow vs multi-agent A/B experiment)
+- **Evidence**: ✅ Phase 2-3 Complete
+  - **Evaluation pipeline**: 6-step workflow (prompt → test → grade → iterate → re-eval)
+  - **Test generation**: Claude-bootstrapped 30 edge cases, realistic + diverse
+  - **Code-based grading**: JSON validity, schema correctness, semantic plausibility (multi-level)
+  - **Model-based grading**: LLM-as-Judge (Opus critique + structured feedback)
+  - **Signal fusion**: code_score + model_score (RecSys pattern for conflict resolution)
+  - **Phase 3 additions**:
+    - Semantic caching as reliability: threshold enforcement, hit rate monitoring
+    - KB maintenance: error handling, --refresh mode, logging
+    - Observability: cache hit/miss logging, similarity scores, production monitoring signals
+    - Key insight: One bad threshold parameter cascades (0.95 vs 0.82 = 67% hit rate difference)
 
 ---
 
@@ -108,13 +142,18 @@
 
 **What's in this layer**: Hand-coded agent loop, 5 workflow patterns (chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer), single agent implementation, workflow vs agent decision framework, extended thinking, Claude Code internals, Claude Agent SDK.
 
-- **Current**: 0/5
+- **Current**: 0/5 → 1/5 (Phase 2) → **2/5** ✅ (Phase 3 Foundation Strengthened)
 - **Target**: 4/5
 - **Why this target**: Strong but not differentiating. 4/5 = "I can hand-write an agent loop, know when to use which pattern, and can defend the workflow-vs-agent decision in an interview." Not 5/5 because I don't intend to build novel agent architectures — I want to be a strong practitioner, not a researcher.
 - **Phase progression**:
-  - Phase 3 → 3/5 (hand-coded agent loop in NomNom)
-  - Phase 5 → 4/5 (5 patterns implemented + workflow vs agent decision framework written)
-- **Evidence**: _(empty)_
+  - Phase 2 → 1/5 (tool use orchestration basics in eval context)
+  - Phase 3 → **2/5** ✅ (hand-coded agent loop patterns from learning scripts; foundation ready for Phase 5)
+  - Phase 5 → **4/5** (5 patterns implemented + workflow vs agent decision framework written)
+- **Evidence**: ✅ Phase 3 Complete
+  - **Multi-tool agent loops**: Hand-wrote while-loop orchestration (Day 1 learning script)
+  - **Tool execution**: understand result feedback, termination conditions
+  - **Agent integration**: Ready for Phase 5 (agent + RAG combined)
+  - Key insight: Agent loop = exactly the pattern from Phase 2 tool_use, applied iteratively
 
 ---
 
@@ -122,12 +161,13 @@
 
 **What's in this layer**: Three multi-agent forms (orchestrator-workers, conversational, hierarchical), five engineering challenges (context passing, coordination, error propagation, cost explosion, eval difficulty), orchestrator-workers hands-on implementation, multi-agent decision framework, Anthropic's stance + opposing viewpoints (Cognition).
 
-- **Current**: 0/5
+- **Current**: 0/5 → **0/5** (Phase 3 Not Started)
 - **Target**: 3/5
 - **Why this target**: **Intentionally capped at 3/5.** I want to know it well enough to interview confidently — especially the "when NOT to use multi-agent" answer, which is the interview kill question. But NomNom doesn't need multi-agent, and I won't fake-build a multi-agent system just to pad this score. The `tech_comparison_agent` side project in Phase 5 is exactly enough.
 - **Phase progression**:
-  - Phase 5 → 3/5 (tech_comparison_agent + decision framework + can articulate Anthropic vs Cognition debate)
-- **Evidence**: _(empty)_
+  - Phase 3 → 0/5 (deferred; focus was RAG/caching)
+  - Phase 5 → **3/5** (tech_comparison_agent + decision framework + can articulate Anthropic vs Cognition debate)
+- **Evidence**: _(empty — deferred to Phase 5)_
 
 ---
 
@@ -153,13 +193,13 @@ A quick at-a-glance view. Update at end of each Phase.
 
 | Layer | Current | Target | Status |
 |---|---|---|---|
-| 0 — API Mastery | 0/5 | 4/5 | Not started |
-| 1 — Prompt Engineering | 0/5 | 4/5 | Not started |
-| 2 — Output Control | 0/5 | 4/5 | Not started |
-| 3 — Augmentation ⭐ | 0/5 | 5/5 | Not started |
-| 4 — Reliability ⭐ | 1/5 | 5/5 | Slight head start (statistics/ML background) |
-| 5 — Agent Engineering | 0/5 | 4/5 | Not started |
-| 6 — Multi-Agent | 0/5 | 3/5 | Not started |
+| 0 — API Mastery | **4/5** ✅ | 4/5 | Complete (Phase 1) |
+| 1 — Prompt Engineering | **3/5** ✅ | 4/5 | Stable (deferred to Phase 4) |
+| 2 — Output Control | **4/5** ✅ | 4/5 | Complete (Phase 2) |
+| 3 — Augmentation ⭐ | **4/5** ✅ | 5/5 | Major progress (Phase 3) |
+| 4 — Reliability ⭐ | **4/5** ✅ | 5/5 | Enhanced (Phase 2-3) — my differentiator |
+| 5 — Agent Engineering | **2/5** ✅ | 4/5 | Foundation (Phase 3), ready for Phase 5 |
+| 6 — Multi-Agent | **0/5** | 3/5 | Deferred to Phase 5-6 |
 
 ---
 
@@ -181,4 +221,4 @@ A quick at-a-glance view. Update at end of each Phase.
 ## Update Log
 
 - **May 10, 2026**: Initial profile drafted. Set targets and identified Layer 3 + Layer 4 as differentiator focus.
-- _(Add an entry at the end of each Phase)_
+- **June 8, 2026**: Phase 3 Complete. Layer 3 (Augmentation) jumped 1/5 → 4/5 ✅. Layer 4 (Reliability) enhanced with semantic caching + KB maintenance. Layer 5 foundation strengthened 1/5 → 2/5. Snapshot created: `Iona_Capability_Profile_phase3_20260608.md`.
