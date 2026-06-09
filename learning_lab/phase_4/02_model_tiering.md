@@ -4,7 +4,51 @@
 **Why this matters:** Choosing the wrong model = 5–20× cost difference with no quality benefit.  
 A junior LLM engineer picks Opus by default. A senior picks the *cheapest model that's good enough*.
 
----
+===============================================================================
+LEARNING Q&A — Test Your Understanding
+===============================================================================
+
+Q1: Summarize nutritional content of a food photo. Use Haiku or Sonnet? Why?
+A1: Sonnet. Involves two YES answers: (1) multimodal data (photo) requires vision,
+    (2) summary requires reasoning (understanding ingredients, portion, nutrition).
+    Haiku fails on both. Sonnet is required.
+
+Q2: Why is ANALYZE_FOOD currently assigned to Haiku a BUG? Use the 3 questions.
+A2: Three decision questions all point to Sonnet:
+    (1) Requires vision? YES (food photo) → Sonnet/Opus required
+    (2) Requires reasoning? YES (analyze, judge portion/ingredients) → Sonnet/Opus
+    (3) Structurally simple? NO (not a schema fill)
+    Result: Questions 1 & 2 are YES → Sonnet needed, not Haiku.
+
+Q3: Why use Opus for eval grader when it runs offline? Doesn't latency matter?
+A3: Correct — latency doesn't matter for offline/batch work. That's the point!
+    When users aren't waiting, prioritize quality over speed. Eval grader needs
+    deep judgment to catch subtle hallucinations. Worth the slow speed + high cost
+    because accuracy matters more than latency.
+
+Q4: Cost difference: Haiku $43/month vs Sonnet $162/month ($120/month delta).
+    Why is this extra $120/month justified for ANALYZE_FOOD?
+A4: Business ROI calculation:
+    - Haiku's weak vision → wrong calorie estimates
+    - Wrong calories → users lose trust → churn
+    - Cost of losing one user (lifetime value) >> $120/month
+    - So $120/month is cheap insurance against churn & trust loss
+    This is about protecting the product's core promise (accurate nutrition),
+    not just optimizing cost.
+
+Q5: Why use Haiku for test dataset generation, not Sonnet?
+A5: Three reasons:
+    (1) Structurally simple task (enumeration, list-making, not judgment)
+    (2) Haiku output is "diverse enough" for eval purposes — you need varied
+        examples, not high-quality judgment
+    (3) Cost savings: ~20× cheaper than Sonnet with no quality loss for this use
+    Key insight: quality bar matters — this task doesn't need Sonnet quality.
+
+KEY TAKEAWAY:
+Model selection = Technical requirements (vision? reasoning?) + Cost-benefit
+analysis (what's the ROI?) + Quality bar per task (how good does it need to be?).
+
+===============================================================================
 
 ## The Decision Framework
 
