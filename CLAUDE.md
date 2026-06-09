@@ -90,6 +90,7 @@ See `docs/iterations/09-food-diary/SUMMARY.md` for retrospective.
 Development rules live in `.claude/rules/`:
 - `dev-rules.md` — standards, commit protocol, testing, code quality
 - `dev-workflow.md` — iteration workflow, documentation updates
+- `phase-handoff-checklist.md` — mandatory steps for Phase 1-6 learning completions (retrospectives, capability profiles, roadmap, CLAUDE.md updates)
 
 
 
