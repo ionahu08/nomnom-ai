@@ -1,156 +1,206 @@
 # Phase 2 Retrospective: Make NomNom Not Crash
 
-**Duration:** June 5–8, 2026 (4 working days)  
+**Duration:** June 5–8, 2026 (10 working days)  
 **Status:** ✅ Complete
 
 ---
 
 ## What Was Built
 
-**Phase 2 achieved the goal: Implement output control — ensure Claude returns valid, structured data without hallucinations.**
+**Phase 2 achieved the goal: Implement output control and evaluation pipeline — ensure Claude returns valid, structured data without hallucinations.**
 
-The work spans **two halves:**
+The work spans **three parts:**
 
-### **Days 1-5: Code Reviews** (docs/iterations/11-eval-pipeline/)
+### **Days 1-5: Output Control + Evaluation Learning** (learning_lab/phase_2/ scripts 01-05)
+
+Five hands-on learning scripts covering structured output and evaluation infrastructure:
+
+1. **01_output_control.py** — Three techniques for guaranteed output format
+   - **Prefill assistant:** Inject assistant message to start JSON, Claude completes it
+   - **Stop sequences:** Model halts when reaching specified string (e.g., `}`)
+   - **Prefill + Stop combo:** Classic pattern combining both for reliability
+   - **Trade-offs:** Token cost vs. flexibility vs. reliability
+
+2. **02_eval_pipeline.py** — 6-step evaluation workflow
+   - Hand-written test cases (5 examples: Caesar salad, eggs, pizza, yogurt, ambiguous)
+   - Code-based grading (JSON validity, calorie range checks)
+   - Prompt iteration based on scores
+   - Understanding: eval drives prompt improvement
+
+3. **03_dataset_generation.py** — Bulk test case generation
+   - Claude generates 30 challenging food descriptions
+   - Ambiguous, blurry, hard-to-recognize cases
+   - Using Day 1 techniques (prefill+stop) for structured output
+   - Building realistic eval datasets
+
+4. **04_code_graders.py** — Sophisticated grading without LLM calls
+   - **JSON validation:** Does it parse?
+   - **Schema validation:** Required fields present and correct type?
+   - **Semantic validation:** Numeric values nutritionally reasonable?
+   - Multi-level grading: fails fast, detailed errors
+
+5. **05_model_grading.py** — LLM-as-Judge with structured critique
+   - Haiku generates nutrition JSON
+   - Opus evaluates as judge (structured critique)
+   - Signal fusion: code_score + model_score = final decision
+   - Rich qualitative feedback (strengths, weaknesses, reasoning)
+
+### **Days 6-7: Production Code Reviews** (docs/iterations/11-eval-pipeline/)
 
 Comprehensive reviews of the four files responsible for output validation and reliability:
 
-1. **parser.py** — JSON extraction and validation
-   - Understands tool_use responses vs. text fallback
-   - Validates Pydantic schemas
-   - Handles malformed Claude outputs gracefully
+1. **06_parser_guardrails_review.md** — parser.py + guardrails.py analysis
+   - Parser: tool_use vs. text extraction, Pydantic validation
+   - Guardrails: calorie bounds (0-5000), macro validation, toxicity detection
+   - Defense-in-depth: constraints at schema + prompt + code levels
+   - Grade: B+ (solid foundation, minor improvements)
 
-2. **guardrails.py** — Domain-specific validation
-   - Checks calorie ranges (0-5000 realistic bounds)
-   - Validates macros (protein, carbs, fat)
-   - Detects toxicity and safety issues
-   - Prevents hallucinations through constraint checking
+2. **07_tools_evaluator_review.md** — tools.py + evaluator.py analysis
+   - Tools: ANALYZE_FOOD_TOOL schema (8 fields, tool_choice enforcement)
+   - Evaluator: 30-case suite, multi-metric scoring
+   - Grade: A− (production-ready, excellent test coverage)
 
-3. **evaluator.py** — Response quality scoring
-   - Built 30-case evaluation suite (edge cases, happy paths, error conditions)
-   - Metrics: semantic validity, accuracy, consistency
-   - Automated scoring without manual inspection
+### **Days 8-9: Capstone Integration** (learning_lab/phase_2/08_capstone + 09_capstone_report)
 
-4. **tools.py** — Structured output schemas
-   - ANALYZE_FOOD_TOOL with 8 required fields
-   - tool_choice enforcement (Claude MUST return structured data)
-   - Schema validation for all responses
+Full-featured evaluation system with comparative analysis:
 
-### **Days 6-7: Integration & Testing**
+- **08_capstone_v1_tool_choice.py:** Tool_choice pipeline (replaces text parsing)
+- **09_capstone_comparison_report.py:** Side-by-side metrics (text parsing vs. tool_choice)
+- **Evaluation metrics:** accuracy, precision, F1 score, semantic validity
+- **Portfolio artifact:** Demonstrates eval methodology + improvements
 
-- Integrated parser, guardrails, evaluator into single validation pipeline
-- Ran 30 test cases covering edge cases (negative calories, missing fields, typos)
-- Achieved 100% success rate on tool_choice (no more text parsing)
-- Benchmarked validation speeds (~50ms per response)
+### **Days 10: Production Integration** (Iteration 11 — integrated into ai_service.py + created evaluation pipeline)
 
-### **Days 8-9: Iteration 11 Documentation**
+Applied all Phase 2 learnings to production code:
 
-- Created docs/iterations/11-eval-pipeline/ (PLAN.md, PHASES.md, BUGLOG.md)
-- Documented all issues found and resolved
-- Created validation pipeline spec for handoff
+- Integrated parser + guardrails + evaluator into ai_service.py validation pipeline
+- Ran 30 test cases, achieved 100% success rate
+- Comprehensive evaluation documentation
 
 ---
 
 ## Key Learning Outcomes by Layer
 
-### **Layer 0 (API Mastery):** 4/5 → 4/5 (no change)
-- ✅ Deepened understanding of tool_use vs. text output
-- ✅ Know when to use tool_choice="force" vs. default
-- ✅ Understand response parsing patterns
+### **Layer 0 (API Mastery):** 4/5 → **4/5** (stable)
+- ✅ Deepened understanding of structured output techniques (prefill, stop, prefill+stop)
+- ✅ Know when to use tool_choice vs. prefill+stop (tradeoffs)
+- ✅ Understand response parsing patterns (text vs. tool_use)
+- ✅ Token cost awareness (prefilling wastes tokens, stop sequences don't)
 
-### **Layer 1 (Prompt Engineering):** 3/5 → 3/5 (no change)
-- ✅ Recognized guardrails should be in schema (enum constraints) and code
-- ⏳ Will refine prompt strategies in Phase 3+
+### **Layer 1 (Prompt Engineering):** 3/5 → **3/5** (stable)
+- ✅ Recognized guardrails should be at multiple levels (schema, prompt, code)
+- ✅ Understand prompt evaluation (how to measure if prompt is good)
+- ✅ Know prompt iteration loop: eval → grade → modify → re-eval
+- ⏳ Will refine advanced prompt strategies in Phase 3+
 
-### **Layer 2 (Output Control):** 1/5 → **4/5** ⭐⭐
+### **Layer 2 (Output Control):** 1/5 → **4/5** ⭐⭐⭐
+- ✅ Master three output control techniques (prefill, stop, prefill+stop)
 - ✅ Implement tool_choice for guaranteed structure
 - ✅ Parse tool_use responses correctly
 - ✅ Validate with Pydantic schemas
-- ✅ Apply domain guardrails (calorie bounds, etc.)
-- ✅ Score response quality with evaluator
-- ✅ Handle edge cases (missing fields, type errors, hallucinations)
+- ✅ Apply domain guardrails (calorie bounds, toxicity, semantic checks)
+- ✅ Code-based grading (JSON, schema, semantic validation)
+- ✅ Model-based grading (LLM-as-Judge with structured critique)
+- ✅ Handle edge cases (missing fields, type errors, hallucinations, ambiguous inputs)
 
-### **Layer 3 (Augmentation):** 1/5 → 2/5 ⭐
-- ✅ Understand RAG context (will use in Phase 3)
-- ✅ Know how guardrails integrate with retrieval
+### **Layer 3 (Augmentation):** 1/5 → **2/5** ⭐
+- ✅ Understand how test datasets expose weaknesses
+- ✅ Know how guardrails integrate with retrieval (will use in Phase 3)
+- ✅ Recognize eval as part of RAG pipeline
 
 ### **Layer 4 (Reliability Engineering):** 2/5 → **3/5** ⭐
-- ✅ Error handling patterns (try/except, fallbacks)
-- ✅ Validation pipeline for robustness
-- ✅ Logging for debugging production issues
+- ✅ Error handling patterns (try/except, graceful failures)
+- ✅ Multi-level validation pipeline for robustness
+- ✅ Logging and observability for production debugging
+- ✅ Signal fusion: combining code scores + model scores
 
 ---
 
 ## Challenges Overcome
 
-### **1. Tool_use vs. text output fragility**
+### **1. Choosing between output control techniques**
 
-**Challenge:** Phase 1 used JSON text parsing (fragile, error-prone). How to guarantee structure?
+**Challenge:** Prefill, stop sequences, and prefill+stop all work. Which to use when?
 
-**Resolution:**
-- Defined ANALYZE_FOOD_TOOL schema with 8 required fields
-- Set tool_choice={"type": "tool", "name": "analyze_food"} (forces tool use)
-- Claude must return structured data or fail (no fallback to text)
-- Achieved 100% success rate — Claude always returns valid schema
+**Resolution (Day 1):**
+- **Prefill:** Claude continues from injection point, good for guiding format but wastes tokens
+- **Stop sequences:** Model halts at specified string, no token waste but requires right stopping point
+- **Prefill + Stop:** Combines both, most robust for JSON (prefill `{`, stop at `}`)
+- **Trade-offs:** Token cost vs. complexity vs. reliability
 
-**Takeaway:** Schema-first design. Let the tool definition enforce structure, not prompts.
-
----
-
-### **2. Building a comprehensive evaluation pipeline**
-
-**Challenge:** How to test output quality without manual inspection? 30 test cases for what?
-
-**Resolution:**
-- Identified edge cases: negative calories, missing fields, typos, hallucinations
-- Built evaluator.py with 30 test cases covering all scenarios
-- Metrics: semantic validity (does the response make sense?), accuracy (is data correct?), consistency (same food → same output)
-- Automated scoring — no human in the loop after setup
-
-**Takeaway:** Evaluation is the watershed from "hobby project" to "engineering." Testing quality matters as much as testing functionality.
+**Takeaway:** Context matters. For JSON, prefill+stop is optimal. For flexible formats, stop sequences win.
 
 ---
 
-### **3. Domain-specific guardrails**
+### **2. Building a realistic eval dataset without manual data**
 
-**Challenge:** How to prevent Claude from returning "-500 calories" or "50g protein for salad"?
+**Challenge:** How to generate 30 test cases that actually expose Claude's weaknesses?
 
-**Resolution:**
-- Implemented guardrails.py with hard bounds
-- Calories: 0-5000 (reasonable food servings)
-- Protein/carbs/fat: 0-500g each
-- Detect suspicious patterns (e.g., all zeros)
-- Return error message if guardrails violated
+**Resolution (Days 2-3):**
+- Started with 5 hand-written cases (easy and hard examples)
+- Built grading pipeline to score outputs
+- Used Claude itself to generate 30 challenging descriptions
+- Used Day 1 techniques (prefill+stop) to force JSON output
+- Result: 30 realistic test cases covering edge cases
 
-**Takeaway:** Constraints should be enforced at multiple levels: schema (enums), prompt (descriptions), code (guardrails). Defense-in-depth.
-
----
-
-### **4. Parsing tool_use responses**
-
-**Challenge:** Tool_use responses have different structure than text. How to extract the data?
-
-**Resolution:**
-- Parsed response.content[0].input (tool parameters)
-- Extracted each field (food_name, calories, protein_g, etc.)
-- Validated against Pydantic FoodAnalysisResponse schema
-- Handled errors gracefully (missing fields → error message, not crash)
-
-**Takeaway:** Tool_use response structure is different from text. Need specialized parsing, not generic JSON extraction.
+**Takeaway:** Use Claude to bootstrap your eval dataset. Manual data is too expensive and limited.
 
 ---
 
-### **5. Evaluating "correctness" without ground truth**
+### **3. Grading without ground truth labels**
 
-**Challenge:** How to score if Claude's response is correct (e.g., is 250 calories for a salad right)?
+**Challenge:** We don't have calorie labels for generated test cases. How to grade?
+
+**Resolution (Days 4-5):**
+- **Code-based grading (Day 4):** JSON validity, schema correctness, semantic plausibility
+- **Multi-level:** Fail fast (if JSON invalid, no need to check schema), but gather all errors
+- **Semantic checks:** Calories in reasonable range (0-5000), macros proportional, no negative values
+- **Model-based grading (Day 5):** Opus judges Haiku's output, provides critique + score
+- **Signal fusion:** Combine code_score + model_score for final decision
+
+**Takeaway:** Don't need ground truth. Code-based checks + model-based critique = sufficient grading. Fusion of signals is more robust than either alone.
+
+---
+
+### **4. Understanding when to use LLM vs. code for validation**
+
+**Challenge:** Should we use Claude to grade every output? That's expensive.
 
 **Resolution:**
-- Semantic validity: Does the response make semantic sense? (calories > 0, protein > 0)
-- Consistency: Same food analyzed twice → should get similar results
-- Detected hallucinations: Are the fields plausible? (30g protein for water is wrong)
-- Didn't aim for 100% accuracy (no ground truth), just caught obvious errors
+- **Code-based grading:** Fast, cheap, deterministic (JSON parsing, range checks)
+- **Model-based grading:** Expensive but rich (understands nuance, provides reasoning)
+- **Hybrid:** Use code first (catches obvious errors), use model only for borderline cases
+- **In production:** Use code-based (fast), sample model-based for monitoring
 
-**Takeaway:** Can't test correctness without data. Test for plausibility instead (constraint checking, consistency, semantic validity).
+**Takeaway:** Not every decision needs an LLM. Code-based validation is sufficient for structured checks. Reserve LLM-as-Judge for quality assurance and monitoring.
+
+---
+
+### **5. Iterating prompts based on eval scores**
+
+**Challenge:** Eval pipeline shows prompt is failing on 40% of cases. Now what?
+
+**Resolution (Day 2 loop):**
+- Run eval, get scores
+- Identify failure patterns (e.g., "ambiguous photos score low")
+- Modify prompt to address pattern (e.g., add guidance for ambiguous cases)
+- Re-run eval, compare scores
+- Iterate until converged
+
+**Takeaway:** Eval pipeline isn't just for grading — it's feedback loop for improvement. Prompt iteration is driven by data.
+
+---
+
+### **6. Handling hallucinations vs. mistakes**
+
+**Challenge:** Claude returns "1000g protein" for a salad. Is this a mistake or hallucination?
+
+**Resolution:**
+- **Mistake:** Claude tried but got the number wrong (recoverable with prompt)
+- **Hallucination:** Claude invented field or value completely (indicates weak guardrails)
+- **Detection:** Code-based checks catch both, but model-based critique explains which
+
+**Takeaway:** Not all errors are equal. Understanding the failure mode (mistake vs. hallucination) guides different fixes (prompt refinement vs. guardrails strengthening).
 
 ---
 
@@ -158,84 +208,97 @@ Comprehensive reviews of the four files responsible for output validation and re
 
 ### What Worked Well ✅
 
-1. **tool_choice enforcement** — 100% structured output success rate
-2. **Pydantic validation** — Caught all schema errors (missing fields, type mismatches)
-3. **Guardrails** — Blocked hallucinations (negative calories, unrealistic macros)
-4. **Evaluator pipeline** — All 30 test cases passed
-5. **Error messages** — Clear feedback when validation failed
-6. **Integration** — Parser → guardrails → evaluator → return (seamless)
+1. **Prefill + Stop pattern** — 100% success rate on JSON output (Days 1-2)
+2. **Test dataset generation** — Claude generated 30 realistic edge cases (Day 3)
+3. **Code-based grading** — Multi-level validation caught all schema errors (Day 4)
+4. **Model-based grading** — Opus critique added qualitative feedback (Day 5)
+5. **Evaluation pipeline** — 6-step workflow (prompt → eval → grade → iterate → re-eval) functional
+6. **Signal fusion** — Combining code_score + model_score worked robustly
+7. **Production integration** — 30 test cases ran with 100% eval completion
 
 ### Known Issues / Regressions
 
-1. **Semantic validity detection is conservative** — May miss some hallucinations
-2. **No human feedback loop** — Evaluator can't learn from user corrections (Phase 5+)
-3. **Limited test coverage** — Only tested with analyze_food, not recommend_meal or weekly_recap
+1. **Eval is expensive** — Model-based grading with Opus adds cost (30 cases × Opus calls)
+2. **Test dataset is synthetic** — Generated by Claude, not real user data (potential bias)
+3. **Code-based grading is domain-specific** — Works for nutrition, may not generalize
 
 ### What Wasn't Tested
 
-- Multiple tool use (only single tool, analyze_food)
-- Fallback when tool_choice fails (shouldn't happen, but edge case)
-- User feedback integration (evaluator learns from corrections)
-- A/B testing different guardrail thresholds
+- Production scale (only 30 test cases, what about 300 or 3000?)
+- Continuous monitoring (eval pipeline runs once, not continuously)
+- User feedback loop (grades based on Claude evaluation, not actual user satisfaction)
+- Conflict resolution (when code_grade and model_grade disagree, what wins?)
 
 ---
 
 ## Key Insights & Lessons Learned
 
-### **1. Output control is foundational**
+### **1. Output control techniques are foundational to reliability**
 
-Before Phase 2, Phase 1 scripts relied on text parsing (fragile). Phase 2 realized that **structure must be enforced at the API level, not at the parsing level.**
+Phase 1 relied on fragile JSON text parsing. Phase 2 discovered three **techniques that guarantee structure:**
 
-**Before:** "Try to parse JSON from text response"  
-**After:** "Define a tool schema, set tool_choice, extract the tool parameters"
+- **Prefill:** Inject assistant message, Claude continues → natural but token-wasteful
+- **Stop sequences:** Model halts at specified string → efficient but requires right stopping point
+- **Prefill + Stop:** Combines both → optimal for JSON
 
-This shift enables everything downstream: validation, guardrails, evaluation, reliability.
-
----
-
-### **2. Evaluation requires multiple metrics**
-
-Correctness is hard to measure without ground truth. Instead, Phase 2 uses **plausibility testing:**
-- Semantic validity (fields make sense)
-- Consistency (same input → similar output)
-- Constraint satisfaction (guardrails)
-- Absence of hallucinations (detectable patterns)
-
-This is pragmatic — measure what's observable, not what's impossible to verify.
+**Takeaway:** Structure enforcement is not prompting problem — it's an API-level decision. Different techniques for different contexts.
 
 ---
 
-### **3. Guardrails work best at multiple layers**
+### **2. Evaluation is the watershed from hobby to engineering**
 
-Don't rely on a single validation point. Instead:
-1. **Schema layer:** Enum constraints (food_category must be salad/fast food/etc.)
-2. **Prompt layer:** Descriptions ("calories 0-5000")
-3. **Code layer:** guardrails.py (hard bounds)
+Phase 1 had no eval pipeline. Phase 2 realized that **evaluation drives everything downstream:**
+- Grades measure current state (prompt is failing on 40% of cases)
+- Feedback loop drives improvement (modify prompt, re-eval, iterate)
+- Scale matters (5 hand-written cases miss edge cases; 30 generated cases find them)
 
-**Why:** Each layer catches different errors. Schema catches wrong categories. Prompt guides Claude. Code layer catches the remaining hallucinations.
-
----
-
-### **4. Tool_choice > text parsing by a huge margin**
-
-Phase 1's JSON parsing was fragile. Phase 2's tool_choice is bulletproof:
-- 100% success rate (no more malformed JSON)
-- Structure guaranteed (schema validation is automatic)
-- Parsing is trivial (just extract tool.input)
-- Error handling is simpler (known fields, known types)
-
-**Takeaway:** This is the biggest reliability improvement Phase 2 made.
+**Takeaway:** Eval isn't testing — it's a product development feedback loop. You can't improve what you don't measure.
 
 ---
 
-### **5. Error messages are part of the API**
+### **3. Grading requires multiple signals, not ground truth**
 
-When validation fails, what should the API return? Phase 2 created detailed error messages:
-- "Calories must be 0-5000, got -500"
-- "Missing required field: protein_g"
-- "Toxicity detected in cat_roast"
+Without labeled data, how do you grade? Phase 2 discovered **hybrid grading:**
+- **Code-based:** Fast, deterministic (JSON valid? schema correct? range plausible?)
+- **Model-based:** Rich, understanding (Opus critique explaining why response is good/bad)
+- **Fusion:** Combine both signals (code scores + model scores = robust decision)
 
-These aren't just for debugging — they tell users what went wrong and how to fix it (if user-facing).
+**Takeaway:** You don't need ground truth. Multiple cheap signals (code checks) + one expensive signal (model critique) = sufficient grading.
+
+---
+
+### **4. Bootstrapping eval data with Claude saves months**
+
+Manual data collection is expensive. Phase 2 realized: **use Claude to generate your own test cases.**
+
+- Prompt Claude: "Generate 30 ambiguous food descriptions"
+- Use prefill+stop (Day 1 technique) to force structured output
+- Results: 30 realistic edge cases in minutes (not months of manual work)
+
+**Takeaway:** Your evaluator doesn't need real data — synthetic data is sufficient if generated thoughtfully.
+
+---
+
+### **5. Signal fusion (RecSys pattern) beats single signals**
+
+When code_grade and model_grade disagree, what wins? Phase 2 learned: **both are right, weight them differently.**
+
+- Code-based (JSON valid?) = critical signal, fail fast
+- Model-based (is response helpful?) = secondary signal, adds nuance
+- Fusion = code gate (must pass) + model score (secondary consideration)
+
+**Takeaway:** From recommender systems: never trust single signal. Combine multiple with explicit rules for conflicts.
+
+---
+
+### **6. Evaluation should be automated, reproducible, and continuous**
+
+Manual eval ("does this look good?") doesn't scale. Phase 2 designed for automation:
+- 6-step pipeline is deterministic (same input → same output)
+- Can run on every new prompt version (reproducible)
+- Can monitor in production (continuous)
+
+**Takeaway:** Once you build an eval pipeline, you have a repeatable feedback loop. That's the power.
 
 ---
 
@@ -300,25 +363,39 @@ These aren't just for debugging — they tell users what went wrong and how to f
 ## Phase 2 Summary
 
 **What went well:**
-- tool_choice eliminated text parsing fragility completely
-- Comprehensive evaluation suite (30 cases) catches edge cases
-- Guardrails work at multiple layers (schema, prompt, code)
-- 100% tool_choice success rate — production-ready
+- Three output control techniques (prefill, stop, prefill+stop) provide flexible structured output options
+- 6-step eval pipeline works end-to-end (prompt → test → grade → iterate → re-test)
+- Claude-generated test dataset (30 cases) captures realistic edge cases efficiently
+- Hybrid grading (code + model) provides robustness without ground truth
+- Signal fusion pattern (from RecSys) handles conflicting signals elegantly
+- 100% eval completion rate on all 30 test cases
 
 **What was harder than expected:**
-- Designing the evaluation suite (what cases matter?)
-- Understanding tool_use response structure (different from text)
-- Evaluating "correctness" without ground truth (measurement challenge)
+- Realizing eval is not just testing — it's a feedback loop for improvement
+- Designing code-based graders (what checks matter for nutrition domain?)
+- Understanding tradeoffs between output control techniques (token cost vs. complexity vs. reliability)
+- Discovering that synthetic (Claude-generated) test data is sufficient (challenged bias toward "real" labeled data)
 
 **Key takeaway:**
-Output control is foundational. Once you guarantee structure (via tool_choice) and validation (via guardrails + evaluator), everything downstream becomes simpler and more reliable. This is the watershed from "proof of concept" to "production system."
+Evaluation is foundational. Once you have a measurable feedback loop (eval pipeline), you can iterate on prompts, guardrails, and schemas systematically. This is the watershed from "trial-and-error prompting" to "data-driven product development."
 
 ---
 
 **Phase 2 Status:** ✅ **COMPLETE**
 
-**Capability Growth:** Layer 2 jumped from 1/5 → 4/5 (Output Control mastery)
+**Capability Growth:**
+- Layer 2 (Output Control): 1/5 → 4/5 (mastery of structured output)
+- Layer 0 (API Mastery): deepened understanding of prefill, stop sequences, token efficiency
 
-**Key Metric:** 100% tool_choice success rate, 98.3/100 avg code score, 93.3% semantic validity
+**Key Metrics:**
+- 30 test cases generated, all evaluated successfully
+- 100% completion on 6-step eval pipeline
+- Hybrid grading combining code (0-100) + model scores (0-10)
+- Time to eval: ~2 minutes for full pipeline on 30 cases
+
+**Key Files:**
+- 5 learning scripts (01-05): prefill+stop, eval, dataset gen, code graders, model graders
+- 2 production code reviews: parser+guardrails, tools+evaluator
+- 1 capstone comparison: text parsing vs. tool_choice metrics
 
 Ready for Phase 3: Semantic Search + Caching (RAG pipeline).
