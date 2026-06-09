@@ -25,6 +25,136 @@ You will see:
     - Non-streamed response (entire response at once, then printed)
     - Streamed response (tokens appear one by one, real-time)
     - Side-by-side comparison of TTFT and total latency
+
+===============================================================================
+LEARNING Q&A — Test Your Understanding
+===============================================================================
+
+Q1a: Why is TTFT (Time to First Token) so much lower than total latency?
+A1a: Streaming consumes tokens as they arrive instead of waiting for the entire
+     response. TTFT is when the first token arrives (~1.5s), total latency is
+     when all tokens arrive (~6.6s). Non-streaming blocks until all tokens are
+     ready, so user waits for the full total latency before seeing anything.
+
+Q1b: How does streaming improve UX compared to non-streaming?
+A1b: Non-streaming: user stares at blank screen for 6.14s (frustrating, feels
+     like the app froze). Streaming: user sees first token at 1.53s (concrete
+     feedback, feels responsive). Perceived latency is much better.
+
+Q2a: Why advance to new steps at time thresholds (0s, 0.5s, 1.0s) instead of
+     waiting for full response?
+A2a: Thresholds simulate a multi-step process. As real time elapses during
+     streaming, advancing steps shows progress ("Recognizing → Analyzing →
+     Generating"). Time passes during streaming, so we can trigger UI updates
+     based on elapsed time.
+
+Q2b: Why is "📊 Analyzing nutrition..." better feedback than a spinning loader?
+A2b: Concrete feedback is more reassuring. "Analyzing nutrition" tells the user:
+     - The app is doing something (not frozen)
+     - WHAT it's doing (analyzing = working on the task)
+     - Progress is visible (steps advancing = getting closer to answer)
+     A spinner just says "something is loading" — less reassuring.
+
+Q2c: If response completed in 2.5s instead of 6.62s, would all three steps appear?
+A2c: Yes. All three steps would appear because their thresholds (0s, 0.5s, 1.0s)
+     are all <= 2.5s. Steps would just appear faster. Thresholds determine WHEN
+     steps appear, not WHETHER they appear.
+
+Q3a: Why only check for event.type == "content_block_delta"?
+A3a: Only content_block_delta events carry text fragments (event.delta.text).
+     Other events are metadata: message_start (stream began), content_block_start
+     (block starting), content_block_stop (block ending), message_stop (stream
+     ending). We only care about actual text tokens.
+
+Q3b: What happens if you remove flush=True from print statements?
+A3b: Output gets buffered in memory instead of appearing immediately. Tokens
+     might appear in batches or not until the stream completes, defeating the
+     real-time UX. flush=True forces immediate write to terminal.
+
+Q3c: Why use hasattr(delta, "text") instead of directly accessing delta.text?
+A3c: Defensive programming. Some delta events might not have a "text" attribute.
+     hasattr checks first; if missing, it skips without crashing. Direct access
+     would raise AttributeError if the attribute doesn't exist.
+
+Q4a: Why accumulate text in a buffer variable during streaming?
+A4a: To preserve the partial response if the stream errors mid-way. If an error
+     occurs after 50% of tokens, the buffer contains those 50% so you can:
+     - Display partial response to user
+     - Log it with error context
+     - Fall back to cached data instead of losing everything
+
+Q4b: If stream errors after 50% of tokens, what's in the buffer?
+A4b: The first 50% of the response text. Buffer accumulates every token received,
+     so partial responses are always preserved even if the stream fails.
+
+Q4c: In production, what three things can you do with a partial response?
+A4c: (1) Display it to user: "Response interrupted, but here's what we got..."
+     (2) Log it with error: preserve the partial response in error logs
+     (3) Fall back: "Stream failed, showing cached result instead..."
+
+Q5a: Does streaming reduce the number of tokens sent to Claude?
+A5a: No. You observed 308 tokens in both streaming and non-streaming. Streaming
+     is purely about HOW you consume tokens (all at once vs. as they arrive),
+     not HOW MANY tokens are used. Same request = same tokens = same cost.
+
+Q5b: If streaming doesn't save money, why use it in production?
+A5b: For User Experience (UX). Users see first token at 1.53s (streaming) instead
+     of waiting 6.14s (non-streaming). Benefits: better engagement, lower bounce
+     rate (users don't think app froze), perceived speed improvement. Streaming
+     improves PERCEIVED latency even if total time is similar.
+
+Q5c: What does "streaming is a UX optimization, not a cost optimization" mean?
+A5c: UX optimization = improves perceived latency and user engagement.
+     NOT cost optimization = doesn't reduce tokens, requests, or API cost.
+     Use streaming when you care about user experience, not to save money.
+
+Q6a: What does end="" do in print(text, end="", flush=True)?
+A6a: Removes the newline after print(). Without it, each token prints on new line:
+       This
+       is
+       a
+       response
+     With end="", tokens concatenate: This is a response
+
+Q6b: Why is flush=True critical for streaming?
+A6b: Ensures output writes to terminal immediately (doesn't buffer in memory).
+     Without it, tokens appear in batches or not until buffer fills/stream ends.
+     For streaming, you want tokens to appear AS THEY ARRIVE, not in batches.
+
+Q6c: In Experiment 3, what does print() without arguments do?
+A6c: Prints a newline (moves to next line). Used to separate progress steps:
+       🔍 Recognizing food...
+       📊 Analyzing nutrition...    ← print() moved us here
+       💬 Generating commentary...
+
+Q7a: For a mobile app, use streaming or non-streaming? Why?
+A7a: Streaming. Mobile users have short attention spans. Non-streaming: user waits
+     6.14s for blank screen → closes app. Streaming: user sees text at 1.53s →
+     stays engaged. User retention matters more than code simplicity.
+
+Q7b: What's the code complexity tradeoff?
+A7b: Non-streaming: simple (call, wait, print). Streaming: complex (async events,
+     track TTFT, handle partial responses on error, buffer management). Worth
+     it for better UX, but requires more careful coding.
+
+Q8a: In NomNom, what progress steps would you show if using this pattern?
+A8a: Based on real timing during analysis:
+       🔍 Recognizing food...      (0.0s) — identify what's in the photo
+       📊 Analyzing nutrition...   (0.5s) — calculate macros/micros
+       💬 Generating answer...     (2.0s) — formulate nutritional response
+       🎭 Adding NomNom's sass...  (4.0s) — add witty commentary
+     Thresholds match actual timing of each step.
+
+Q8b: Why is showing step labels better UX than silent processing?
+A8b: Concrete feedback = reassurance. "Recognizing..." tells user what's
+     happening NOW. Silent processing feels slow/frozen even if timing is same.
+     Progress transparency = perceived speed improvement + user confidence.
+
+KEY TAKEAWAY:
+Streaming improves perceived latency and user engagement (UX), not token cost
+(cost). Use when you care about real-time feedback and user experience.
+
+===============================================================================
 """
 
 import os
