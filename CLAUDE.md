@@ -55,10 +55,19 @@ See `docs/iterations/09-food-diary/SUMMARY.md` for retrospective.
 - **Outcome:** tool_choice integrated, eval pipeline built (30 edge cases), error messages improved
 - **Key metrics:** 100% tool_choice success rate, 98.3/100 avg code score, 93.3% semantic validity
 - **Iteration docs:** `docs/iterations/11-eval-pipeline/`
+- **Retrospective:** `docs/learning/03_phase_retrospectives/phase_2_retro.md`
 
-**Phase 3** (Week 5–6, starting June 9, 2026): Semantic Search + Caching
+**Phase 3** ✅ COMPLETE (June 9–8, 2026)
 - Focus: embedding.py, cache.py, seed_knowledge.py, recommendation_service.py
 - Goal: Build RAG pipeline + semantic cache for meal recommendations
+- **Outcome:** Days 1-9 learning (naive RAG → hybrid search → citations), Day 10 production integration
+- **Key metrics:** Threshold tuned 0.95 → 0.82, 7 bugs fixed, 5 files updated, 4 commits
+- **Iteration docs:** `docs/iterations/12-semantic-cache-production/`
+- **Retrospective:** `docs/learning/03_phase_retrospectives/phase_3_retro.md`
+
+**Phase 4** 🚀 STARTING (Week 7, June 10+ 2026): Request Routing + Rate Limiting + Logging
+- Focus: router.py, rate_limiter.py, logger.py
+- Goal: Infrastructure for production reliability and observability
 
 
 ## Key Docs
