@@ -20,11 +20,10 @@ class TestTaskTypes:
 class TestTaskRoutes:
     """Test task-to-model routing."""
 
-    def test_analyze_food_uses_haiku_with_fallback(self):
-        """Food analysis should use Haiku with Sonnet fallback."""
+    def test_analyze_food_uses_sonnet(self):
+        """Food analysis should use Sonnet for multimodal vision accuracy."""
         route = get_route(TaskType.ANALYZE_FOOD)
-        assert route.primary_model == "claude-haiku-4-5-20251001"
-        assert route.fallback_model == "claude-sonnet-4-20250514"
+        assert route.primary_model == "claude-sonnet-4-20250514"
         assert route.max_tokens == 500
 
     def test_recommend_meal_uses_sonnet(self):
@@ -60,9 +59,9 @@ class TestGetModelForTask:
     """Test convenience function to get model name."""
 
     def test_get_model_for_analyze_food(self):
-        """Should return Haiku for food analysis."""
+        """Should return Sonnet for food analysis (multimodal accuracy required)."""
         model = get_model_for_task(TaskType.ANALYZE_FOOD)
-        assert model == "claude-haiku-4-5-20251001"
+        assert model == "claude-sonnet-4-20250514"
 
     def test_get_model_for_recommend_meal(self):
         """Should return Sonnet for recommendations."""

@@ -38,10 +38,48 @@ class TestPricing:
         cost = AICallLogger.estimate_cost("claude-haiku-4-5-20251001", 0, 0)
         assert cost == 0.0
 
-    def test_unknown_model_returns_zero(self):
-        """Unknown model should return zero cost (with warning)."""
-        cost = AICallLogger.estimate_cost("unknown-model", 100, 100)
-        assert cost == 0.0
+    def test_cache_creation_tokens_pricing(self):
+        """Cache creation tokens should use 25% premium pricing."""
+        # 1M cache_creation tokens at $1.00 (25% premium on $0.80 input)
+        cost = AICallLogger.estimate_cost(
+            "claude-haiku-4-5-20251001",
+            input_tokens=0,
+            output_tokens=0,
+            cache_creation_tokens=1_000_000,
+        )
+        assert cost == pytest.approx(1.00, rel=1e-2)
+
+    def test_cache_read_tokens_pricing(self):
+        """Cache read tokens should use 90% discount pricing."""
+        # 1M cache_read tokens at $0.08 (90% discount on $0.80 input)
+        cost = AICallLogger.estimate_cost(
+            "claude-haiku-4-5-20251001",
+            input_tokens=0,
+            output_tokens=0,
+            cache_read_tokens=1_000_000,
+        )
+        assert cost == pytest.approx(0.08, rel=1e-2)
+
+    def test_cache_read_much_cheaper_than_regular_input(self):
+        """Cache read should be ~90% cheaper than regular input tokens."""
+        regular_cost = AICallLogger.estimate_cost(
+            "claude-haiku-4-5-20251001",
+            input_tokens=1000,
+            output_tokens=0,
+        )
+        cache_cost = AICallLogger.estimate_cost(
+            "claude-haiku-4-5-20251001",
+            input_tokens=0,
+            output_tokens=0,
+            cache_read_tokens=1000,
+        )
+        # Cache read should be ~10% of regular input cost (90% discount)
+        assert cache_cost < regular_cost / 5  # Much cheaper
+
+    def test_unknown_model_raises_error(self):
+        """Unknown model should raise ValueError."""
+        with pytest.raises(ValueError, match="Unknown model for pricing"):
+            AICallLogger.estimate_cost("unknown-model", 100, 100)
 
 
 class TestTokenExtraction:
@@ -85,7 +123,12 @@ class TestLogEntry:
     def test_successful_call_log(self):
         """Should create log entry for successful call."""
         response = MagicMock(spec=anthropic.types.Message)
-        response.usage = MagicMock(input_tokens=100, output_tokens=50)
+        response.usage = MagicMock(
+            input_tokens=100,
+            output_tokens=50,
+            cache_creation_input_tokens=0,
+            cache_read_input_tokens=0,
+        )
 
         log_entry = AICallLogger.log_call(
             model="claude-haiku-4-5-20251001",

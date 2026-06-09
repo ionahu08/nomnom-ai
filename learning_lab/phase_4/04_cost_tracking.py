@@ -114,10 +114,23 @@ class CallMetrics:
 
 def calculate_cost(model: str, usage) -> float:
     """Calculate USD cost from token usage."""
-    if model not in PRICING:
+    # Extract model short name from full model ID
+    # "claude-sonnet-4-5" → "sonnet"
+    # "claude-haiku-4-5" → "haiku"
+    # "claude-opus-4-7" → "opus"
+    if "sonnet" in model:
+        model_key = "sonnet"
+    elif "haiku" in model:
+        model_key = "haiku"
+    elif "opus" in model:
+        model_key = "opus"
+    else:
         raise ValueError(f"Unknown model: {model}")
 
-    pricing = PRICING[model]
+    if model_key not in PRICING:
+        raise ValueError(f"Unknown model: {model_key}")
+
+    pricing = PRICING[model_key]
 
     input_tokens = getattr(usage, "input_tokens", 0)
     output_tokens = getattr(usage, "output_tokens", 0)

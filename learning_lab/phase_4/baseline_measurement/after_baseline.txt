@@ -1,0 +1,119 @@
+
+================================================================================
+PHASE 4 DAY 4: BASELINE MEASUREMENT
+================================================================================
+Measuring 20 representative requests across 3 task types
+(This is the BEFORE snapshot — will re-measure after Day 5 fixes)
+
+▶ Request 1/20: Food recognition 1: ramen bowl
+  Task: analyze_food         | Model: claude-sonnet-4-20250514
+  ERROR: 'model'
+
+▶ Request 2/20: Food recognition 2: caesar salad
+  Task: analyze_food         | Model: claude-sonnet-4-20250514
+  ERROR: 'model'
+
+▶ Request 3/20: Food recognition 3: sushi platter
+  Task: analyze_food         | Model: claude-sonnet-4-20250514
+  ERROR: 'model'
+
+▶ Request 4/20: Food recognition 4: pasta carbonara
+  Task: analyze_food         | Model: claude-sonnet-4-20250514
+  ERROR: 'model'
+
+▶ Request 5/20: Food recognition 5: avocado toast
+  Task: analyze_food         | Model: claude-sonnet-4-20250514
+  ERROR: 'model'
+
+▶ Request 6/20: Food recognition 6: thai curry
+  Task: analyze_food         | Model: claude-sonnet-4-20250514
+  ERROR: 'model'
+
+▶ Request 7/20: Food recognition 7: greek salad
+  Task: analyze_food         | Model: claude-sonnet-4-20250514
+  ERROR: 'model'
+
+▶ Request 8/20: Food recognition 8: burger with fries
+  Task: analyze_food         | Model: claude-sonnet-4-20250514
+  ERROR: 'model'
+
+▶ Request 9/20: JSON extraction 1: simple protein
+  Task: json_extraction      | Model: claude-haiku-4-5-20251001
+  ERROR: 'model'
+
+▶ Request 10/20: JSON extraction 2: dessert
+  Task: json_extraction      | Model: claude-haiku-4-5-20251001
+  ERROR: 'model'
+
+▶ Request 11/20: JSON extraction 3: fruit
+  Task: json_extraction      | Model: claude-haiku-4-5-20251001
+  ERROR: 'model'
+
+▶ Request 12/20: JSON extraction 4: vegetable
+  Task: json_extraction      | Model: claude-haiku-4-5-20251001
+  ERROR: 'model'
+
+▶ Request 13/20: JSON extraction 5: dairy
+  Task: json_extraction      | Model: claude-haiku-4-5-20251001
+  ERROR: 'model'
+
+▶ Request 14/20: JSON extraction 6: nuts
+  Task: json_extraction      | Model: claude-haiku-4-5-20251001
+  ERROR: 'model'
+
+▶ Request 15/20: JSON extraction 7: grain
+  Task: json_extraction      | Model: claude-haiku-4-5-20251001
+  ERROR: 'model'
+
+▶ Request 16/20: RAG answer 1: salmon vs tilapia
+  Task: recommend_meal       | Model: claude-sonnet-4-20250514
+  ERROR: 'model'
+
+▶ Request 17/20: RAG answer 2: whole wheat bread
+  Task: recommend_meal       | Model: claude-sonnet-4-20250514
+  ERROR: 'model'
+
+▶ Request 18/20: RAG answer 3: olive oil benefits
+  Task: recommend_meal       | Model: claude-sonnet-4-20250514
+  ERROR: 'model'
+
+▶ Request 19/20: RAG answer 4: protein timing
+  Task: recommend_meal       | Model: claude-sonnet-4-20250514
+  ERROR: 'model'
+
+▶ Request 20/20: RAG answer 5: intermittent fasting
+  Task: recommend_meal       | Model: claude-sonnet-4-20250514
+  ERROR: 'model'
+
+
+================================================================================
+BASELINE RESULTS
+================================================================================
+
+COST & LATENCY BY TASK TYPE:
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+TOTAL                | Count:  0 | Avg Cost: $0.000000 | Total: $0.000000
+
+LATENCY PERCENTILES:
+--------------------------------------------------------------------------------
+
+COST FORECAST (at current pricing):
+--------------------------------------------------------------------------------
+Baseline: 0 requests at $0.000000 total
+Average per request: $0.000000
+At 1,000 daily requests:
+  Daily:   $0.00/day
+  Monthly: $0.00/month
+
+CACHE HIT RATE:
+--------------------------------------------------------------------------------
+Cache hits: 0/0 (0.0%)
+(Expected: ~0% on first run, higher on repeated requests)
+
+================================================================================
+END BASELINE MEASUREMENT
+================================================================================
+
+Re-run this script after Day 5 fixes to get AFTER snapshot.
+Compare costs and latency for before/after analysis.

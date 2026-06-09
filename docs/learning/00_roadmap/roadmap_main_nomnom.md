@@ -861,7 +861,7 @@ Update Capability Profile:
 
 **Coming up:**
 - Days 1–2: Prompt caching, model tiering, streaming concepts
-- Day 3: Code reviews (router.py, rate_limiter.py, logger.py)
+- Day 3: Code review4s (router.py, rate_limiter.py, logger.py)
 - Day 4: Capstone (cost/latency baseline + optimization)
 - Day 5: Production integration
 

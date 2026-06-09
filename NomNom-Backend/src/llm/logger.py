@@ -25,12 +25,22 @@ class AICallLogger:
     # https://www.anthropic.com/pricing/claude
     PRICING = {
         "claude-haiku-4-5-20251001": {
-            "input": 0.80,   # $0.80 per 1M input tokens
-            "output": 4.00,  # $4.00 per 1M output tokens
+            "input": 0.80,        # $0.80 per 1M input tokens
+            "output": 4.00,       # $4.00 per 1M output tokens
+            "cache_creation": 1.00,    # 25% premium
+            "cache_read": 0.08,        # 90% discount
         },
         "claude-sonnet-4-20250514": {
-            "input": 3.00,   # $3.00 per 1M input tokens
-            "output": 15.00, # $15.00 per 1M output tokens
+            "input": 3.00,        # $3.00 per 1M input tokens
+            "output": 15.00,      # $15.00 per 1M output tokens
+            "cache_creation": 3.75,    # 25% premium
+            "cache_read": 0.30,        # 90% discount
+        },
+        "claude-opus-4-7": {
+            "input": 15.00,       # $15.00 per 1M input tokens
+            "output": 75.00,      # $75.00 per 1M output tokens
+            "cache_creation": 18.75,   # 25% premium
+            "cache_read": 1.50,        # 90% discount
         },
     }
 
@@ -39,26 +49,36 @@ class AICallLogger:
         model: str,
         input_tokens: int,
         output_tokens: int,
+        cache_creation_tokens: int = 0,
+        cache_read_tokens: int = 0,
     ) -> float:
         """
-        Estimate API cost for an LLM call.
+        Estimate API cost for an LLM call, including cache token pricing.
 
         Args:
             model: Model name
             input_tokens: Number of input tokens
             output_tokens: Number of output tokens
+            cache_creation_tokens: Tokens used to create cache (25% premium)
+            cache_read_tokens: Tokens read from cache (90% discount)
 
         Returns:
             Estimated cost in USD
         """
         if model not in AICallLogger.PRICING:
-            logger.warning(f"Unknown model for pricing: {model}")
-            return 0.0
+            raise ValueError(f"Unknown model for pricing: {model}. Add to PRICING dict.")
 
         pricing = AICallLogger.PRICING[model]
+
+        # Regular input/output tokens
         input_cost = (input_tokens / 1_000_000) * pricing["input"]
         output_cost = (output_tokens / 1_000_000) * pricing["output"]
-        total_cost = input_cost + output_cost
+
+        # Cache tokens use separate pricing (25% premium to create, 90% discount to read)
+        cache_creation_cost = (cache_creation_tokens / 1_000_000) * pricing.get("cache_creation", pricing["input"] * 1.25)
+        cache_read_cost = (cache_read_tokens / 1_000_000) * pricing.get("cache_read", pricing["input"] * 0.10)
+
+        total_cost = input_cost + output_cost + cache_creation_cost + cache_read_cost
 
         return round(total_cost, 6)
 
@@ -111,11 +131,21 @@ class AICallLogger:
         """
         input_tokens = 0
         output_tokens = 0
+        cache_creation_tokens = 0
+        cache_read_tokens = 0
 
         if response:
             input_tokens, output_tokens = AICallLogger.extract_token_usage(response)
+            cache_creation_tokens = getattr(response.usage, "cache_creation_input_tokens", 0)
+            cache_read_tokens = getattr(response.usage, "cache_read_input_tokens", 0)
 
-        estimated_cost = AICallLogger.estimate_cost(model, input_tokens, output_tokens)
+        estimated_cost = AICallLogger.estimate_cost(
+            model,
+            input_tokens,
+            output_tokens,
+            cache_creation_tokens=cache_creation_tokens,
+            cache_read_tokens=cache_read_tokens,
+        )
 
         log_entry = {
             "model": model,
