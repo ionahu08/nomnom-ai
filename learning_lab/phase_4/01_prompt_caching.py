@@ -30,11 +30,82 @@ Cost impact (Sonnet pricing):
 Break-even: if you repeat the same prompt 2+ times within 1 hour, you save.
 
 Usage:
-    python day1_caching.py
+    python 01_prompt_caching.py
 
 You will see:
     Call 1 (MISS) → cache_creation_input_tokens populated
     Call 2 (HIT)  → cache_read_input_tokens populated, cost drops ~90%
+
+===============================================================================
+LEARNING Q&A — Test Your Understanding
+===============================================================================
+
+Q1a: Why is cache_control placed on the system prompt and not messages?
+A1a: System prompt is static (same NomNom persona every request), but user
+     messages change. Caching the static part saves tokens on every subsequent
+     request.
+
+Q1b: How do you cache both tool schema AND system prompt in one request?
+A1b: Add cache_control to both:
+       tools=[{..., "cache_control": {"type": "ephemeral"}}],
+       system=[{..., "cache_control": {"type": "ephemeral"}}],
+       messages=[...]  # No cache_control — always fresh
+
+Q2a: Request has input_tokens=1000, cache_creation_input_tokens=900,
+     output_tokens=100. What's the cost?
+A2a: (1000*3 + 900*3.75 + 100*15) / 1M = 7875 / 1M = $0.007875
+
+Q2b: Next request (cache HIT): input_tokens=100, cache_read_input_tokens=900,
+     output_tokens=100. What's the cost? How much saved?
+A2b: (100*3 + 900*0.3 + 100*15) / 1M = 2070 / 1M = $0.00207
+     Savings: $0.007875 - $0.00207 = $0.005805 (73% cheaper!)
+
+Q3a: If I change "Important: " to "CRITICAL: " before the cached system prompt,
+     what happens to the cache?
+A3a: Cache misses. The entire text block changed, so Claude can't reuse the
+     cached version. Cache requires exact content match.
+
+Q3b: How should I restructure to inject dynamic content without breaking cache?
+A3b: Put dynamic content in a SEPARATE block AFTER the cached block:
+       system=[
+           {"type": "text", "text": NOMNOM_SYSTEM_PROMPT,
+            "cache_control": {"type": "ephemeral"}},  # Cached
+           {"type": "text", "text": f"User: {user_name}"}  # Fresh each time
+       ]
+
+Q4a: Why use getattr(usage, "cache_read_input_tokens", 0) instead of direct access?
+A4a: Defensive programming. On a cache MISS, the API doesn't return
+     cache_read_input_tokens at all. getattr() returns 0 as default instead
+     of crashing with AttributeError.
+
+Q4b: What happens if you directly access usage.cache_read_input_tokens on cache MISS?
+A4b: AttributeError — the attribute doesn't exist on MISS responses.
+
+Q5a: Why use {**ANALYZE_FOOD_TOOL, "cache_control": {...}} instead of just
+     passing ANALYZE_FOOD_TOOL?
+A5a: Dictionary unpacking. The ** operator merges dicts. This adds cache_control
+     to the same dict as the tool definition, not as a separate tool.
+       ✅ {**tool, "cache_control": {...}}  → ONE tool with cache_control
+       ❌ [tool, {"cache_control": {...}}]  → TWO separate tools (broken!)
+
+Q5b: The comment says "Tool schemas are sent before system in API's processing order."
+     Why does order matter?
+A5b: API processes: tools → system → messages. When you cache, you cache
+     everything processed UP TO that point. So:
+       - cache_control on tools: cache ~500 tokens
+       - cache_control on system: cache ~2000 tokens (tools + system)
+       - cache_control on messages: cache everything (defeats purpose!)
+     Experiment 3 caches both by placing cache_control on both separately.
+
+Q6a: Prove the break-even math: 2000-token system prompt, Sonnet pricing.
+A6a: MISS cost: (2000 * 3.75) / 1M = $0.0075
+     HIT cost:  (2000 * 0.30) / 1M = $0.0006
+     2 calls with caching: $0.0075 + $0.0006 = $0.0081
+     2 calls without caching: (2000 * 3.00) * 2 / 1M = $0.012
+     Savings: $0.012 - $0.0081 = $0.0039 (32% cheaper with caching)
+     Break-even after just 2 calls!
+
+===============================================================================
 """
 
 import os
