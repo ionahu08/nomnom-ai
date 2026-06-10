@@ -6,7 +6,120 @@
 
 ---
 
-## Evaluation Framework
+## 🎯 KEY FINDINGS (Real-World Data)
+
+### MAJOR DISCOVERY: The Evaluation Was Wrong
+
+**Initial hypothesis:** Single agent would be faster (5-8s) but slightly more expensive.
+
+**Reality:** Single agent was 8x SLOWER (80s) AND more expensive (2x cost).
+
+### The Numbers
+```
+Orchestrator-Workers (Day 7):
+  ✅ 10 seconds latency
+  ✅ $0.023 (2.3 cents)
+  ✅ Completed successfully
+  ✅ Predictable structure
+
+Single Agent (Day 8):
+  ❌ 80 seconds latency (8x slower)
+  ❌ $0.045 (2x cost)
+  ❌ Hit token limit, never completed
+  ❌ Variable structure
+```
+
+### Why Single Agent Failed
+
+1. **Context explosion** — Message history grows with every search
+   - Loop 1: user_input + 4 searches + 4 results = ~200 tokens
+   - Loop 2: all previous + 4 new searches + 4 new results = ~400 tokens
+   - Loop 3: all accumulated + tries to generate = RUN OUT OF TOKENS
+
+2. **Increasing max_tokens made it SLOWER**
+   - max_tokens=1024 → 29.6s latency
+   - max_tokens=2048 → 29.6s latency (NO IMPROVEMENT)
+   - max_tokens=4096 → 79.9s latency (SLOWER!)
+   - More context = slower API processing = hitting limit anyway
+
+3. **Sequential overhead compounds**
+   - Each loop must process entire message history before deciding next step
+   - 8 searches × sequential processing = exponential slowdown
+
+---
+
+## ✅ CONCLUSION
+
+**For this specific task:** **Orchestrator-Workers wins decisively.**
+- 8x faster (10s vs. 80s)
+- 2x cheaper ($0.023 vs. $0.045)
+- Completes successfully (single agent hit token limit)
+- Predictable output structure
+
+**For decomposable tasks in general:**
+- **Use Orchestrator-Workers** if task naturally decomposes into independent subtasks
+- **Context isolation** (workers don't see each other's searches) is the key advantage
+- **Parallelization** saves exponential latency (10 workers ~5-6s, not 800s)
+- **Scales better** — add more workers without degradation
+
+**When might Single Agent win?**
+- Very small tasks (1-2 searches max, minimal context growth)
+- Tasks with NO natural decomposition
+- Prototyping (write quickly, accept overhead)
+
+---
+
+## 💬 INTERVIEW TALKING POINTS
+
+**Q: When would you use orchestrator-workers over a single agent?**
+
+A: Almost always if the task naturally decomposes. Here's why: I initially thought single agent would be faster (simpler = faster), but I actually tested both. Single agent took 80 seconds due to context accumulation, while orchestrator-workers took 10 seconds. That's 8x difference.
+
+The key insight: as a single agent loops and accumulates search results, its message history explodes. Each subsequent API call processes more context, slowing down. Orchestrator-workers avoids this by isolating worker contexts — each worker only sees its subtask, not others' results.
+
+**Q: Didn't you say single agent would be faster in the design doc?**
+
+A: Yes, and I was wrong. That's a key lesson: **theory doesn't always match practice**. I estimated 5-8s, but real execution hit 80s. The culprit was context accumulation. This is why hands-on testing matters more than assumptions.
+
+Increasing max_tokens from 1024 → 2048 → 4096 didn't help. In fact, 4096 was slower (79.9s) because the API had more context to process before hitting the limit anyway.
+
+**Q: What's the cost difference now?**
+
+A: Orchestrator-workers: ~2.3¢, Single agent: ~4-5¢ (2x more expensive). The single agent burned tokens on context re-processing every loop. Workers' isolated context = fewer total tokens.
+
+**Q: Would single agent ever win?**
+
+A: Only for very small tasks (1-2 searches, minimal looping). For any task requiring multiple agent decisions, the context explosion kills it. Orchestrator-workers isn't overengineered — it's the practical solution.
+
+**Q: What would happen with 10 workers vs. 10 searches?**
+
+A: 
+- Orchestrator-workers: ~5-6s (all 10 workers in parallel)
+- Single agent: 800s+ (10 sequential searches × context explosion)
+
+The advantage compounds with scale.
+
+---
+
+## 📊 SIDE-BY-SIDE COMPARISON
+
+| Metric | Orchestrator-Workers | Single Agent | Winner |
+|--------|----------------------|--------------|--------|
+| **Total Cost** | ~$0.023 (2.3¢) | ~$0.040-0.050 (4-5¢) | **Orchestrator (2x cheaper)** |
+| **Total Latency** | ~10s | ~80s | **Orchestrator (8x faster)** |
+| **Output Quality** | Excellent (3 sections) | Incomplete (hit token limit) | **Orchestrator** |
+| **Output Structure** | Predictable (3 sections) | Varies | Orchestrator |
+| **Code Complexity** | Medium (asyncio, 3 functions) | Low (single loop) | Single Agent |
+| **Debugging** | Harder (3 agents) | Easier (1 agent) | Single Agent |
+| **Scalability** | Easy (add more workers) | Hard (context explosion) | **Orchestrator** |
+| **Token Efficiency** | High (isolated contexts) | **Low (context grows each loop)** | **Orchestrator** |
+| **Context Management** | Excellent (workers isolated) | **Poor (accumulates indefinitely)** | **Orchestrator** |
+
+---
+
+## 📋 DETAILED EVALUATION
+
+### Evaluation Framework
 
 ### Task
 Compare PyTorch vs. TensorFlow for production machine learning.
@@ -191,116 +304,6 @@ Estimated cost: ~$0.035-0.050 (HIGHER than Day 7)
 - ✅ Balanced (Claude naturally considers tradeoffs)
 - ✅ Actionable
 
----
-
-## Side-by-Side Comparison
-
-| Metric | Orchestrator-Workers | Single Agent | Winner |
-|--------|----------------------|--------------|--------|
-| **Total Cost** | ~$0.023 (2.3¢) | ~$0.040-0.050 (4-5¢) | **Orchestrator (2x cheaper)** |
-| **Total Latency** | ~10s | ~80s | **Orchestrator (8x faster)** |
-| **Output Quality** | Excellent (3 sections) | Incomplete (hit token limit) | **Orchestrator** |
-| **Output Structure** | Predictable (3 sections) | Varies | Orchestrator |
-| **Code Complexity** | Medium (asyncio, 3 functions) | Low (single loop) | Single Agent |
-| **Debugging** | Harder (3 agents) | Easier (1 agent) | Single Agent |
-| **Scalability** | Easy (add more workers) | Hard (context explosion) | **Orchestrator** |
-| **Token Efficiency** | High (isolated contexts) | **Low (context grows each loop)** | **Orchestrator** |
-| **Context Management** | Excellent (workers isolated) | **Poor (accumulates indefinitely)** | **Orchestrator** |
-
-**Bottom Line:** Orchestrator-Workers wins across the board for this task.
-
----
-
-## Key Findings
-
-### MAJOR DISCOVERY: The Evaluation Was Wrong
-
-**Initial hypothesis:** Single agent would be faster (5-8s) but slightly more expensive.
-
-**Reality:** Single agent was 8x SLOWER (80s) AND more expensive (2x cost).
-
-**Why?**
-1. **Context explosion** — Message history grows with every search
-2. **Increasing max_tokens doesn't help** — Actually makes it slower (more context to process)
-3. **Eventually hits limit anyway** — Didn't even generate final report (stopped at Loop 3)
-4. **Sequential overhead compounds** — Each loop must process all previous context
-
----
-
-### When Orchestrator-Workers Wins (REAL WORLD)
-1. **Task naturally decomposes** into independent subtasks ✅
-2. **Workers have isolated context** (don't see each other's searches) ✅
-3. **Parallelization dramatically saves latency** (4s for 3 workers vs. 80s for sequential) ✅
-4. **Cost is lower** (context isolation saves tokens) ✅
-5. **Scales better** (add 10 workers, still ~5-6s latency instead of 800s+ sequential)
-
----
-
-### When Single Agent Wins (If It Wins At All)
-**Hard to find a case for this task.**
-- Not faster: 80s vs. 10s
-- Not cheaper: ~$0.045 vs. ~$0.023
-- Not cleaner: Still hits token limits
-- Only advantage: "Simpler code" (but breaks under load)
-
-**Single agent might win for:**
-- Very small tasks (1-2 searches max)
-- Tasks with no natural decomposition AND low token overhead
-- Prototyping (write quickly, optimize later)
-
----
-
-### The Lesson
-**Orchestrator-Workers isn't complex for fun** — it's complex because:
-1. Context isolation prevents token explosion
-2. Parallelization saves latency exponentially
-3. Scaling works (add more workers without degradation)
-
-**Single agent with unlimited loops = context disaster**
-
----
-
-## Interview Talking Points
-
-**Q: When would you use orchestrator-workers over a single agent?**
-
-A: Almost always if the task naturally decomposes. Here's why: I initially thought single agent would be faster (simpler = faster), but I actually tested both. Single agent took 80 seconds due to context accumulation, while orchestrator-workers took 10 seconds. That's 8x difference.
-
-The key insight: as a single agent loops and accumulates search results, its message history explodes. Each subsequent API call processes more context, slowing down. Orchestrator-workers avoids this by isolating worker contexts — each worker only sees its subtask, not others' results.
-
-**Q: Didn't you say single agent would be faster in the design doc?**
-
-A: Yes, and I was wrong. That's a key lesson: **theory doesn't always match practice**. I estimated 5-8s, but real execution hit 80s. The culprit was context accumulation. This is why hands-on testing matters more than assumptions.
-
-Increasing max_tokens from 1024 → 2048 → 4096 didn't help. In fact, 4096 was slower (79.9s) because the API had more context to process before hitting the limit anyway.
-
-**Q: What's the cost difference now?**
-
-A: Orchestrator-workers: ~2.3¢, Single agent: ~4-5¢ (2x more expensive). The single agent burned tokens on context re-processing every loop. Workers' isolated context = fewer total tokens.
-
-**Q: Would single agent ever win?**
-
-A: Only for very small tasks (1-2 searches, minimal looping). For any task requiring multiple agent decisions, the context explosion kills it. Orchestrator-workers isn't overengineered — it's the practical solution.
-
-**Q: What would happen with 10 workers vs. 10 searches?**
-
-A: 
-- Orchestrator-workers: ~5-6s (all 10 workers in parallel)
-- Single agent: 800s+ (10 sequential searches × context explosion)
-
-The advantage compounds with scale.
-
----
-
-## Conclusion
-
-For **this specific task (PyTorch vs. TensorFlow comparison):**
-- **Single Agent is better** (faster, simpler, marginally cheaper)
-
-For **decomposable tasks with many subtasks:**
-- **Orchestrator-Workers is better** (predictable, scalable, parallelizable)
-
-For **interview:** Understand the tradeoff. Don't build orchestrator-workers unless you can justify the complexity. Single agent often wins.
 
 ---
 
