@@ -6,7 +6,29 @@ Orchestrator-Workers multi-agent system.
 User: "Compare PyTorch vs. TensorFlow for production"
 Orchestrator decomposes → 3 workers research in parallel → Aggregator synthesizes
 
-Run: python3 07_tech_comparison_agent.py
+ARCHITECTURE:
+  user_input
+      ↓
+  run_orchestrator()              [Claude Sonnet] Decomposes into 3 research tasks
+      ↓ returns: tasks = [{dimension, query}, ...]
+  run_workers_parallel()          [asyncio.gather] Executes 3 workers in parallel
+      ├─ run_worker(task 1)       [Claude Haiku] Researches → returns {findings}
+      ├─ run_worker(task 2)       [Claude Haiku] Researches → returns {findings}
+      └─ run_worker(task 3)       [Claude Haiku] Researches → returns {findings}
+      ↓ returns: worker_results = [{dimension, findings}, ...]
+  run_aggregator()                [Claude Sonnet] Synthesizes all results → report
+
+KEY INSIGHT: Aggregator receives worker_results indirectly (via main function),
+not directly. Each component has single responsibility: Orchestrator decides,
+Workers execute, Aggregator synthesizes. Orchestrator knows nothing of Aggregator.
+
+COST BREAKDOWN:
+  - 1x Sonnet call (orchestrator)
+  - 3x Haiku calls (workers, parallel)
+  - 1x Sonnet call (aggregator)
+  ≈ $0.15 total
+
+RUN: python3 07_tech_comparison_agent.py
 """
 
 import asyncio
@@ -197,10 +219,10 @@ Use the decompose_research tool to output your decomposition."""
     ]
 
     response = client.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-4-6",
         max_tokens=1024,
         tools=get_orchestrator_tools(),
-        tool_choice="required",  # Force orchestrator to use the tool
+        tool_choice={"type": "tool", "name": "decompose_research"},  # Force orchestrator to use the tool
         messages=messages
     )
 
@@ -271,7 +293,7 @@ Write a professional comparison report (800-1000 words) that:
     ]
 
     response = client.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-4-6",
         max_tokens=1500,
         messages=messages
     )
