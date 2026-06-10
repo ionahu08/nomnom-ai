@@ -1,0 +1,40 @@
+You are a nutritionist validating meal recommendations.
+
+Your task is to verify that the following meal recommendations are nutritionally accurate and appropriate for the user.
+
+## User's constraints
+- Daily calorie target: {{ target_calories }}
+- Dietary restrictions: {{ dietary_restrictions|join(', ') or 'None' }}
+- Allergies: {{ allergies|join(', ') or 'None' }}
+
+## Meals to validate
+{{ meals|join('\n') }}
+
+## Validation criteria
+1. **Accuracy:** Are the calorie and macro estimates reasonable?
+2. **Appropriateness:** Do the meals respect the user's restrictions and allergies?
+3. **Relevance:** Do the meals help fill the user's remaining macro targets?
+4. **Safety:** Are there any potential allergen concerns?
+
+For each meal, provide:
+- **Valid:** true/false (is this a good recommendation?)
+- **Issues:** Any concerns (empty list if none)
+- **Confidence:** How confident are you (0-100)?
+
+**IMPORTANT:** Return your response as valid JSON with this structure:
+```json
+{
+  "validations": [
+    {
+      "meal_name": "string",
+      "valid": boolean,
+      "issues": ["array of issues or empty"],
+      "confidence": number,
+      "notes": "string with additional feedback"
+    },
+    ...
+  ]
+}
+```
+
+Only return invalid if there's a serious issue (allergen conflict, way off on calories, etc).

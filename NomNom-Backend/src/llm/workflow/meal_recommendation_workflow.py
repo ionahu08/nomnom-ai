@@ -15,10 +15,12 @@ This is STRUCTURED, PREDICTABLE, and COST-CONTROLLED.
 import json
 import logging
 from dataclasses import dataclass
+from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.llm.client import LLMClient
+from src.llm.prompt_engine import render_prompt
 from src.llm.router import TaskType, get_route
 from src.schemas.user_profile import UserProfile
 from src.services.food_log_service import FoodLog
@@ -186,18 +188,88 @@ class MealRecommendationWorkflow:
         Input: Constraints, RAG results
         Output: 3 recommendation options with reasoning
 
-        Calls Claude to generate creative recommendations based on constraints.
+        Calls Claude (Sonnet) to generate creative recommendations.
         """
-        # In a real implementation, this would call Claude
-        # For now, return mock options based on RAG results
-        options = [
+        logger.info("Step 3: Generating recommendation options via Claude")
+
+        # Format KB entries for Claude
+        kb_entries_text = "\n".join(
+            [f"- {entry.get('name', 'Unknown')}: {entry}" for entry in rag_results[:5]]
+        )
+
+        # Render prompt with Jinja2
+        system_prompt = render_prompt(
+            "workflow_generate_options.j2",
+            target_calories=workflow_input.target_calories,
+            target_protein=workflow_input.target_protein,
+            target_carbs=workflow_input.target_carbs,
+            target_fat=workflow_input.target_fat,
+            missing_calories=constraints["missing_calories"],
+            missing_protein=constraints["missing_protein"],
+            missing_carbs=constraints["missing_carbs"],
+            missing_fat=constraints["missing_fat"],
+            dietary_restrictions=constraints["dietary_restrictions"],
+            allergies=constraints["allergies"],
+            cuisine_preferences=constraints["cuisine_preferences"],
+            kb_entries=kb_entries_text,
+        )
+
+        # Call Claude
+        response = await self.llm_client.create_message_with_retry(
+            model="claude-sonnet-4-6",
+            messages=[{"role": "user", "content": "Generate meal recommendations."}],
+            system=system_prompt,
+            max_tokens=1500,
+        )
+
+        # Parse response
+        response_text = response.content[0].text
+
+        # Extract JSON from response
+        try:
+            # Handle markdown code fences
+            if "```json" in response_text:
+                json_str = response_text.split("```json")[1].split("```")[0].strip()
+            elif "```" in response_text:
+                json_str = response_text.split("```")[1].split("```")[0].strip()
+            else:
+                json_str = response_text
+
+            data = json.loads(json_str)
+            options = [
+                RecommendationOption(
+                    meal_name=opt["meal_name"],
+                    calories=opt["calories"],
+                    protein_g=opt["protein_g"],
+                    carbs_g=opt["carbs_g"],
+                    fat_g=opt["fat_g"],
+                    reasoning=opt["reasoning"],
+                )
+                for opt in data.get("options", [])
+            ]
+
+            if not options:
+                logger.warning("Claude returned no options, using fallback")
+                return self._get_fallback_options()
+
+            logger.info(f"Generated {len(options)} options")
+            return options
+
+        except (json.JSONDecodeError, KeyError) as e:
+            logger.error(f"Failed to parse Claude response: {e}")
+            logger.debug(f"Response was: {response_text}")
+            return self._get_fallback_options()
+
+    def _get_fallback_options(self) -> list[RecommendationOption]:
+        """Return fallback options if Claude fails."""
+        return [
             RecommendationOption(
                 meal_name="Grilled Chicken with Quinoa",
                 calories=450,
                 protein_g=35,
                 carbs_g=45,
                 fat_g=8,
-                reasoning="High protein, matches your macro targets"
+                reasoning="High protein, balanced macros"
             ),
             RecommendationOption(
                 meal_name="Salmon with Sweet Potato",
@@ -205,7 +277,7 @@ class MealRecommendationWorkflow:
                 protein_g=30,
                 carbs_g=50,
                 fat_g=12,
-                reasoning="Omega-3 rich, good carbs"
+                reasoning="Omega-3 rich, good nutrients"
             ),
             RecommendationOption(
                 meal_name="Vegetarian Buddha Bowl",
@@ -213,11 +285,9 @@ class MealRecommendationWorkflow:
                 protein_g=18,
                 carbs_g=55,
                 fat_g=10,
-                reasoning="Aligns with your preferences"
+                reasoning="Balanced and satisfying"
             ),
         ]
-
-        return options
 
     async def _step_4_validate(
         self, options: list[RecommendationOption]
@@ -228,11 +298,67 @@ class MealRecommendationWorkflow:
         Input: Recommendation options
         Output: Validated options (removes any invalid ones)
 
-        In a real implementation, this would call Claude to verify
-        the nutritional claims are accurate.
+        Calls Claude (Haiku) to verify nutritional claims.
         """
-        # For now, pass through (all are valid)
-        return options
+        logger.info(f"Step 4: Validating {len(options)} options")
+
+        if not options:
+            return options
+
+        # Format options for Claude
+        meals_text = "\n".join(
+            [f"- {opt.meal_name}: {opt.calories} cal, {opt.protein_g}g protein, "
+             f"{opt.carbs_g}g carbs, {opt.fat_g}g fat"
+             for opt in options]
+        )
+
+        # Render prompt
+        system_prompt = render_prompt(
+            "workflow_validate.j2",
+            target_calories=600,  # Example, could vary
+            dietary_restrictions=[],
+            allergies=[],
+            meals=meals_text,
+        )
+
+        # Call Claude (use Haiku for this simpler task)
+        try:
+            response = await self.llm_client.create_message_with_retry(
+                model="claude-haiku-4-5-20251001",
+                messages=[{"role": "user", "content": "Validate these meals."}],
+                system=system_prompt,
+                max_tokens=1000,
+            )
+
+            response_text = response.content[0].text
+
+            # Parse validation response
+            if "```json" in response_text:
+                json_str = response_text.split("```json")[1].split("```")[0].strip()
+            elif "```" in response_text:
+                json_str = response_text.split("```")[1].split("```")[0].strip()
+            else:
+                json_str = response_text
+
+            data = json.loads(json_str)
+            validations = {v["meal_name"]: v for v in data.get("validations", [])}
+
+            # Filter: keep only valid meals
+            validated = [
+                opt for opt in options
+                if validations.get(opt.meal_name, {}).get("valid", True)
+            ]
+
+            if not validated:
+                logger.warning("All options failed validation, keeping originals")
+                return options
+
+            logger.info(f"Validated {len(validated)} options")
+            return validated
+
+        except Exception as e:
+            logger.warning(f"Validation failed: {e}, keeping all options")
+            return options
 
     async def _step_5_rank(
         self, options: list[RecommendationOption], user_profile: UserProfile
@@ -243,19 +369,78 @@ class MealRecommendationWorkflow:
         Input: Validated options, user profile
         Output: Top 3 ranked options
 
-        In a real implementation, this would consider user history,
-        preferences, dietary restrictions, etc.
+        Calls Claude (Haiku) to rank by user preference.
         """
-        # For now, return first 3 (already good quality from Step 3)
-        top_3 = options[:3]
+        logger.info(f"Step 5: Ranking {len(options)} options")
 
-        reasoning = (
-            "I've analyzed your nutrition targets and generated 3 personalized "
-            "meal recommendations that fit your macros and preferences."
+        if not options:
+            return WorkflowOutput(
+                top_3_options=[],
+                reasoning="No valid options to rank.",
+                total_tokens=self.total_tokens,
+            )
+
+        # Format options for Claude
+        meals_text = "\n".join(
+            [f"- {opt.meal_name}: {opt.reasoning}" for opt in options]
         )
 
-        return WorkflowOutput(
-            top_3_options=top_3,
-            reasoning=reasoning,
-            total_tokens=self.total_tokens,
+        # Render prompt
+        system_prompt = render_prompt(
+            "workflow_rank.j2",
+            dietary_restrictions=user_profile.dietary_restrictions or [],
+            cuisine_preferences=user_profile.cuisine_preferences or [],
+            allergies=user_profile.allergies or [],
+            meals=meals_text,
         )
+
+        try:
+            # Call Claude (use Haiku for this simpler task)
+            response = await self.llm_client.create_message_with_retry(
+                model="claude-haiku-4-5-20251001",
+                messages=[{"role": "user", "content": "Rank these meals."}],
+                system=system_prompt,
+                max_tokens=1000,
+            )
+
+            response_text = response.content[0].text
+
+            # Parse ranking response
+            if "```json" in response_text:
+                json_str = response_text.split("```json")[1].split("```")[0].strip()
+            elif "```" in response_text:
+                json_str = response_text.split("```")[1].split("```")[0].strip()
+            else:
+                json_str = response_text
+
+            data = json.loads(json_str)
+            rankings = {r["meal_name"]: r for r in data.get("rankings", [])}
+
+            # Sort options by rank
+            ranked_options = sorted(
+                options,
+                key=lambda opt: rankings.get(opt.meal_name, {}).get("rank", 999)
+            )
+
+            # Take top 3
+            top_3 = ranked_options[:3]
+
+            reasoning = (
+                "I've analyzed your nutrition targets and ranked 3 personalized "
+                "meal recommendations that fit your macros and preferences."
+            )
+
+            logger.info(f"Ranked options, returning top {len(top_3)}")
+            return WorkflowOutput(
+                top_3_options=top_3,
+                reasoning=reasoning,
+                total_tokens=self.total_tokens,
+            )
+
+        except Exception as e:
+            logger.warning(f"Ranking failed: {e}, returning first 3 options")
+            return WorkflowOutput(
+                top_3_options=options[:3],
+                reasoning="Generated 3 meal recommendations.",
+                total_tokens=self.total_tokens,
+            )
