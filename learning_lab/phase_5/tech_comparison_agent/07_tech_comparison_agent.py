@@ -4,29 +4,52 @@ Phase 5 Day 7: Tech Comparison Agent
 Orchestrator-Workers multi-agent system.
 
 User: "Compare PyTorch vs. TensorFlow for production"
-Orchestrator decomposes → 3 workers research in parallel → Aggregator synthesizes
+Orchestrator decomposes → workers research in parallel → Aggregator synthesizes
 
-ARCHITECTURE:
+ARCHITECTURE (Data Flow):
   user_input
       ↓
-  run_orchestrator()              [Claude Sonnet] Decomposes into 3 research tasks
-      ↓ returns: tasks = [{dimension, query}, ...]
-  run_workers_parallel()          [asyncio.gather] Executes 3 workers in parallel
-      ├─ run_worker(task 1)       [Claude Haiku] Researches → returns {findings}
-      ├─ run_worker(task 2)       [Claude Haiku] Researches → returns {findings}
-      └─ run_worker(task 3)       [Claude Haiku] Researches → returns {findings}
-      ↓ returns: worker_results = [{dimension, findings}, ...]
-  run_aggregator()                [Claude Sonnet] Synthesizes all results → report
+  run_agent(user_input)                                [Coordinator layer]
+      ↓
+      ├─ run_orchestrator(user_input)                 [Claude Sonnet] Decomposes
+      │   ↓ returns: tasks = [{dimension, query}, ...]
+      │
+      ├─ await run_workers_parallel(tasks)            [Parallel executor - asyncio.gather]
+      │   ├─ run_worker(task 1, ...)                  [Same agent, diff prompt]
+      │   │   [Claude Haiku loop] → {findings}
+      │   ├─ run_worker(task 2, ...)                  [Same agent, diff prompt]
+      │   │   [Claude Haiku loop] → {findings}
+      │   └─ run_worker(task 3, ...)                  [Same agent, diff prompt]
+      │       [Claude Haiku loop] → {findings}
+      │   ↓ returns: worker_results = [{dimension, findings}, ...]
+      │
+      └─ run_aggregator(user_input, worker_results)   [Claude Sonnet] Synthesizes
+          ↓ returns: final_report
 
-KEY INSIGHT: Aggregator receives worker_results indirectly (via main function),
-not directly. Each component has single responsibility: Orchestrator decides,
-Workers execute, Aggregator synthesizes. Orchestrator knows nothing of Aggregator.
+KEY INSIGHTS:
+  1. Workers are NOT 3 different agents — they're the SAME run_worker() function
+     running 3 times in PARALLEL with different inputs (dimension, query).
+     The "multi-agent" intelligence is in the orchestrator's decomposition, not the workers.
+
+  2. run_agent() is the coordinator that orchestrates the entire flow.
+     It has no AI logic; it just calls orchestrator → workers → aggregator in sequence.
+
+  3. Each component has single responsibility:
+     - Orchestrator: Decides WHAT to parallelize (intelligent)
+     - Workers: Execute research (dumb executors, same code 3x)
+     - Aggregator: Synthesizes results (intelligent)
 
 COST BREAKDOWN:
   - 1x Sonnet call (orchestrator)
-  - 3x Haiku calls (workers, parallel)
+  - 3x Haiku calls (workers, ALL IN PARALLEL)
   - 1x Sonnet call (aggregator)
-  ≈ $0.15 total
+  ≈ $0.023 total (2.3 cents)
+
+LATENCY:
+  - Orchestrator: ~3s
+  - Workers (parallel): ~4s (NOT 12s due to asyncio.gather)
+  - Aggregator: ~3s
+  - Total: ~10s
 
 RUN: python3 07_tech_comparison_agent.py
 """
