@@ -86,6 +86,13 @@ User: "{user_input}"
         json_str = response.content[0].text.strip()
         print(f"Output:\n{json_str}\n")
 
+        # Strip markdown code fences if present
+        if json_str.startswith("```"):
+            json_str = json_str.split("```")[1]
+            if json_str.startswith("json"):
+                json_str = json_str[4:]
+            json_str = json_str.strip()
+
         data = json.loads(json_str)
         constraints = DietaryConstraints(
             calorie_target=data["calorie_target"],
@@ -168,6 +175,14 @@ Return ONLY valid JSON (no markdown):
         )
 
         json_str = response.content[0].text.strip()
+
+        # Strip markdown code fences if present
+        if json_str.startswith("```"):
+            json_str = json_str.split("```")[1]
+            if json_str.startswith("json"):
+                json_str = json_str[4:]
+            json_str = json_str.strip()
+
         menus = json.loads(json_str)
         print(f"Generated {len(menus)} menus:")
         for menu in menus:
@@ -219,6 +234,14 @@ Return ONLY JSON:
         )
 
         json_str = response.content[0].text.strip()
+
+        # Strip markdown code fences if present
+        if json_str.startswith("```"):
+            json_str = json_str.split("```")[1]
+            if json_str.startswith("json"):
+                json_str = json_str[4:]
+            json_str = json_str.strip()
+
         validations = json.loads(json_str)
 
         passed = sum(1 for v in validations if v["passes_validation"])
@@ -294,6 +317,14 @@ Return ONLY JSON:
         )
 
         json_str = response.content[0].text.strip()
+
+        # Strip markdown code fences if present
+        if json_str.startswith("```"):
+            json_str = json_str.split("```")[1]
+            if json_str.startswith("json"):
+                json_str = json_str[4:]
+            json_str = json_str.strip()
+
         result = json.loads(json_str)
         print(f"Top Recommendation: {result['top_recommendation']}\n")
         print(f"Rationale: {result['rationale']}\n")
