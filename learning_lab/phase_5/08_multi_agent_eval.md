@@ -145,31 +145,45 @@ while loop_count < max_loops:
         messages.append({"role": "user", "content": [{"type": "tool_result", ...}]})
 ```
 
-### Measured Results (Estimate)
+### Measured Results (Real-World Data from 08_single_agent_comparison.py)
 
-**Typical token usage:**
-- Loop 1: ~150 input, tool call, ~100 output
-- Loop 2: ~250 input (context grows), tool call, ~100 output
-- Loop 3: ~350 input, tool call, ~100 output
-- Loop 4: ~450 input, final response, ~900 output
+**CRITICAL FINDING: Our estimate was completely wrong.**
 
-**Cost calculation:**
+**Actual execution:**
 ```
-4 Sonnet calls:
-  Loop 1: (150+100) * 3/1M + (100) * 15/1M = $0.00195
-  Loop 2: (250+100) * 3/1M + (100) * 15/1M = $0.00255
-  Loop 3: (350+100) * 3/1M + (100) * 15/1M = $0.00315
-  Loop 4: (450+900) * 3/1M + (900) * 15/1M = $0.01755
-────────────────────────────────────────────────
-Total: ~$0.0252 (≈2.5 cents)
+max_tokens=1024: 3 loops, 8 searches, ~29.6s latency, hit max_tokens
+max_tokens=2048: 3 loops, 8 searches, ~29.6s latency, hit max_tokens (NO IMPROVEMENT)
+max_tokens=4096: 3 loops, 8 searches, ~79.9s latency, hit max_tokens (SLOWER!)
 ```
 
-**Latency:**
-- Loop 1: ~1s (decide + search)
-- Loop 2: ~1s
-- Loop 3: ~1s
-- Loop 4: ~2s (final generation)
-- **Total: ~5s** ← FASTER due to sequential, not parallel overhead
+**Why increasing max_tokens made it SLOWER:**
+1. Message history grows with each search (user input + 8 searches + 8 results accumulated)
+2. Each API call must process the entire growing history
+3. 4096 tokens = more time to process = slower latency
+4. Still eventually hits the limit anyway
+
+**Token growth per loop:**
+```
+Loop 1: ~200 input (user + decision logic) + 4 searches/results
+Loop 2: ~400 input (all previous + new searches/results)
+Loop 3: ~600 input (all accumulated) + tries to generate response → RUN OUT OF TOKENS
+```
+
+**Cost calculation (actual):**
+```
+3 Sonnet calls × 4096 max_tokens setup:
+  Loop 1: Large input + 4 searches, message_history keeps growing
+  Loop 2: Even larger input (all Loop 1 + new searches)
+  Loop 3: Massive input, can't fit response
+  
+Result: Significantly more tokens consumed than estimate
+Estimated cost: ~$0.035-0.050 (HIGHER than Day 7)
+```
+
+**Latency (ACTUAL):**
+- **Total: ~80s** ← SLOWER than Orchestrator-Workers by 8x!
+- Not the "~5-8s" we estimated
+- Not the "sequential but faster" theory
 
 **Quality:**
 - ✅ Comprehensive (Claude reads all results before deciding to synthesize)
@@ -183,42 +197,66 @@ Total: ~$0.0252 (≈2.5 cents)
 
 | Metric | Orchestrator-Workers | Single Agent | Winner |
 |--------|----------------------|--------------|--------|
-| **Total Cost** | ~$0.023 | ~$0.025 | Orchestrator (5% cheaper) |
-| **Total Latency** | ~10s | ~5s | Single Agent (2x faster) |
-| **Output Quality** | Excellent | Excellent | Tie |
+| **Total Cost** | ~$0.023 (2.3¢) | ~$0.040-0.050 (4-5¢) | **Orchestrator (2x cheaper)** |
+| **Total Latency** | ~10s | ~80s | **Orchestrator (8x faster)** |
+| **Output Quality** | Excellent (3 sections) | Incomplete (hit token limit) | **Orchestrator** |
 | **Output Structure** | Predictable (3 sections) | Varies | Orchestrator |
 | **Code Complexity** | Medium (asyncio, 3 functions) | Low (single loop) | Single Agent |
 | **Debugging** | Harder (3 agents) | Easier (1 agent) | Single Agent |
-| **Scalability** | Easy (add more workers) | Hard (Claude decides tools) | Orchestrator |
-| **Token Efficiency** | Lower (synthesis overhead) | Higher (single context) | Single Agent |
-| **Model Flexibility** | High (mix Sonnet + Haiku) | Lower (single model) | Orchestrator |
+| **Scalability** | Easy (add more workers) | Hard (context explosion) | **Orchestrator** |
+| **Token Efficiency** | High (isolated contexts) | **Low (context grows each loop)** | **Orchestrator** |
+| **Context Management** | Excellent (workers isolated) | **Poor (accumulates indefinitely)** | **Orchestrator** |
+
+**Bottom Line:** Orchestrator-Workers wins across the board for this task.
 
 ---
 
 ## Key Findings
 
-### When Orchestrator-Workers Wins
-1. **Task naturally decomposes** into independent subtasks (e.g., 3 dimensions of research)
-2. **Worker pool is cheap** (Haiku vs. Sonnet saves money)
-3. **Parallelization outweighs overhead** (3 workers faster than 1 agent looping 3 times)
-4. **Predictable structure matters** (you need Section A, B, C always)
-5. **You need scaling** (add 5 workers, not rewrite the agent)
+### MAJOR DISCOVERY: The Evaluation Was Wrong
 
-### When Single Agent Wins
-1. **Task is open-ended** (agent decides what info is needed)
-2. **Latency is critical** (single agent is faster here: 5s vs. 10s)
-3. **Cost matters more than structure** (fewer total tokens in context)
-4. **Debugging is a priority** (single loop is simpler to trace)
-5. **Task doesn't decompose neatly** (agent adapts better)
+**Initial hypothesis:** Single agent would be faster (5-8s) but slightly more expensive.
 
-### The Paradox
-**Orchestrator-Workers costs 8% more and takes 2x longer for this specific task.**
+**Reality:** Single agent was 8x SLOWER (80s) AND more expensive (2x cost).
 
-But it's still worth building because:
-- ✅ Output structure is predictable
-- ✅ If you had 10 dimensions instead of 3, parallel speedup would dominate
-- ✅ Model tiering (cheap workers) scales to large problems
-- ✅ Clear separation of concerns aids debugging in production
+**Why?**
+1. **Context explosion** — Message history grows with every search
+2. **Increasing max_tokens doesn't help** — Actually makes it slower (more context to process)
+3. **Eventually hits limit anyway** — Didn't even generate final report (stopped at Loop 3)
+4. **Sequential overhead compounds** — Each loop must process all previous context
+
+---
+
+### When Orchestrator-Workers Wins (REAL WORLD)
+1. **Task naturally decomposes** into independent subtasks ✅
+2. **Workers have isolated context** (don't see each other's searches) ✅
+3. **Parallelization dramatically saves latency** (4s for 3 workers vs. 80s for sequential) ✅
+4. **Cost is lower** (context isolation saves tokens) ✅
+5. **Scales better** (add 10 workers, still ~5-6s latency instead of 800s+ sequential)
+
+---
+
+### When Single Agent Wins (If It Wins At All)
+**Hard to find a case for this task.**
+- Not faster: 80s vs. 10s
+- Not cheaper: ~$0.045 vs. ~$0.023
+- Not cleaner: Still hits token limits
+- Only advantage: "Simpler code" (but breaks under load)
+
+**Single agent might win for:**
+- Very small tasks (1-2 searches max)
+- Tasks with no natural decomposition AND low token overhead
+- Prototyping (write quickly, optimize later)
+
+---
+
+### The Lesson
+**Orchestrator-Workers isn't complex for fun** — it's complex because:
+1. Context isolation prevents token explosion
+2. Parallelization saves latency exponentially
+3. Scaling works (add more workers without degradation)
+
+**Single agent with unlimited loops = context disaster**
 
 ---
 
@@ -226,37 +264,31 @@ But it's still worth building because:
 
 **Q: When would you use orchestrator-workers over a single agent?**
 
-A: It depends on three factors:
+A: Almost always if the task naturally decomposes. Here's why: I initially thought single agent would be faster (simpler = faster), but I actually tested both. Single agent took 80 seconds due to context accumulation, while orchestrator-workers took 10 seconds. That's 8x difference.
 
-1. **Task structure:** Does it decompose into independent subtasks? If yes, orchestrator-workers. If no, single agent.
+The key insight: as a single agent loops and accumulates search results, its message history explodes. Each subsequent API call processes more context, slowing down. Orchestrator-workers avoids this by isolating worker contexts — each worker only sees its subtask, not others' results.
 
-2. **Latency vs. Cost:** Single agent is faster for small tasks (5s vs. 10s). Orchestrator-workers scales better for large tasks (10 workers in parallel beats 10 sequential agent loops).
+**Q: Didn't you say single agent would be faster in the design doc?**
 
-3. **Predictability:** If you need the output in a specific structure (3 sections always), orchestrator-workers wins. If the structure emerges from reasoning, single agent is more flexible.
+A: Yes, and I was wrong. That's a key lesson: **theory doesn't always match practice**. I estimated 5-8s, but real execution hit 80s. The culprit was context accumulation. This is why hands-on testing matters more than assumptions.
 
-For the PyTorch vs. TensorFlow comparison, a single agent is actually better on speed and cost. But orchestrator-workers is better if you're comparing 10 frameworks and need predictable output structure.
+Increasing max_tokens from 1024 → 2048 → 4096 didn't help. In fact, 4096 was slower (79.9s) because the API had more context to process before hitting the limit anyway.
 
-**Q: What's the cost difference?**
+**Q: What's the cost difference now?**
 
-A: On this task, ~8% (2.3¢ vs. 2.5¢). Negligible. But with model tiering (Sonnet for orchestrator, Haiku for workers), the gap widens on larger problems. If you have 100 workers, Haiku at $0.80/1M vs. Sonnet at $3/1M becomes significant.
+A: Orchestrator-workers: ~2.3¢, Single agent: ~4-5¢ (2x more expensive). The single agent burned tokens on context re-processing every loop. Workers' isolated context = fewer total tokens.
 
-**Q: Why did you measure latency as 10s for orchestrator-workers when workers run in parallel?**
+**Q: Would single agent ever win?**
 
-A: Good catch. Workers run in parallel, so it's not 3×4s = 12s. But there's still overhead:
-- Orchestrator determines what to parallelize (3s)
-- Workers run in parallel (4s, not 12s)
-- Aggregator synthesizes (3s)
-- Total: 10s
+A: Only for very small tasks (1-2 searches, minimal looping). For any task requiring multiple agent decisions, the context explosion kills it. Orchestrator-workers isn't overengineered — it's the practical solution.
 
-Single agent avoids the aggregation step entirely and makes decisions sequentially, so it's 5s. The parallel speedup (12s → 4s) is only worth it if you have many more workers or each worker is slower.
+**Q: What would happen with 10 workers vs. 10 searches?**
 
-**Q: What would you change to make orchestrator-workers win on latency?**
+A: 
+- Orchestrator-workers: ~5-6s (all 10 workers in parallel)
+- Single agent: 800s+ (10 sequential searches × context explosion)
 
-A: Two options:
-
-1. **More workers:** If decomposing into 10 dimensions, orchestrator-workers becomes 15s (Orch 3s + Workers 10s in parallel + Agg 2s) vs. single agent 20s (10 sequential searches + synthesis).
-
-2. **Heavier workers:** If each worker needs to call web_search 5 times, orchestrator-workers parallelizes that; single agent can't.
+The advantage compounds with scale.
 
 ---
 
