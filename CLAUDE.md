@@ -73,9 +73,16 @@ See `docs/iterations/09-food-diary/SUMMARY.md` for retrospective.
 - **Iteration docs:** `docs/iterations/13-cost-and-latency/`
 - **Retrospective:** `docs/learning/03_phase_retrospectives/phase_4_retro.md`
 
-**Phase 5** 🚀 STARTING (Week 8, June 11+ 2026): Prompt Caching & Streaming
-- Focus: Implement prompt caching to offset Sonnet cost increase
-- Goal: 60%+ cache hit rate, reduce daily cost to $1.80-2.00/day
+**Phase 5** ✅ COMPLETE (June 10-12, 2026): Workflow & Agent Orchestration
+- Focus: Learn 5 orchestration patterns, decide when to use each, production integration
+- **Outcome:** 5 patterns mastered (chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer), 2 services built (workflow + agent), orchestrator-workers proven 8x faster than single agent, production integrated into meal recommendation workflow
+- **Key metrics:** Layer 4 (Agents & Workflows) → 5/5, latency 60s → 20-25s (67% reduction), all tests passing
+- **Iteration docs:** `docs/iterations/14-meal-recommendation-workflow/`
+- **Retrospective:** `docs/learning/03_phase_retrospectives/phase_5_retro.md`
+
+**Phase 6** 🚀 STARTING (Week 9, June 13+ 2026): MCP Servers & Claude-as-a-Tool
+- Focus: Expose NomNom patterns to Claude via MCP server design
+- Goal: NomNom accessible from any Claude context, API-first orchestration
 
 
 ## Key Docs
