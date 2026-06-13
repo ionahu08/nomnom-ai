@@ -6,6 +6,46 @@
 
 ---
 
+## Quick Self-Check: Q&A
+
+**Q1: What are the three types of MCP exports?**
+
+A: Tools (callable actions), Resources (read-only data), Prompts (reusable templates with variables).
+- Tools: Claude decides when to call based on user request
+- Resources: Static or semi-static data Claude can reference
+- Prompts: System prompts with variable injection (e.g., user context)
+
+**Q2: How should you expose NomNom's meal recommendation workflow to Claude via MCP?**
+
+A: As a **Tool**. Here's why:
+- It's callable (takes input: calories, diet_type; returns output: recommendation)
+- Claude decides **when** to call it based on what the user asks
+- Tools are for actions; Resources would be static data; Prompts would be system instructions
+
+**Q3: When would you use REST API vs MCP for NomNom?**
+
+A: **Both, for different clients:**
+- **REST API** (for iOS app, web browsers): Traditional HTTP calls. You control the client code.
+  ```
+  iPhone → HTTP GET /api/v1/recommendations/meal → Backend → Response
+  ```
+- **MCP** (for Claude, notebooks, other LLMs): Standard protocol for LLM integration. Claude's client knows how to invoke tools.
+  ```
+  Claude → Calls MCP tool "recommend_meal" → Backend → Response
+  ```
+
+Why both? REST API for traditional clients. MCP for LLM integration.
+
+**Q4: What transport should you use for local dev vs. production?**
+
+A: 
+- **Local development:** Use **stdio** (simplest, no network needed, server runs as subprocess)
+- **Production remote:** Use **HTTP/WebSocket** (persistent connection, scalable, authentication-ready)
+
+Trade-off: stdio is simpler for dev, HTTP is better for remote production servers.
+
+---
+
 ## Why MCP Matters
 
 **Current state of NomNom:**
