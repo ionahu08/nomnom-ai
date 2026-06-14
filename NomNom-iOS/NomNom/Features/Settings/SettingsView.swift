@@ -97,7 +97,7 @@ struct SettingsView: View {
                             Text(allergy).tag(allergy)
                         }
                     }
-                    .onChange(of: newAllergy) { oldValue, newValue in
+                    .onChange(of: newAllergy) { newValue in
                         if !newValue.isEmpty {
                             addAllergy()
                         }
@@ -129,7 +129,7 @@ struct SettingsView: View {
                             Text(condition).tag(condition)
                         }
                     }
-                    .onChange(of: newCondition) { oldValue, newValue in
+                    .onChange(of: newCondition) { newValue in
                         if !newValue.isEmpty {
                             addCondition()
                         }
