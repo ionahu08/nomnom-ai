@@ -18,10 +18,10 @@ struct SettingsView: View {
                 Section("Health Profile") {
                     if let profile = viewModel.profile {
                         let goals = [
-                            ("maintain", "保持体重"),
-                            ("lose_weight", "减脂"),
-                            ("gain_muscle", "增肌"),
-                            ("shape_figure", "塑型")
+                            ("maintain", "Maintain Weight"),
+                            ("lose_weight", "Lose Weight"),
+                            ("gain_muscle", "Gain Muscle"),
+                            ("shape_figure", "Shape Figure")
                         ]
 
                         Picker("Goal", selection: Binding(
