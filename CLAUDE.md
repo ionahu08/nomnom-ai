@@ -30,10 +30,17 @@ iOS App (SwiftUI) ──▶ NomNom-Backend (FastAPI) ──▶ PostgreSQL + pgve
 
 ## Current Iteration
 
-**Iteration 16: MCP Server** — Complete ✅
-See `docs/iterations/16-mcp-server/SUMMARY.md` for retrospective.
+**Iteration 17: Personalized Nutrition Profile** — 🚀 STARTING (June 13, 2026)
+See `docs/iterations/17-personalized-nutrition/` for plan and phases.
 
-**Summary:** Iterations 11–16 completed (June 5–13, 2026):
+**Goal:** Enable users to set personal health info (age, weight, goals, medical history) and calculate personalized daily calorie/macronutrient recommendations shown on Food Diary.
+
+**Scope:**
+- Backend: Health profile API, nutrition calculation service (Mifflin-St Jeor, TDEE, macro splits by goal)
+- iOS: Settings screen upgrade (anthropometric data, medical info), Food Diary daily summary with progress bars
+- Duration: 5–7 days
+
+**Completed Iterations Summary (11–16):**
 - Iteration 11: Eval pipeline (test → grade → iterate)
 - Iteration 12: Semantic cache production (pgvector, 0.82 threshold)
 - Iteration 13: Cost & latency optimization (Sonnet routing, cache pricing)
@@ -41,7 +48,7 @@ See `docs/iterations/16-mcp-server/SUMMARY.md` for retrospective.
 - Iteration 15: Fridge/leftovers agent (PLAN only, not implemented)
 - Iteration 16: MCP server + Claude Code integration (3 tools, ecosystem standardization)
 
-**Next:** Phase 7 (if continuing) or transition to production work.
+**Paused:** Phase 7 Job-Search Multi-Agent (Option A) — Can resume after Iteration 17.
 
 
 ## Current Learning Phase
