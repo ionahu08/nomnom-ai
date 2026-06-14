@@ -10,7 +10,8 @@ struct MedicalInfoView: View {
     @State private var newMedication = ""
 
     var body: some View {
-        Form {
+        NavigationStack {
+            Form {
                 // MARK: - Allergies
                 Section("Allergies") {
                     if let allergies = viewModel.profile?.allergies, !allergies.isEmpty {
@@ -134,6 +135,7 @@ struct MedicalInfoView: View {
                     }
                 }
             }
+        }
     }
 
     private func addAllergy() {
