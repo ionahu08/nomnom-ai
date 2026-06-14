@@ -81,11 +81,22 @@ class LLMClient:
         # Try primary model up to 2 times
         for attempt in range(2):
             try:
+                # Format system prompt with caching if provided
+                system_param = system
+                if system and isinstance(system, str):
+                    system_param = [
+                        {
+                            "type": "text",
+                            "text": system,
+                            "cache_control": {"type": "ephemeral"},
+                        }
+                    ]
+
                 response = await asyncio.wait_for(
                     self.client.messages.create(
                         model=model,
                         max_tokens=effective_max_tokens,
-                        system=system,
+                        system=system_param,
                         messages=messages,
                         **kwargs,
                     ),

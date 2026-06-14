@@ -214,10 +214,13 @@ A quick at-a-glance view. Update at end of each Phase.
 | 0 — API Mastery | **4.5/5** ✅ | 4/5 | Enhanced (Phase 1), caching model (Phase 4) |
 | 1 — Prompt Engineering | **3.5/5** ✅ | 4/5 | Stable, deferred advanced techniques |
 | 2 — Output Control | **4/5** ✅ | 4/5 | Complete (Phase 2), consistent |
-| 3 — Augmentation ⭐ | **4.5/5** ✅ | 5/5 | Major progress (Phase 3), applied (Phase 4) |
-| 4 — Reliability ⭐ | **4/5** ✅ | 5/5 | Enhanced (Phase 2-3), stable (Phase 4) — my differentiator |
-| 5 — Agent Engineering | **5/5** ✅ | 4/5 | Mastery achieved (Phase 5) — exceeds target |
-| 6 — Multi-Agent | **4/5** ✅ | 3/5 | Complete (Phase 5) — exceeds target |
+| 3 — Augmentation ⭐ | **4.7/5** ✅ | 5/5 | Major progress (Phase 3), applied (Phase 4), MCP integrated (Phase 6) |
+| 4 — Reliability ⭐ | **4/5** ✅ | 5/5 | Enhanced (Phase 2-3), stable (Phase 4-6) — my differentiator |
+| 5 — Agent Engineering | **5/5** ✅ | 4/5 | Mastery achieved (Phase 5), industrial study (Phase 6) |
+| 6 — Multi-Agent | **4/5** ✅ | 3/5 | Complete (Phase 5-6) — exceeds target |
+| **7 — Architecture** ⭐ | **4.5/5** ✅ | — | **NEW (Phase 6)** — MCP, standardization, ecosystem |
+
+**Overall Capability**: **4.6/5 → 4.7/5** ✅ (Consolidation + new layer)
 
 ---
 
@@ -231,7 +234,7 @@ A quick at-a-glance view. Update at end of each Phase.
 | Phase 3 (RAG + PDF + citations) | Week 5–6 | June 28, 2026 | June 9, 2026 | ✅ Complete |
 | Phase 4 (Performance + cost) | Week 7 | July 5, 2026 | June 9, 2026 | ✅ Complete |
 | Phase 5 (Workflow + agent + multi-agent) | Week 8–9 | July 19, 2026 | June 12, 2026 | ✅ Complete |
-| Phase 6 (MCP standardization) | Week 10 | July 26, 2026 | — | Upcoming |
+| Phase 6 (MCP standardization + ecosystem) | Week 10 | July 26, 2026 | **June 13, 2026** ✅ | ✅ Complete |
 | Phase 7 (Optional: extension projects) | Week 11–12 | August 9, 2026 | — | Optional |
 
 ---
@@ -242,3 +245,4 @@ A quick at-a-glance view. Update at end of each Phase.
 - **June 8, 2026**: Phase 3 Complete. Layer 3 (Augmentation) jumped 1/5 → 4/5 ✅. Layer 4 (Reliability) enhanced with semantic caching + KB maintenance. Layer 5 foundation strengthened 1/5 → 2/5. Snapshot created: `Iona_Capability_Profile_phase3_20260608.md`.
 - **June 9, 2026**: Phase 4 Complete. Layer 0 (API) enhanced 4/5 → 4.5/5 with caching cost model. Layer 3 (Augmentation) applied tiering framework 4/5 → 4.5/5. Layer 1 (Prompt Eng) updated 3/5 → 3.5/5. Overall: 3.7/5 → 4.2/5. Key achievement: Cost engineering competency (2/5 → 4.5/5, major improvement). Snapshot created: `Iona_Capability_Profile_phase4_20260609.md`.
 - **June 12, 2026**: Phase 5 Complete. **Layer 5 (Agent Engineering): 2/5 → 5/5** ✅ — Mastered all 5 workflow patterns, built 2 services, benchmarked orchestrator-workers vs. single agent (8x latency difference discovered). **Layer 6 (Multi-Agent): 0/5 → 4/5** ✅ — Researched 3 forms, understood challenges, built tech_comparison_agent, made "don't use" decision for NomNom. Overall capability: 4.2/5 → 4.6/5. Key achievement: Orchestration mastery (Layers 5-6 major jump). Phase 5 accelerated (3 days, learning compressed with production work). Iteration 14 (meal recommendation workflow) production-integrated alongside learning. Snapshot created: `Iona_Capability_Profile_phase5_20260612.md`.
+- **June 13, 2026**: Phase 6 Complete. **Layer 7 (Architecture & Standardization): NEW → 4.5/5** ✅ — Built MCP server from first principles, integrated with Claude Code, audited full `src/llm/` module (9/10 production confidence), studied Claude Code internals as industrial reference. **Layer 3 (Augmentation): 4.5/5 → 4.7/5** ✅ — MCP tools are standardized augmentation. Consolidated mastery: All 7 layers documented with interview-ready narratives. Overall capability: 4.6/5 → **4.7/5** (consolidation phase). Key achievement: Full-stack LLM engineer (API → Prompts → Output Control → Augmentation → Reliability → Agents → Multi-Agent → **Architecture**). Compressed Phase 6 into 1 day parallel with blocker resolution. All 8 deliverables complete (learning materials, code, tests, documentation). Snapshot created: `Iona_Capability_Profile_phase6_20260613.md`. **Ready for industry.**

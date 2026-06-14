@@ -130,7 +130,7 @@ def run_single_agent(user_input: str):
         # Call Claude with tools
         response = client.messages.create(
             model="claude-sonnet-4-6",
-            max_tokens=2048,  # Increased to allow synthesis after multiple searches
+            max_tokens=4096,  # High limit to allow synthesis after multiple searches
             tools=tools,
             messages=messages
         )

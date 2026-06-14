@@ -9,13 +9,13 @@ Usage:
 """
 
 import json
-from mcp.server import Server
+from mcp.server import FastMCP
 
 # Create server instance
-server = Server("NomNom")
+app = FastMCP("NomNom")
 
 
-@server.tool()
+@app.tool()
 def recommend_meal(calories: int, diet_type: str) -> dict:
     """
     Recommend a meal matching calorie and diet constraints.
@@ -50,7 +50,7 @@ def recommend_meal(calories: int, diet_type: str) -> dict:
     }
 
 
-@server.tool()
+@app.tool()
 def analyze_food_image(image_path: str) -> dict:
     """
     Analyze a food image and extract nutritional information.
@@ -68,7 +68,7 @@ def analyze_food_image(image_path: str) -> dict:
     }
 
 
-@server.tool()
+@app.tool()
 def lookup_nutrition(query: str) -> dict:
     """
     Query the nutrition knowledge base for food information.
@@ -96,4 +96,4 @@ if __name__ == "__main__":
     print("NomNom MCP Server (Test Version) starting...", file=sys.stderr)
     print("Available tools: recommend_meal, analyze_food_image, lookup_nutrition", file=sys.stderr)
     print("Note: Using mock data (not real backend)", file=sys.stderr)
-    server.run(transport="stdio")
+    app.run()

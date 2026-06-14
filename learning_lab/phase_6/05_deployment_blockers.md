@@ -1,7 +1,7 @@
 # Phase 6: MCP Integration - Current Status & Blockers
 
-**Date:** June 13, 2026  
-**Status:** ✅ Learning Complete, 🚧 Integration Blocked on Dependencies
+**Date:** June 13, 2026 (Updated)  
+**Status:** ✅ Learning Complete, ✅ Blockers Resolved, 🚧 Verification In Progress
 
 ---
 
@@ -27,90 +27,96 @@
 
 ---
 
-## Current Blockers
+## Blockers - RESOLVED ✅
 
-### Blocker 1: Backend Dependencies
+### Blocker 1: Backend Dependencies — RESOLVED ✅
 
-**Issue:** `nomnom_mcp_server.py` imports NomNom-Backend code which requires:
-- sqlalchemy
-- psycopg2
-- anthropic
-- dotenv
-- Other dependencies
+**Issue:** `nomnom_mcp_server.py` imports NomNom-Backend code requiring sqlalchemy, psycopg2, anthropic, etc.
 
-**Error:**
+**Error:** `ModuleNotFoundError: No module named 'sqlalchemy'`
+
+**Root cause:** venv only had `mcp` and `anthropic`, not the full backend stack
+
+**Solution applied:**
+```bash
+pip install -e /Users/ionahu/sources/NomNom/NomNom-Backend/
 ```
-ModuleNotFoundError: No module named 'sqlalchemy'
-```
+This installed 100+ dependencies from pyproject.toml in editable mode, including:
+- sqlalchemy, asyncpg (database)
+- anthropic (LLM API)
+- torch, transformers, sentence-transformers (embeddings)
+- All other backend dependencies
 
-**Why it happened:** venv only has `mcp` and `anthropic`, not full backend stack.
+**Status:** ✅ All dependencies installed, imports succeed
 
-**Solution options:**
-1. Install backend dependencies in venv:
-   ```bash
-   pip install -r NomNom-Backend/requirements.txt
-   ```
+### Blocker 2: MCP Library API Mismatch — RESOLVED ✅
 
-2. Use full Python environment with all deps installed globally
+**Issue:** Decorator syntax `@server.tool()` didn't exist in mcp library
 
-3. Simplify server to not import real backend (mock-based for demo)
+**Error:** `AttributeError: 'Server' object has no attribute 'tool'`
 
-### Blocker 2: MCP Library API Mismatch
+**Root cause:** Using low-level `Server` API which doesn't have the `@tool()` decorator. The MCP SDK provides two APIs:
+- Low-level `Server`: requires manual registration with `@server.call_tool()` and `@server.list_tools()`
+- High-level `FastMCP`: provides convenient `@app.tool()` decorator
 
-**Issue:** Decorator syntax changed in mcp library version
+**Solution applied:**
+Changed imports from `from mcp.server import Server` to `from mcp.server import FastMCP`
+Updated all tool definitions:
+- Changed `server = Server("NomNom")` → `app = FastMCP("NomNom")`
+- Changed `@server.tool()` → `@app.tool()` (all 3 tools)
+- Changed `server.run(transport="stdio")` → `app.run()` (FastMCP auto-detects stdio)
 
-**Error:**
-```
-AttributeError: 'Server' object has no attribute 'tool'
-```
+**Files updated:**
+- `nomnom_mcp_server.py` (real workflow server)
+- `nomnom_mcp_server_test.py` (simplified mock server)
 
-**Why it happened:** mcp library API differs from what we coded
-
-**Solution:** Check installed mcp version and update server code to match
+**Status:** ✅ Both servers import successfully and respond to MCP initialize message
 
 ---
 
-## Path Forward (Next Steps)
+## Path Forward - Blockers Resolved, Next: Claude Code Integration
 
-### Option A: Full Integration (Recommended for Production)
+Now that both blockers are fixed, the next steps are:
 
-1. **Install backend dependencies:**
+1. **Register server with Claude Code:**
    ```bash
-   source ~/venv_nomnom/bin/activate
-   cd /Users/ionahu/sources/NomNom/NomNom-Backend
-   pip install -r requirements.txt
+   claude mcp add nomnom python /Users/ionahu/sources/NomNom/learning_lab/phase_6/nomnom_mcp_server.py
    ```
 
-2. **Fix mcp API issue** (check what's available):
-   ```python
-   import mcp.server
-   help(mcp.server.Server)  # See actual API
-   ```
+2. **Verify in Claude Code:**
+   - Open Claude Code (Desktop app or Web)
+   - In a notebook, tools should auto-discover
+   - Test each tool:
+     ```python
+     result = recommend_meal(calories=600, diet_type="vegetarian")
+     print(result)
+     ```
 
-3. **Update server code** to match actual API
+3. **Complete verification checklist:**
+   - [ ] Claude Code lists tools
+   - [ ] `analyze_food_image` works with local photo
+   - [ ] `lookup_nutrition` returns RAG results with citations
+   - [ ] `recommend_meal` invokes real workflow (5-step chaining)
+   - [ ] Resources can be browsed
 
-4. **Test with:**
-   ```bash
-   ~/venv_nomnom/bin/python3 nomnom_mcp_server.py
-   ```
+4. **Document results:**
+   - Update SUMMARY.md with test results
+   - Create iteration 16 retrospective
+   - Document lessons learned about MCP API
 
-5. **Register and verify:**
-   ```bash
-   claude mcp add nomnom python /path/to/nomnom_mcp_server.py
-   # Test in Claude Code notebook
-   ```
+## What Was Learned
 
-### Option B: Demo Version (Faster for Learning)
+### Blocker 1 Resolution: Dependency Management
+- **Lesson:** Virtual environments isolate Python dependencies. Installing a single package doesn't cascade — you must install the full dependency tree.
+- **Solution:** Use editable installs (`pip install -e .`) for development packages that have pyproject.toml
+- **Takeaway:** This is why production Docker images explicitly list all dependencies.
 
-Use `nomnom_mcp_server_test.py` (mock-based) to verify MCP protocol works, then integrate with real backend later.
-
-### Option C: Simplified Approach
-
-Create a lightweight MCP server that:
-- Doesn't import full backend
-- Calls backend via HTTP REST API instead
-- Avoids dependency issues
-- Still works with Claude Code
+### Blocker 2 Resolution: SDK API Levels
+- **Lesson:** MCP SDK has two API tiers:
+  - **Low-level:** Fine-grained control, manual registration, complex decorators
+  - **High-level:** Convenient decorators, auto-discovery, recommended for most use cases
+- **Solution:** Prefer `FastMCP` over `Server` for simpler, more Pythonic code
+- **Takeaway:** Always check if a library has multiple API levels before diving deep into one approach
 
 ---
 
@@ -128,14 +134,14 @@ Create a lightweight MCP server that:
 
 ## Verification Checklist Status
 
-Current state:
-- [ ] Claude Code can list NomNom tools — **Blocked on server startup**
-- [ ] `analyze_food_image` works with local photo — **Blocked on server startup**
-- [ ] `lookup_nutrition` returns RAG answers — **Blocked on server startup**
-- [ ] `recommend_meal` invokes workflow — **Blocked on server startup**
-- [ ] Resources can be browsed — **Blocked on server startup**
+Current state (post-blocker-resolution):
+- [ ] Claude Code can list NomNom tools — 🚧 Next: register with `claude mcp add`
+- [ ] `analyze_food_image` works with local photo — 🚧 Next: test in Claude Code
+- [ ] `lookup_nutrition` returns RAG answers — 🚧 Next: test in Claude Code
+- [ ] `recommend_meal` invokes workflow — 🚧 Next: test in Claude Code
+- [ ] Resources can be browsed — 🚧 Next: implement resources in server
 
-**Root cause:** Server won't start due to dependencies + API mismatch
+**Blocker status:** ✅ RESOLVED — servers now start and respond to MCP protocol
 
 ---
 

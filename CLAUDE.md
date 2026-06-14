@@ -109,9 +109,10 @@ See `docs/iterations/16-mcp-server/SUMMARY.md` for retrospective.
 | `docs/learning/01_capability_profile/Iona_Capability_Profile.md` | Iona's skill level tracking across 7 layers |
 | `docs/learning/05_learning_notes/` | Deep concept notes (API, agents, LLM OS, production) |
 | `learning_lab/` | Sandbox for Phase 1-6 hands-on concept practice (separate from production code) |
-| 🗂️ `.claude/agent-memory/code-reviewer/REPO_REFERENCE_LOGIC_MAP.md` | Repository structure, folder references, and navigation strategies |
 | `.claude/rules/dev-rules.md` | Standards and conventions |
 | `.claude/rules/dev-workflow.md` | Iteration workflow and process |
+| 🗂️ `.claude/rules/repo-navigation-quick-ref.md` | Repository structure overview (auto-loaded every session) |
+| 🗂️ `docs/REPO_STRUCTURE.md` | Detailed folder references, dependencies, and navigation strategies |
 
 ## Rules
 

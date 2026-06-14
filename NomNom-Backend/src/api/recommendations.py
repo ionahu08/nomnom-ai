@@ -4,7 +4,7 @@ Recommendations API — RAG-powered meal suggestions using knowledge base.
 
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.deps import get_current_user
@@ -30,6 +30,7 @@ router = APIRouter(prefix="/api/v1/recommendations", tags=["recommendations"])
 async def get_meal_recommendation(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+    use_workflow: bool = Query(False, description="Use 5-step workflow for better recommendations (slower but higher quality)"),
 ):
     """
     Get a RAG-powered meal recommendation based on today's nutrition.
@@ -40,11 +41,18 @@ async def get_meal_recommendation(
     Args:
         current_user: Authenticated user
         db: Database session
+        use_workflow: If True, use 5-step workflow for better recommendations (slower)
 
     Returns:
         MealRecommendationResponse with personalized recommendation
     """
     try:
+        # If workflow is requested, use it for higher-quality recommendations
+        if use_workflow:
+            from src.services.workflow_recommendation_service import WorkflowRecommendationService
+            service = WorkflowRecommendationService(llm_client, db)
+            return await service.get_meal_recommendation(current_user)
+
         # Step 1: Get user profile and targets
         profile = await get_profile(db, current_user.id)
         if profile is None:

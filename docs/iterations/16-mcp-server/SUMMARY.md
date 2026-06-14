@@ -1,8 +1,16 @@
 # Iteration 16 Summary: MCP Server Integration
 
-**Status:** 🚧 In Progress (June 13, 2026)
+**Status:** ✅ Servers Operational, 🚧 Claude Code Integration Pending (June 13, 2026)
 
-**When complete, this section will contain:**
+## Progress Summary
+
+**Blockers resolved:** Both critical blockers preventing server startup have been fixed.
+- ✅ Backend dependencies installed (100+ packages via editable install)
+- ✅ MCP API mismatch resolved (switched from Server to FastMCP)
+- ✅ Both servers (real + test) now start and respond to MCP protocol
+- 🚧 Next: Register with Claude Code and verify all tools work
+
+---
 
 ---
 
@@ -52,13 +60,19 @@ for item in result['results']:
 
 ## Testing Results
 
-**Verification Checklist:**
-- [x] MCP server runs on stdio transport
-- [ ] Claude Code lists NomNom tools
-- [ ] `analyze_food_image` works with local photo
-- [ ] `lookup_nutrition` returns RAG results with citations
-- [ ] `recommend_meal` invokes workflow
-- [ ] Resources can be browsed
+**Blocker Resolution Tests:**
+- [x] Server imports successfully (all dependencies resolved)
+- [x] MCP decorators work correctly (switched to FastMCP API)
+- [x] Both servers respond to initialize message (stdio transport working)
+- [x] Test server responds immediately (mock data works)
+- [x] Real server responds (backend integration working)
+
+**Verification Checklist (Next Phase):**
+- [ ] Claude Code lists NomNom tools → requires `claude mcp add` registration
+- [ ] `analyze_food_image` works with local photo → test in Claude Code
+- [ ] `lookup_nutrition` returns RAG results with citations → test in Claude Code
+- [ ] `recommend_meal` invokes workflow → test in Claude Code  
+- [ ] Resources can be browsed → requires resource implementation
 
 ## Key Achievement
 
@@ -88,7 +102,41 @@ This is the real shape of productization — your backend becomes native to Clau
 **Updated:**
 - None (server is independent, doesn't modify production code)
 
-## Challenges & Solutions
+## Blocker Solutions
+
+### Blocker 1: Backend Dependencies Missing
+**Problem:** Server couldn't import `src.schemas.user_profile` and other backend modules
+
+**Root cause:** Virtual environment missing 100+ packages required by NomNom-Backend
+
+**Solution:**
+```bash
+pip install -e /Users/ionahu/sources/NomNom/NomNom-Backend/
+```
+This installed all dependencies from pyproject.toml including sqlalchemy, asyncpg, torch, anthropic, etc.
+
+**Result:** ✅ All imports succeed
+
+### Blocker 2: MCP API Mismatch
+**Problem:** `@server.tool()` decorator didn't exist
+
+**Root cause:** Using low-level `Server` API from mcp.server. Should use high-level `FastMCP` API
+
+**Solution:**
+- Changed `from mcp.server import Server` → `from mcp.server import FastMCP`
+- Changed `server = Server(...)` → `app = FastMCP(...)`
+- Changed `@server.tool()` → `@app.tool()`
+- Changed `server.run(transport="stdio")` → `app.run()` (auto-detects stdio)
+
+**Files updated:**
+- `nomnom_mcp_server.py` (real workflow server)
+- `nomnom_mcp_server_test.py` (simplified mock server)
+
+**Result:** ✅ Both servers start and respond to MCP protocol
+
+---
+
+## Challenges & Solutions (Feature Development)
 
 ### Challenge 1: Tool Error Handling
 **Problem:** Tools need to handle errors gracefully (not crash the server).

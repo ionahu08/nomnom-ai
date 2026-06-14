@@ -48,8 +48,8 @@ class ModelRoute:
 # Task-to-Model Routing Table
 TASK_ROUTES = {
     TaskType.ANALYZE_FOOD: ModelRoute(
-        primary_model="claude-sonnet-4-20250514",
-        fallback_model="claude-sonnet-4-20250514",
+        primary_model="claude-haiku-4-5-20251001",
+        fallback_model="claude-haiku-4-5-20251001",
         max_tokens=500,
         temperature=0.7,  # Slightly creative but consistent
     ),
