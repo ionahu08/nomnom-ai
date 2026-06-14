@@ -9,7 +9,13 @@ class DiaryViewModel: ObservableObject {
     @Published var isLoadingCalendar = false
     @Published var errorMessage: String?
 
+    @Published var calorieTarget: Int = 2000
+    @Published var proteinTarget: Double = 150
+    @Published var carbTarget: Double = 200
+    @Published var fatTarget: Double = 65
+
     private let api = APIClient.shared
+    private let profileService = ProfileService()
     private let dateFormatter = ISO8601DateFormatter()
 
     init() {
@@ -60,6 +66,18 @@ class DiaryViewModel: ObservableObject {
         }
 
         isLoadingCalendar = false
+    }
+
+    func loadDailyTargets() async {
+        do {
+            let profile = try await profileService.getProfile()
+            self.calorieTarget = profile.calorieTarget ?? 2000
+            self.proteinTarget = Double(profile.proteinTarget ?? 150)
+            self.carbTarget = Double(profile.carbTarget ?? 200)
+            self.fatTarget = Double(profile.fatTarget ?? 65)
+        } catch {
+            print("Failed to load nutrition targets: \(error)")
+        }
     }
 
     func loadLogs(for date: Date) async {

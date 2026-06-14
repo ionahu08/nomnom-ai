@@ -154,6 +154,7 @@ struct DiaryView: View {
                 let components = calendar.dateComponents([.year, .month], from: now)
                 displayedMonth = calendar.date(from: DateComponents(year: components.year, month: components.month, day: 1)) ?? now
 
+                await viewModel.loadDailyTargets()
                 await viewModel.loadCalendarSummary()
                 // After calendar loads, load logs for the selected date
                 await viewModel.loadLogs(for: viewModel.selectedDate)
@@ -239,7 +240,7 @@ struct DiaryView: View {
         let totalCarbs = viewModel.logsForSelectedDate.reduce(0.0) { $0 + $1.carbsG }
         let totalFat = viewModel.logsForSelectedDate.reduce(0.0) { $0 + $1.fatG }
 
-        return VStack(spacing: 12) {
+        return VStack(spacing: 16) {
             HStack {
                 Text("\(viewModel.logsForSelectedDate.count) meal\(viewModel.logsForSelectedDate.count == 1 ? "" : "s")")
                     .font(.subheadline)
@@ -247,28 +248,43 @@ struct DiaryView: View {
                 Spacer()
             }
 
-            HStack(spacing: 16) {
-                summaryItem(value: "\(totalCals)", label: "kcal", color: NomNomColors.primary)
-                summaryItem(value: String(format: "%.0f", totalProtein), label: "protein", color: NomNomColors.success)
-                summaryItem(value: String(format: "%.0f", totalCarbs), label: "carbs", color: NomNomColors.warning)
-                summaryItem(value: String(format: "%.0f", totalFat), label: "fat", color: NomNomColors.danger)
+            // Calorie circular progress
+            ProgressCircle(
+                consumed: totalCals,
+                target: viewModel.calorieTarget,
+                label: "Daily Calories"
+            )
+
+            Divider()
+                .padding(.vertical, 8)
+
+            // Macro progress bars
+            VStack(spacing: 12) {
+                NutritionProgressBar(
+                    nutrient: "Protein",
+                    consumed: totalProtein,
+                    target: viewModel.proteinTarget,
+                    unit: "g"
+                )
+
+                NutritionProgressBar(
+                    nutrient: "Carbs",
+                    consumed: totalCarbs,
+                    target: viewModel.carbTarget,
+                    unit: "g"
+                )
+
+                NutritionProgressBar(
+                    nutrient: "Fat",
+                    consumed: totalFat,
+                    target: viewModel.fatTarget,
+                    unit: "g"
+                )
             }
         }
         .padding()
         .background(NomNomColors.surface)
         .cornerRadius(16)
-    }
-
-    private func summaryItem(value: String, label: String, color: Color) -> some View {
-        VStack(spacing: 2) {
-            Text(value)
-                .font(.headline)
-                .foregroundColor(color)
-            Text(label)
-                .font(.caption2)
-                .foregroundColor(NomNomColors.textSecondary)
-        }
-        .frame(maxWidth: .infinity)
     }
 
     // MARK: - Helpers
