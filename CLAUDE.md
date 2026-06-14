@@ -49,13 +49,15 @@ See `docs/iterations/17-personalized-nutrition/` for details.
 - iOS: Complete Settings screen with health data input, Food Diary integration with daily targets
 - Key fixes: JSON field type corrections, test fixture isolation, removed auto-profile creation during registration
 
-**Completed Iterations Summary (11–16):**
-- Iteration 11: Eval pipeline (test → grade → iterate)
+**Completed Iterations Summary (11–16):** ✅ All documented with PLAN/PHASES/BUGLOG/SUMMARY
+- Iteration 11: Eval pipeline (test → grade → iterate) — SUMMARY.md added June 14
 - Iteration 12: Semantic cache production (pgvector, 0.82 threshold)
 - Iteration 13: Cost & latency optimization (Sonnet routing, cache pricing)
-- Iteration 14: Meal recommendation workflow (orchestrator-workers, 8x latency gain)
+- Iteration 14: Meal recommendation workflow (orchestrator-workers, 8x latency gain) — PHASES/BUGLOG/SUMMARY added June 14
 - Iteration 15: Fridge/leftovers agent (PLAN only, not implemented)
-- Iteration 16: MCP server + Claude Code integration (3 tools, ecosystem standardization)
+- Iteration 16: MCP server + Claude Code integration (3 tools, ecosystem standardization) — PHASES/BUGLOG added June 14
+
+**Documentation Status:** All iterations 11–16 now have complete standard documentation (PLAN.md → PHASES.md → BUGLOG.md → SUMMARY.md), enabling seamless handoff between sessions.
 
 **Paused:** Phase 7 Job-Search Multi-Agent (Option A) — Can resume after Iteration 17.
 
