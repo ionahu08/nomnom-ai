@@ -6,6 +6,8 @@ struct SettingsView: View {
 
     @State private var newAllergy = ""
     @State private var newCondition = ""
+    @State private var customAllergy = ""
+    @State private var customCondition = ""
 
     init() {
         _viewModel = StateObject(wrappedValue: SettingsViewModel(authService: AuthService()))
@@ -38,11 +40,18 @@ struct SettingsView: View {
                             }
                         }
 
-                        HStack {
-                            Text("Birth Date")
-                            Spacer()
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text("Birth Date")
+                                Spacer()
+                                if let age = profile.age {
+                                    Text("\(age) years old")
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+
                             DatePicker(
-                                "Birth Date",
+                                "Select birth date",
                                 selection: Binding(
                                     get: {
                                         if let age = profile.age {
@@ -130,24 +139,25 @@ struct SettingsView: View {
                     }
                     .onChange(of: newAllergy) { newValue in
                         if newValue == "Other" {
-                            // Show custom input
+                            customAllergy = ""
                         } else if !newValue.isEmpty {
                             addAllergy()
+                            newAllergy = ""
                         }
                     }
 
                     if newAllergy == "Other" {
                         HStack {
-                            TextField("Enter custom allergy", text: Binding(
-                                get: { "" },
-                                set: { text in
-                                    if !text.isEmpty {
-                                        addAllergy(custom: text)
-                                        newAllergy = ""
-                                    }
+                            TextField("Enter allergy", text: $customAllergy)
+                                .textFieldStyle(.roundedBorder)
+                            Button("Add") {
+                                if !customAllergy.isEmpty {
+                                    addAllergy(custom: customAllergy)
+                                    customAllergy = ""
+                                    newAllergy = ""
                                 }
-                            ))
-                            .textFieldStyle(.roundedBorder)
+                            }
+                            .disabled(customAllergy.trimmingCharacters(in: .whitespaces).isEmpty)
                         }
                     }
                 }
@@ -179,24 +189,25 @@ struct SettingsView: View {
                     }
                     .onChange(of: newCondition) { newValue in
                         if newValue == "Other" {
-                            // Show custom input
+                            customCondition = ""
                         } else if !newValue.isEmpty {
                             addCondition()
+                            newCondition = ""
                         }
                     }
 
                     if newCondition == "Other" {
                         HStack {
-                            TextField("Enter custom condition", text: Binding(
-                                get: { "" },
-                                set: { text in
-                                    if !text.isEmpty {
-                                        addCondition(custom: text)
-                                        newCondition = ""
-                                    }
+                            TextField("Enter condition", text: $customCondition)
+                                .textFieldStyle(.roundedBorder)
+                            Button("Add") {
+                                if !customCondition.isEmpty {
+                                    addCondition(custom: customCondition)
+                                    customCondition = ""
+                                    newCondition = ""
                                 }
-                            ))
-                            .textFieldStyle(.roundedBorder)
+                            }
+                            .disabled(customCondition.trimmingCharacters(in: .whitespaces).isEmpty)
                         }
                     }
                 }
