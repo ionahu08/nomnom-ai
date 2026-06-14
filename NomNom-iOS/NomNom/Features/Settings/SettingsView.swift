@@ -19,6 +19,21 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                // Success Message - appears at top
+                if viewModel.savedSuccessfully {
+                    Section {
+                        HStack {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                            Text("Profile saved successfully!")
+                                .foregroundColor(.green)
+                            Spacer()
+                        }
+                        .padding(.vertical, 8)
+                    }
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                }
+
                 // Health Profile Section
                 Section("Health Profile") {
                     if let profile = viewModel.profile {
@@ -54,44 +69,57 @@ struct SettingsView: View {
                             }
 
                             HStack(spacing: 8) {
-                                Picker("Year", selection: Binding(
-                                    get: { selectedYear },
-                                    set: { newYear in
-                                        selectedYear = newYear
-                                        updateAgeFromDatePickers()
+                                VStack(alignment: .center, spacing: 4) {
+                                    Text("Year").font(.caption2).foregroundColor(.secondary)
+                                    Picker("Year", selection: Binding(
+                                        get: { selectedYear },
+                                        set: { newYear in
+                                            selectedYear = newYear
+                                            updateAgeFromDatePickers()
+                                        }
+                                    )) {
+                                        ForEach((1920...Calendar.current.component(.year, from: Date())), id: \.self) { year in
+                                            Text(String(year)).tag(year)
+                                        }
                                     }
-                                )) {
-                                    ForEach((1920...Calendar.current.component(.year, from: Date())), id: \.self) { year in
-                                        Text(String(year)).tag(year)
-                                    }
+                                    .pickerStyle(.wheel)
+                                    .frame(height: 100)
                                 }
-                                .frame(maxWidth: .infinity)
 
-                                Picker("Month", selection: Binding(
-                                    get: { selectedMonth },
-                                    set: { newMonth in
-                                        selectedMonth = newMonth
-                                        updateAgeFromDatePickers()
+                                VStack(alignment: .center, spacing: 4) {
+                                    Text("Month").font(.caption2).foregroundColor(.secondary)
+                                    Picker("Month", selection: Binding(
+                                        get: { selectedMonth },
+                                        set: { newMonth in
+                                            selectedMonth = newMonth
+                                            updateAgeFromDatePickers()
+                                        }
+                                    )) {
+                                        ForEach(1...12, id: \.self) { month in
+                                            Text(String(format: "%02d", month)).tag(month)
+                                        }
                                     }
-                                )) {
-                                    ForEach(1...12, id: \.self) { month in
-                                        Text(String(format: "%02d", month)).tag(month)
-                                    }
+                                    .pickerStyle(.wheel)
+                                    .frame(height: 100)
                                 }
-                                .frame(maxWidth: .infinity)
 
-                                Picker("Day", selection: Binding(
-                                    get: { selectedDay },
-                                    set: { newDay in
-                                        selectedDay = newDay
-                                        updateAgeFromDatePickers()
+                                VStack(alignment: .center, spacing: 4) {
+                                    Text("Day").font(.caption2).foregroundColor(.secondary)
+                                    Picker("Day", selection: Binding(
+                                        get: { selectedDay },
+                                        set: { newDay in
+                                            let maxDay = daysInMonth(selectedMonth, year: selectedYear)
+                                            selectedDay = min(newDay, maxDay)
+                                            updateAgeFromDatePickers()
+                                        }
+                                    )) {
+                                        ForEach(1...daysInMonth(selectedMonth, year: selectedYear), id: \.self) { day in
+                                            Text(String(format: "%02d", day)).tag(day)
+                                        }
                                     }
-                                )) {
-                                    ForEach(1...31, id: \.self) { day in
-                                        Text(String(format: "%02d", day)).tag(day)
-                                    }
+                                    .pickerStyle(.wheel)
+                                    .frame(height: 100)
                                 }
-                                .frame(maxWidth: .infinity)
                             }
                         }
 
@@ -300,18 +328,6 @@ struct SettingsView: View {
                     }
                 }
 
-                // Save Status
-                if viewModel.savedSuccessfully {
-                    Section {
-                        HStack {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
-                            Text("Saved!")
-                                .foregroundColor(.green)
-                        }
-                    }
-                }
-
                 // Error Message
                 if let error = viewModel.errorMessage {
                     Section {
@@ -357,6 +373,18 @@ struct SettingsView: View {
                 }
             }
         }
+    }
+
+    private func daysInMonth(_ month: Int, year: Int) -> Int {
+        let calendar = Calendar.current
+        var dateComponents = DateComponents()
+        dateComponents.year = year
+        dateComponents.month = month
+        dateComponents.day = 1
+
+        guard let date = calendar.date(from: dateComponents) else { return 31 }
+        guard let range = calendar.range(of: .day, in: .month, for: date) else { return 31 }
+        return range.count
     }
 
     private func updateAgeFromDatePickers() {
