@@ -4,6 +4,9 @@ struct SettingsView: View {
     @EnvironmentObject var authService: AuthService
     @StateObject private var viewModel: SettingsViewModel
 
+    @State private var newAllergy = ""
+    @State private var newCondition = ""
+
     init() {
         _viewModel = StateObject(wrappedValue: SettingsViewModel(authService: AuthService()))
     }
@@ -79,21 +82,55 @@ struct SettingsView: View {
                     }
                 }
 
-                // Medical Information Section
-                Section("Medical Information (Optional)") {
-                    if viewModel.profile != nil {
-                        NavigationLink(destination: MedicalInfoView(viewModel: viewModel)) {
+                // Medical Information Section - Allergies
+                Section("Allergies") {
+                    if let allergies = viewModel.profile?.allergies, !allergies.isEmpty {
+                        ForEach(allergies, id: \.self) { allergy in
                             HStack {
-                                Text("Allergies & Conditions")
+                                Text(allergy)
                                 Spacer()
-                                if !(viewModel.profile?.allergies?.isEmpty ?? true) || !(viewModel.profile?.medicalConditions?.isEmpty ?? true) {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(.green)
+                                Button(action: {
+                                    viewModel.profile?.allergies?.removeAll { $0 == allergy }
+                                }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(.red)
                                 }
-                                Image(systemName: "chevron.right")
-                                    .foregroundColor(.gray)
                             }
                         }
+                    }
+                    HStack {
+                        TextField("Add allergy...", text: $newAllergy)
+                        Button(action: addAllergy) {
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundColor(.blue)
+                        }
+                        .disabled(newAllergy.trimmingCharacters(in: .whitespaces).isEmpty)
+                    }
+                }
+
+                // Medical Information Section - Conditions
+                Section("Medical Conditions") {
+                    if let conditions = viewModel.profile?.medicalConditions, !conditions.isEmpty {
+                        ForEach(conditions, id: \.self) { condition in
+                            HStack {
+                                Text(condition)
+                                Spacer()
+                                Button(action: {
+                                    viewModel.profile?.medicalConditions?.removeAll { $0 == condition }
+                                }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(.red)
+                                }
+                            }
+                        }
+                    }
+                    HStack {
+                        TextField("Add condition...", text: $newCondition)
+                        Button(action: addCondition) {
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundColor(.blue)
+                        }
+                        .disabled(newCondition.trimmingCharacters(in: .whitespaces).isEmpty)
                     }
                 }
 
@@ -212,6 +249,28 @@ struct SettingsView: View {
             .task {
                 await viewModel.loadProfile()
             }
+        }
+    }
+
+    private func addAllergy() {
+        let trimmed = newAllergy.trimmingCharacters(in: .whitespaces)
+        if !trimmed.isEmpty {
+            if viewModel.profile?.allergies == nil {
+                viewModel.profile?.allergies = []
+            }
+            viewModel.profile?.allergies?.append(trimmed)
+            newAllergy = ""
+        }
+    }
+
+    private func addCondition() {
+        let trimmed = newCondition.trimmingCharacters(in: .whitespaces)
+        if !trimmed.isEmpty {
+            if viewModel.profile?.medicalConditions == nil {
+                viewModel.profile?.medicalConditions = []
+            }
+            viewModel.profile?.medicalConditions?.append(trimmed)
+            newCondition = ""
         }
     }
 }
