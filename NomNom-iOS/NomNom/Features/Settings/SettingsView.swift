@@ -17,19 +17,25 @@ struct SettingsView: View {
                 // Health Profile Section
                 Section("Health Profile") {
                     if let profile = viewModel.profile {
-                        HStack {
-                            Text("Goal")
-                            Spacer()
-                            Picker("", selection: Binding(
-                                get: { profile.goal ?? "maintain" },
-                                set: { viewModel.profile?.goal = $0 }
-                            )) {
-                                Text("Maintain Weight").tag("maintain")
-                                Text("Lose Weight").tag("lose_weight")
-                                Text("Gain Muscle").tag("gain_muscle")
-                                Text("Shape Figure").tag("shape_figure")
+                        let goals = [
+                            ("maintain", "保持体重"),
+                            ("lose_weight", "减脂"),
+                            ("gain_muscle", "增肌"),
+                            ("shape_figure", "塑型")
+                        ]
+
+                        Picker("Goal", selection: Binding(
+                            get: { profile.goal ?? "maintain" },
+                            set: {
+                                viewModel.profile?.goal = $0
+                                Task {
+                                    await viewModel.updateMacroTargets()
+                                }
                             }
-                            .pickerStyle(.segmented)
+                        )) {
+                            ForEach(goals, id: \.0) { value, label in
+                                Text(label).tag(value)
+                            }
                         }
 
                         HStack {
