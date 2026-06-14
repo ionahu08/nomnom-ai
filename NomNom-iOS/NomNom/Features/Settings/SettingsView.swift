@@ -17,22 +17,9 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            Form {
-                // Success Message - appears at top
-                if viewModel.savedSuccessfully {
-                    Section {
-                        HStack {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
-                            Text("Profile saved successfully!")
-                                .foregroundColor(.green)
-                            Spacer()
-                        }
-                        .padding(.vertical, 8)
-                    }
-                    .transition(.move(edge: .top).combined(with: .opacity))
-                }
+        ZStack {
+            NavigationStack {
+                Form {
 
                 // Health Profile Section
                 Section("Health Profile") {
@@ -371,6 +358,27 @@ struct SettingsView: View {
                     selectedMonth = Calendar.current.component(.month, from: birthDate)
                     selectedDay = Calendar.current.component(.day, from: birthDate)
                 }
+            }
+
+            // Centered Toast Notification
+            if viewModel.savedSuccessfully {
+                VStack {
+                    HStack(spacing: 12) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 24))
+                            .foregroundColor(.white)
+                        Text("Profile saved successfully!")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.white)
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 16)
+                    .background(Color.green)
+                    .cornerRadius(12)
+                    .shadow(radius: 8)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                .transition(.scale.combined(with: .opacity))
             }
         }
     }
