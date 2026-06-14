@@ -359,6 +359,7 @@ struct SettingsView: View {
                     selectedDay = Calendar.current.component(.day, from: birthDate)
                 }
             }
+            }
 
             // Centered Toast Notification
             if viewModel.savedSuccessfully {
