@@ -270,6 +270,7 @@ struct SettingsView: View {
                 }
             }
             .task {
+                viewModel.setAuthService(authService)
                 await viewModel.loadProfile()
             }
         }

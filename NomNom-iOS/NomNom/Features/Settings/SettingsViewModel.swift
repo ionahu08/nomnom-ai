@@ -8,9 +8,13 @@ class SettingsViewModel: ObservableObject {
     @Published var savedSuccessfully = false
 
     private let profileService = ProfileService()
-    private let authService: AuthService
+    private var authService: AuthService
 
     init(authService: AuthService) {
+        self.authService = authService
+    }
+
+    func setAuthService(_ authService: AuthService) {
         self.authService = authService
     }
 
