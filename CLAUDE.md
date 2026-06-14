@@ -116,10 +116,12 @@ See `docs/iterations/16-mcp-server/SUMMARY.md` for retrospective.
 
 ## Rules
 
-Development rules live in `.claude/rules/`:
+Development standards and references live in `.claude/rules/`:
 - `dev-rules.md` — standards, commit protocol, testing, code quality
 - `dev-workflow.md` — iteration workflow, documentation updates
 - `phase-handoff-checklist.md` — mandatory steps for Phase 1-6 learning completions (retrospectives, capability profiles, roadmap, CLAUDE.md updates)
+- `repo-navigation-quick-ref.md` — repository structure overview (auto-loaded every session)
+- `ios_app_icon_troubleshooting.md` — iOS app icon debugging checklist
 
 
 
