@@ -8,14 +8,14 @@ It is automatically loaded into context when working with Claude Code.
 
 **NomNom** is an AI-powered food tracking app with a roasting cat personality. Users photograph meals, the LLM analyzes nutritional content and delivers witty commentary, and the cat learns user preferences over time via semantic caching and RAG. Built with Python/FastAPI backend and SwiftUI iOS app.
 
-## Dual Purpose (As of May 2026)
+## Dual Purpose (As of June 2026)
 
 This codebase serves two parallel tracks:
 
-1. **Production product** — iOS app continuing toward launch (currently Iteration 09 complete)
-2. **LLM Harnessing learning journey** — 10-week structured learning by the developer (Iona), May 10–July 26, 2026
+1. **Production product** — iOS app continuing toward launch (currently Iteration 16 MCP complete)
+2. **LLM Harnessing learning journey** — ✅ COMPLETE (May 12–June 13, 2026). Iona is now a full-stack LLM engineer with 4.7/5 capability across 7 layers.
 
-Both tracks coexist in this repo. Iteration work continues in `docs/iterations/`. Learning work tracks in `docs/learning/`.
+Iteration work continues in `docs/iterations/`. Learning journey complete; retrospectives and capability profiles track progression in `docs/learning/`.
 
 ## System Context
 
@@ -30,10 +30,18 @@ iOS App (SwiftUI) ──▶ NomNom-Backend (FastAPI) ──▶ PostgreSQL + pgve
 
 ## Current Iteration
 
-**Iteration 09: Food Diary (Calendar View)** — Complete ✅
-See `docs/iterations/09-food-diary/SUMMARY.md` for retrospective.
+**Iteration 16: MCP Server** — Complete ✅
+See `docs/iterations/16-mcp-server/SUMMARY.md` for retrospective.
 
-**Next:** Iteration 10 (Recommendations from History) — Planned
+**Summary:** Iterations 11–16 completed (June 5–13, 2026):
+- Iteration 11: Eval pipeline (test → grade → iterate)
+- Iteration 12: Semantic cache production (pgvector, 0.82 threshold)
+- Iteration 13: Cost & latency optimization (Sonnet routing, cache pricing)
+- Iteration 14: Meal recommendation workflow (orchestrator-workers, 8x latency gain)
+- Iteration 15: Fridge/leftovers agent (PLAN only, not implemented)
+- Iteration 16: MCP server + Claude Code integration (3 tools, ecosystem standardization)
+
+**Next:** Phase 7 (if continuing) or transition to production work.
 
 
 ## Current Learning Phase
@@ -80,9 +88,13 @@ See `docs/iterations/09-food-diary/SUMMARY.md` for retrospective.
 - **Iteration docs:** `docs/iterations/14-meal-recommendation-workflow/`
 - **Retrospective:** `docs/learning/03_phase_retrospectives/phase_5_retro.md`
 
-**Phase 6** 🚀 STARTING (Week 9, June 13+ 2026): MCP Servers & Claude-as-a-Tool
+**Phase 6** ✅ COMPLETE (June 13, 2026): MCP Servers & Claude-as-a-Tool
 - Focus: Expose NomNom patterns to Claude via MCP server design
-- Goal: NomNom accessible from any Claude context, API-first orchestration
+- **Outcome:** Built functional MCP server with 3 tools (recommend_meal, analyze_food_image, lookup_nutrition), integrated with Claude Code ecosystem, studied Claude internals as industrial reference
+- **Key metrics:** Layer 7 (Architecture & Standardization) → 4.5/5 (NEW), Layer 3 (Augmentation) → 4.7/5, overall 4.6→4.7/5, production confidence 9/10
+- **Iteration docs:** `docs/iterations/16-mcp-server/`
+- **Retrospective:** `docs/learning/03_phase_retrospectives/phase_6_retro.md`
+- **Capability snapshot:** `docs/learning/01_capability_profile/Iona_Capability_Profile_phase6_20260613.md`
 
 
 ## Key Docs
@@ -110,9 +122,11 @@ Development rules live in `.claude/rules/`:
 
 
 
-## Learning-Aware AI Behavior (Phase 0-6, May–July 2026)
+## Learning Journey Context (Completed May 12–June 13, 2026)
 
-During the 10-week learning journey, AI assistance behavior should adapt by code location:
+**Note:** The 10-week LLM Harnessing learning journey is now complete. Iona has achieved 4.7/5 overall capability across 7 layers and is ready for senior LLM engineer roles. This section documents how AI assistance was tailored during the active learning phases (0–6).
+
+During the learning journey, AI assistance behavior was adapted by code location:
 
 ### `NomNom-Backend/src/llm/` and `learning_lab/`
 
