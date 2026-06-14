@@ -43,7 +43,12 @@ struct SettingsView: View {
                             Spacer()
                             TextField("Age", value: Binding(
                                 get: { profile.age ?? 0 },
-                                set: { viewModel.profile?.age = $0 }
+                                set: {
+                                    viewModel.profile?.age = $0
+                                    Task {
+                                        await viewModel.updateMacroTargets()
+                                    }
+                                }
                             ), format: .number)
                             .frame(width: 60)
                             .keyboardType(.numberPad)
@@ -55,7 +60,12 @@ struct SettingsView: View {
                             Spacer()
                             TextField("Height", value: Binding(
                                 get: { profile.heightCm ?? 0 },
-                                set: { viewModel.profile?.heightCm = $0 }
+                                set: {
+                                    viewModel.profile?.heightCm = $0
+                                    Task {
+                                        await viewModel.updateMacroTargets()
+                                    }
+                                }
                             ), format: .number)
                             .frame(width: 80)
                             .keyboardType(.decimalPad)
@@ -67,7 +77,12 @@ struct SettingsView: View {
                             Spacer()
                             TextField("Weight", value: Binding(
                                 get: { profile.weightKg ?? 0 },
-                                set: { viewModel.profile?.weightKg = $0 }
+                                set: {
+                                    viewModel.profile?.weightKg = $0
+                                    Task {
+                                        await viewModel.updateMacroTargets()
+                                    }
+                                }
                             ), format: .number)
                             .frame(width: 80)
                             .keyboardType(.decimalPad)
