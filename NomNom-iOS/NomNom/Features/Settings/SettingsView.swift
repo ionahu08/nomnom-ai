@@ -11,6 +11,95 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                // Health Profile Section
+                Section("Health Profile") {
+                    if let profile = viewModel.profile {
+                        HStack {
+                            Text("Goal")
+                            Spacer()
+                            Picker("", selection: Binding(
+                                get: { profile.goal ?? "maintain" },
+                                set: { viewModel.profile?.goal = $0 }
+                            )) {
+                                Text("Maintain Weight").tag("maintain")
+                                Text("Lose Weight").tag("lose_weight")
+                                Text("Gain Muscle").tag("gain_muscle")
+                                Text("Shape Figure").tag("shape_figure")
+                            }
+                            .pickerStyle(.segmented)
+                        }
+
+                        HStack {
+                            Text("Age")
+                            Spacer()
+                            TextField("Age", value: Binding(
+                                get: { profile.age ?? 0 },
+                                set: { viewModel.profile?.age = $0 }
+                            ), format: .number)
+                            .frame(width: 60)
+                            .keyboardType(.numberPad)
+                            .textFieldStyle(.roundedBorder)
+                        }
+
+                        HStack {
+                            Text("Race")
+                            Spacer()
+                            TextField("Optional", text: Binding(
+                                get: { profile.race ?? "" },
+                                set: { viewModel.profile?.race = $0.isEmpty ? nil : $0 }
+                            ))
+                            .textFieldStyle(.roundedBorder)
+                        }
+
+                        HStack {
+                            Text("Height (cm)")
+                            Spacer()
+                            TextField("Height", value: Binding(
+                                get: { profile.heightCm ?? 0 },
+                                set: { viewModel.profile?.heightCm = $0 }
+                            ), format: .number)
+                            .frame(width: 80)
+                            .keyboardType(.decimalPad)
+                            .textFieldStyle(.roundedBorder)
+                        }
+
+                        HStack {
+                            Text("Weight (kg)")
+                            Spacer()
+                            TextField("Weight", value: Binding(
+                                get: { profile.weightKg ?? 0 },
+                                set: { viewModel.profile?.weightKg = $0 }
+                            ), format: .number)
+                            .frame(width: 80)
+                            .keyboardType(.decimalPad)
+                            .textFieldStyle(.roundedBorder)
+                        }
+                    } else if viewModel.isLoading {
+                        ProgressView()
+                    }
+                }
+
+                // Medical Information Section
+                Section("Medical Information (Optional)") {
+                    if let profile = viewModel.profile {
+                        NavigationLink(destination: MedicalInfoView(profile: Binding(
+                            get: { profile },
+                            set: { viewModel.profile = $0 }
+                        ))) {
+                            HStack {
+                                Text("Allergies & Conditions")
+                                Spacer()
+                                if !(profile.allergies?.isEmpty ?? true) || !(profile.medicalConditions?.isEmpty ?? true) {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(.green)
+                                }
+                                Image(systemName: "chevron.right")
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                    }
+                }
+
                 // Cat Style Section
                 Section("Cat Style") {
                     if let profile = viewModel.profile {
