@@ -30,14 +30,20 @@ iOS App (SwiftUI) ──▶ NomNom-Backend (FastAPI) ──▶ PostgreSQL + pgve
 
 ## Current Iteration
 
-**Iteration 18: Enhanced Food Diary Visualization** — 🚀 STARTING (June 14, 2026)
-See `docs/iterations/18-food-diary-visualization/` for plan and phases.
+**Iteration 18: Enhanced Food Diary Visualization** — 🔄 IN PROGRESS (June 14, 2026)
+See `docs/iterations/18-food-diary-visualization/` for plan, phases, and summary.
 
-**Goal:** Replace plain text nutrition displays with modern visual progress indicators (circular progress for calories, horizontal bars for macros) on Food Diary.
+**Status:** Phases 1-3 ✅ Complete, Phase 4 🚧 Ready for Device Testing
 
-**Scope:**
-- iOS: ProgressCircle component, NutritionProgressBar components, integration with Food Diary
-- Duration: 4 days
+**What's Built:**
+- ProgressCircle component: Circular progress for daily calorie tracking
+- NutritionProgressBar component: Horizontal bars for protein/carbs/fat
+- DiaryView integration: Visual summary replaces plain text
+- DiaryViewModel updates: Target loading from ProfileService
+- Build verified: Compiles without errors
+- Edge cases handled: Zero targets, >100% consumption, animations
+
+**Next Step:** Device testing to verify visual appearance and real-time updates work correctly
 
 ---
 
