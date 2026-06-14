@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MedicalInfoView: View {
-    @Binding var profile: UserProfile
+    @ObservedObject var viewModel: SettingsViewModel
     @Environment(\.dismiss) var dismiss
 
     @State private var newAllergy = ""
@@ -10,17 +10,16 @@ struct MedicalInfoView: View {
     @State private var newMedication = ""
 
     var body: some View {
-        NavigationStack {
-            Form {
+        Form {
                 // MARK: - Allergies
                 Section("Allergies") {
-                    if let allergies = profile.allergies, !allergies.isEmpty {
+                    if let allergies = viewModel.profile?.allergies, !allergies.isEmpty {
                         ForEach(allergies, id: \.self) { allergy in
                             HStack {
                                 Text(allergy)
                                 Spacer()
                                 Button(action: {
-                                    profile.allergies?.removeAll { $0 == allergy }
+                                    viewModel.profile?.allergies?.removeAll { $0 == allergy }
                                 }) {
                                     Image(systemName: "xmark.circle.fill")
                                         .foregroundColor(.red)
@@ -41,13 +40,13 @@ struct MedicalInfoView: View {
 
                 // MARK: - Medical Conditions
                 Section("Medical Conditions") {
-                    if let conditions = profile.medicalConditions, !conditions.isEmpty {
+                    if let conditions = viewModel.profile?.medicalConditions, !conditions.isEmpty {
                         ForEach(conditions, id: \.self) { condition in
                             HStack {
                                 Text(condition)
                                 Spacer()
                                 Button(action: {
-                                    profile.medicalConditions?.removeAll { $0 == condition }
+                                    viewModel.profile?.medicalConditions?.removeAll { $0 == condition }
                                 }) {
                                     Image(systemName: "xmark.circle.fill")
                                         .foregroundColor(.red)
@@ -68,13 +67,13 @@ struct MedicalInfoView: View {
 
                 // MARK: - Surgeries
                 Section("Past Surgeries") {
-                    if let surgeries = profile.surgeries, !surgeries.isEmpty {
+                    if let surgeries = viewModel.profile?.surgeries, !surgeries.isEmpty {
                         ForEach(surgeries, id: \.self) { surgery in
                             HStack {
                                 Text(surgery)
                                 Spacer()
                                 Button(action: {
-                                    profile.surgeries?.removeAll { $0 == surgery }
+                                    viewModel.profile?.surgeries?.removeAll { $0 == surgery }
                                 }) {
                                     Image(systemName: "xmark.circle.fill")
                                         .foregroundColor(.red)
@@ -95,13 +94,13 @@ struct MedicalInfoView: View {
 
                 // MARK: - Medications
                 Section("Current Medications") {
-                    if let medications = profile.medications, !medications.isEmpty {
+                    if let medications = viewModel.profile?.medications, !medications.isEmpty {
                         ForEach(medications, id: \.self) { medication in
                             HStack {
                                 Text(medication)
                                 Spacer()
                                 Button(action: {
-                                    profile.medications?.removeAll { $0 == medication }
+                                    viewModel.profile?.medications?.removeAll { $0 == medication }
                                 }) {
                                     Image(systemName: "xmark.circle.fill")
                                         .foregroundColor(.red)
@@ -135,16 +134,15 @@ struct MedicalInfoView: View {
                     }
                 }
             }
-        }
     }
 
     private func addAllergy() {
         let trimmed = newAllergy.trimmingCharacters(in: .whitespaces)
         if !trimmed.isEmpty {
-            if profile.allergies == nil {
-                profile.allergies = []
+            if viewModel.profile?.allergies == nil {
+                viewModel.profile?.allergies = []
             }
-            profile.allergies?.append(trimmed)
+            viewModel.profile?.allergies?.append(trimmed)
             newAllergy = ""
         }
     }
@@ -152,10 +150,10 @@ struct MedicalInfoView: View {
     private func addCondition() {
         let trimmed = newCondition.trimmingCharacters(in: .whitespaces)
         if !trimmed.isEmpty {
-            if profile.medicalConditions == nil {
-                profile.medicalConditions = []
+            if viewModel.profile?.medicalConditions == nil {
+                viewModel.profile?.medicalConditions = []
             }
-            profile.medicalConditions?.append(trimmed)
+            viewModel.profile?.medicalConditions?.append(trimmed)
             newCondition = ""
         }
     }
@@ -163,10 +161,10 @@ struct MedicalInfoView: View {
     private func addSurgery() {
         let trimmed = newSurgery.trimmingCharacters(in: .whitespaces)
         if !trimmed.isEmpty {
-            if profile.surgeries == nil {
-                profile.surgeries = []
+            if viewModel.profile?.surgeries == nil {
+                viewModel.profile?.surgeries = []
             }
-            profile.surgeries?.append(trimmed)
+            viewModel.profile?.surgeries?.append(trimmed)
             newSurgery = ""
         }
     }
@@ -174,18 +172,20 @@ struct MedicalInfoView: View {
     private func addMedication() {
         let trimmed = newMedication.trimmingCharacters(in: .whitespaces)
         if !trimmed.isEmpty {
-            if profile.medications == nil {
-                profile.medications = []
+            if viewModel.profile?.medications == nil {
+                viewModel.profile?.medications = []
             }
-            profile.medications?.append(trimmed)
+            viewModel.profile?.medications?.append(trimmed)
             newMedication = ""
         }
     }
 }
 
 #Preview {
-    MedicalInfoView(profile: .constant(UserProfile(
+    let mockViewModel = SettingsViewModel(authService: AuthService())
+    mockViewModel.profile = UserProfile(
         allergies: ["Peanuts", "Shellfish"],
         medicalConditions: ["Pre-diabetes"]
-    )))
+    )
+    return MedicalInfoView(viewModel: mockViewModel)
 }

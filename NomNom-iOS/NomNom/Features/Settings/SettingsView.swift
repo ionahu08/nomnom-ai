@@ -81,15 +81,12 @@ struct SettingsView: View {
 
                 // Medical Information Section
                 Section("Medical Information (Optional)") {
-                    if let profile = viewModel.profile {
-                        NavigationLink(destination: MedicalInfoView(profile: Binding(
-                            get: { profile },
-                            set: { viewModel.profile = $0 }
-                        ))) {
+                    if viewModel.profile != nil {
+                        NavigationLink(destination: MedicalInfoView(viewModel: viewModel)) {
                             HStack {
                                 Text("Allergies & Conditions")
                                 Spacer()
-                                if !(profile.allergies?.isEmpty ?? true) || !(profile.medicalConditions?.isEmpty ?? true) {
+                                if !(viewModel.profile?.allergies?.isEmpty ?? true) || !(viewModel.profile?.medicalConditions?.isEmpty ?? true) {
                                     Image(systemName: "checkmark.circle.fill")
                                         .foregroundColor(.green)
                                 }
@@ -194,7 +191,7 @@ struct SettingsView: View {
                         authService.logout()
                     } label: {
                         HStack {
-                            Image(systemName: "arrowtriangleright.turn.counterclockwise")
+                            Image(systemName: "arrow.backward.circle")
                             Text("Logout")
                                 .frame(maxWidth: .infinity, alignment: .center)
                         }
