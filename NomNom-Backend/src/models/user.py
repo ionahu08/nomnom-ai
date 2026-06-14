@@ -28,9 +28,11 @@ class UserProfile(Base):
     # Body stats
     age: Mapped[int] = mapped_column(Integer)
     gender: Mapped[str] = mapped_column(String(20))
+    race: Mapped[str | None] = mapped_column(String(50), nullable=True)
     height_cm: Mapped[float] = mapped_column(Float)
     weight_kg: Mapped[float] = mapped_column(Float)
     activity_level: Mapped[str] = mapped_column(String(20))
+    goal: Mapped[str | None] = mapped_column(String(20), nullable=True)
 
     # Cat personality
     cat_style: Mapped[str] = mapped_column(String(50), default="sassy")
@@ -39,6 +41,11 @@ class UserProfile(Base):
     allergies: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     dietary_restrictions: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     cuisine_preferences: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+
+    # Medical info (stored as JSON lists)
+    medical_conditions: Mapped[dict | None] = mapped_column(JSON, nullable=True, default={})
+    surgeries: Mapped[dict | None] = mapped_column(JSON, nullable=True, default={})
+    medications: Mapped[dict | None] = mapped_column(JSON, nullable=True, default={})
 
     # Daily targets (nullable = auto-calculated from TDEE)
     calorie_target: Mapped[int | None] = mapped_column(Integer, nullable=True)

@@ -17,11 +17,29 @@ def calculate_tdee(age: int, gender: str, height_cm: float, weight_kg: float, ac
     return round(bmr * multiplier)
 
 
-def calculate_macro_targets(tdee: int) -> MacroTargets:
-    """Split TDEE into protein, carbs, and fat gram targets."""
-    protein_cals = tdee * DEFAULT_MACRO_SPLIT["protein"]
-    carb_cals = tdee * DEFAULT_MACRO_SPLIT["carbs"]
-    fat_cals = tdee * DEFAULT_MACRO_SPLIT["fat"]
+def calculate_macro_targets(tdee: int, goal: str | None = None, weight_kg: float | None = None) -> MacroTargets:
+    """Split TDEE into protein, carbs, and fat gram targets based on fitness goal."""
+    # Goal-based macro splits
+    goal_splits = {
+        "lose_weight": {"protein": 0.30, "carbs": 0.40, "fat": 0.30},
+        "maintain": {"protein": 0.25, "carbs": 0.50, "fat": 0.25},
+        "gain_muscle": {"protein": 0.35, "carbs": 0.45, "fat": 0.20},
+        "shape_figure": {"protein": 0.35, "carbs": 0.40, "fat": 0.25},
+    }
+
+    # Also adjust TDEE based on goal
+    if goal == "lose_weight" and weight_kg:
+        tdee = round(tdee * 0.85)  # 500 kcal deficit
+    elif goal == "gain_muscle" and weight_kg:
+        tdee = round(tdee * 1.1)   # 250 kcal surplus
+    elif goal == "shape_figure" and weight_kg:
+        tdee = round(tdee * 0.95)  # 250 kcal deficit
+
+    macro_split = goal_splits.get(goal or "maintain", DEFAULT_MACRO_SPLIT)
+
+    protein_cals = tdee * macro_split["protein"]
+    carb_cals = tdee * macro_split["carbs"]
+    fat_cals = tdee * macro_split["fat"]
 
     return MacroTargets(
         calorie_target=tdee,
@@ -32,11 +50,11 @@ def calculate_macro_targets(tdee: int) -> MacroTargets:
 
 
 def get_effective_targets(profile: UserProfile) -> MacroTargets:
-    """Get macro targets: use user overrides if set, otherwise calculate from TDEE."""
+    """Get macro targets: use user overrides if set, otherwise calculate from TDEE with goal adjustment."""
     tdee = calculate_tdee(
         profile.age, profile.gender, profile.height_cm, profile.weight_kg, profile.activity_level
     )
-    calculated = calculate_macro_targets(tdee)
+    calculated = calculate_macro_targets(tdee, goal=profile.goal, weight_kg=profile.weight_kg)
 
     return MacroTargets(
         calorie_target=profile.calorie_target or calculated.calorie_target,

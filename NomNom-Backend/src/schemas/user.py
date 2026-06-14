@@ -7,10 +7,15 @@ class ProfileCreate(BaseModel):
     height_cm: float
     weight_kg: float
     activity_level: str
+    goal: str | None = None  # lose_weight, maintain, gain_muscle, shape_figure
+    race: str | None = None
     cat_style: str = "sassy"
     allergies: list[str] | None = None
     dietary_restrictions: list[str] | None = None
     cuisine_preferences: list[str] | None = None
+    medical_conditions: list[str] | None = None
+    surgeries: list[str] | None = None
+    medications: list[str] | None = None
 
 
 class ProfileUpdate(BaseModel):
@@ -19,10 +24,15 @@ class ProfileUpdate(BaseModel):
     height_cm: float | None = None
     weight_kg: float | None = None
     activity_level: str | None = None
+    goal: str | None = None
+    race: str | None = None
     cat_style: str | None = None
     allergies: list[str] | None = None
     dietary_restrictions: list[str] | None = None
     cuisine_preferences: list[str] | None = None
+    medical_conditions: list[str] | None = None
+    surgeries: list[str] | None = None
+    medications: list[str] | None = None
     calorie_target: int | None = None
     protein_target: int | None = None
     carb_target: int | None = None
@@ -42,13 +52,18 @@ class ProfileResponse(BaseModel):
     user_id: int
     age: int
     gender: str
+    race: str | None
     height_cm: float
     weight_kg: float
     activity_level: str
+    goal: str | None
     cat_style: str
     allergies: list[str] | None
     dietary_restrictions: list[str] | None
     cuisine_preferences: list[str] | None
+    medical_conditions: list[str] | None
+    surgeries: list[str] | None
+    medications: list[str] | None
     calorie_target: int | None
     protein_target: int | None
     carb_target: int | None
