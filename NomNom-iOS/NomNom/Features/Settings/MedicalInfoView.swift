@@ -181,11 +181,5 @@ struct MedicalInfoView: View {
     }
 }
 
-#Preview {
-    let mockViewModel = SettingsViewModel(authService: AuthService())
-    mockViewModel.profile = UserProfile(
-        allergies: ["Peanuts", "Shellfish"],
-        medicalConditions: ["Pre-diabetes"]
-    )
-    return MedicalInfoView(viewModel: mockViewModel)
-}
+// Preview removed - requires full app context to initialize
+// Test in Xcode by building and navigating to Settings > Medical Information
