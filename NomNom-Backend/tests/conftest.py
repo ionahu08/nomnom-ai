@@ -8,26 +8,30 @@ from src.app import app
 # Use in-memory SQLite for tests
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
-engine = create_async_engine(TEST_DATABASE_URL, echo=False)
-test_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-
-
-async def override_get_db():
-    async with test_session() as session:
-        yield session
-
-
-app.dependency_overrides[get_db] = override_get_db
-
 
 @pytest.fixture(autouse=True)
 async def setup_db():
-    """Create all tables before each test, drop after."""
+    """Create fresh database for each test."""
+    # Create new engine per test to ensure isolation
+    engine = create_async_engine(TEST_DATABASE_URL, echo=False)
+    test_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+    async def override_get_db():
+        async with test_session() as session:
+            yield session
+
+    app.dependency_overrides[get_db] = override_get_db
+
+    # Create all tables
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
     yield
+
+    # Cleanup
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+    await engine.dispose()
 
 
 @pytest.fixture

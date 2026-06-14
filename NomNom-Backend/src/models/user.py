@@ -37,14 +37,14 @@ class UserProfile(Base):
     cat_style: Mapped[str] = mapped_column(String(50), default="sassy")
 
     # Dietary info (stored as JSON lists)
-    allergies: Mapped[dict | None] = mapped_column(JSON, nullable=True)
-    dietary_restrictions: Mapped[dict | None] = mapped_column(JSON, nullable=True)
-    cuisine_preferences: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    allergies: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    dietary_restrictions: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    cuisine_preferences: Mapped[list | None] = mapped_column(JSON, nullable=True)
 
     # Medical info (stored as JSON lists)
-    medical_conditions: Mapped[dict | None] = mapped_column(JSON, nullable=True, default={})
-    surgeries: Mapped[dict | None] = mapped_column(JSON, nullable=True, default={})
-    medications: Mapped[dict | None] = mapped_column(JSON, nullable=True, default={})
+    medical_conditions: Mapped[list | None] = mapped_column(JSON, nullable=True, default=None)
+    surgeries: Mapped[list | None] = mapped_column(JSON, nullable=True, default=None)
+    medications: Mapped[list | None] = mapped_column(JSON, nullable=True, default=None)
 
     # Daily targets (nullable = auto-calculated from TDEE)
     calorie_target: Mapped[int | None] = mapped_column(Integer, nullable=True)
