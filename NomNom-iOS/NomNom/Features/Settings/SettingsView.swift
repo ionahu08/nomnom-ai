@@ -45,16 +45,6 @@ struct SettingsView: View {
                         }
 
                         HStack {
-                            Text("Race")
-                            Spacer()
-                            TextField("Optional", text: Binding(
-                                get: { profile.race ?? "" },
-                                set: { viewModel.profile?.race = $0.isEmpty ? nil : $0 }
-                            ))
-                            .textFieldStyle(.roundedBorder)
-                        }
-
-                        HStack {
                             Text("Height (cm)")
                             Spacer()
                             TextField("Height", value: Binding(
@@ -84,6 +74,8 @@ struct SettingsView: View {
 
                 // Medical Information Section - Allergies
                 Section("Allergies") {
+                    let commonAllergies = ["Peanuts", "Tree Nuts", "Shellfish", "Fish", "Milk", "Eggs", "Wheat", "Soy", "Sesame", "Mustard"]
+
                     if let allergies = viewModel.profile?.allergies, !allergies.isEmpty {
                         ForEach(allergies, id: \.self) { allergy in
                             HStack {
@@ -98,18 +90,24 @@ struct SettingsView: View {
                             }
                         }
                     }
-                    HStack {
-                        TextField("Add allergy...", text: $newAllergy)
-                        Button(action: addAllergy) {
-                            Image(systemName: "plus.circle.fill")
-                                .foregroundColor(.blue)
+
+                    Picker("Add allergy", selection: $newAllergy) {
+                        Text("Select allergy").tag("")
+                        ForEach(commonAllergies, id: \.self) { allergy in
+                            Text(allergy).tag(allergy)
                         }
-                        .disabled(newAllergy.trimmingCharacters(in: .whitespaces).isEmpty)
+                    }
+                    .onChange(of: newAllergy) { oldValue, newValue in
+                        if !newValue.isEmpty {
+                            addAllergy()
+                        }
                     }
                 }
 
                 // Medical Information Section - Conditions
                 Section("Medical Conditions") {
+                    let commonConditions = ["Diabetes", "Hypertension", "Heart Disease", "Asthma", "COPD", "Arthritis", "Thyroid Disease", "Kidney Disease", "Liver Disease", "Cancer"]
+
                     if let conditions = viewModel.profile?.medicalConditions, !conditions.isEmpty {
                         ForEach(conditions, id: \.self) { condition in
                             HStack {
@@ -124,13 +122,17 @@ struct SettingsView: View {
                             }
                         }
                     }
-                    HStack {
-                        TextField("Add condition...", text: $newCondition)
-                        Button(action: addCondition) {
-                            Image(systemName: "plus.circle.fill")
-                                .foregroundColor(.blue)
+
+                    Picker("Add condition", selection: $newCondition) {
+                        Text("Select condition").tag("")
+                        ForEach(commonConditions, id: \.self) { condition in
+                            Text(condition).tag(condition)
                         }
-                        .disabled(newCondition.trimmingCharacters(in: .whitespaces).isEmpty)
+                    }
+                    .onChange(of: newCondition) { oldValue, newValue in
+                        if !newValue.isEmpty {
+                            addCondition()
+                        }
                     }
                 }
 

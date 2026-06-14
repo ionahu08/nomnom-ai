@@ -28,7 +28,6 @@ class UserProfile(Base):
     # Body stats
     age: Mapped[int] = mapped_column(Integer)
     gender: Mapped[str] = mapped_column(String(20))
-    race: Mapped[str | None] = mapped_column(String(50), nullable=True)
     height_cm: Mapped[float] = mapped_column(Float)
     weight_kg: Mapped[float] = mapped_column(Float)
     activity_level: Mapped[str] = mapped_column(String(20))

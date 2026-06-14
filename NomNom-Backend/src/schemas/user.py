@@ -8,7 +8,6 @@ class ProfileCreate(BaseModel):
     weight_kg: float
     activity_level: str
     goal: str | None = None  # lose_weight, maintain, gain_muscle, shape_figure
-    race: str | None = None
     cat_style: str = "sassy"
     allergies: list[str] | None = None
     dietary_restrictions: list[str] | None = None
@@ -25,7 +24,6 @@ class ProfileUpdate(BaseModel):
     weight_kg: float | None = None
     activity_level: str | None = None
     goal: str | None = None
-    race: str | None = None
     cat_style: str | None = None
     allergies: list[str] | None = None
     dietary_restrictions: list[str] | None = None
@@ -52,7 +50,6 @@ class ProfileResponse(BaseModel):
     user_id: int
     age: int
     gender: str
-    race: str | None
     height_cm: float
     weight_kg: float
     activity_level: str

@@ -23,7 +23,6 @@ class ProfileService {
         return UserProfile(
             age: 25,
             gender: "other",
-            race: nil,
             heightCm: 170,
             weightKg: 70,
             activityLevel: "moderate",

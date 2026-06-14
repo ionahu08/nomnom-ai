@@ -3,7 +3,6 @@ import Foundation
 struct UserProfile: Codable {
     var age: Int?
     var gender: String?
-    var race: String?
     var heightCm: Double?
     var weightKg: Double?
     var activityLevel: String?
@@ -23,7 +22,6 @@ struct UserProfile: Codable {
     enum CodingKeys: String, CodingKey {
         case age
         case gender
-        case race
         case heightCm = "height_cm"
         case weightKg = "weight_kg"
         case activityLevel = "activity_level"
