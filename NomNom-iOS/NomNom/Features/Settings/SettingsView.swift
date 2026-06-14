@@ -8,6 +8,9 @@ struct SettingsView: View {
     @State private var newCondition = ""
     @State private var customAllergy = ""
     @State private var customCondition = ""
+    @State private var selectedYear = Calendar.current.component(.year, from: Date())
+    @State private var selectedMonth = Calendar.current.component(.month, from: Date())
+    @State private var selectedDay = Calendar.current.component(.day, from: Date())
 
     init() {
         _viewModel = StateObject(wrappedValue: SettingsViewModel(authService: AuthService()))
@@ -50,28 +53,46 @@ struct SettingsView: View {
                                 }
                             }
 
-                            DatePicker(
-                                "Select birth date",
-                                selection: Binding(
-                                    get: {
-                                        if let age = profile.age {
-                                            let calendar = Calendar.current
-                                            let birthDate = calendar.date(byAdding: .year, value: -age, to: Date())!
-                                            return birthDate
-                                        }
-                                        return Date()
-                                    },
-                                    set: { newDate in
-                                        let age = Calendar.current.dateComponents([.year], from: newDate, to: Date()).year ?? 0
-                                        viewModel.profile?.age = max(1, age)
-                                        Task {
-                                            await viewModel.updateMacroTargets()
-                                        }
+                            HStack(spacing: 8) {
+                                Picker("Year", selection: Binding(
+                                    get: { selectedYear },
+                                    set: { newYear in
+                                        selectedYear = newYear
+                                        updateAgeFromDatePickers()
                                     }
-                                ),
-                                displayedComponents: .date
-                            )
-                            .labelsHidden()
+                                )) {
+                                    ForEach((1920...Calendar.current.component(.year, from: Date())), id: \.self) { year in
+                                        Text(String(year)).tag(year)
+                                    }
+                                }
+                                .frame(maxWidth: .infinity)
+
+                                Picker("Month", selection: Binding(
+                                    get: { selectedMonth },
+                                    set: { newMonth in
+                                        selectedMonth = newMonth
+                                        updateAgeFromDatePickers()
+                                    }
+                                )) {
+                                    ForEach(1...12, id: \.self) { month in
+                                        Text(String(format: "%02d", month)).tag(month)
+                                    }
+                                }
+                                .frame(maxWidth: .infinity)
+
+                                Picker("Day", selection: Binding(
+                                    get: { selectedDay },
+                                    set: { newDay in
+                                        selectedDay = newDay
+                                        updateAgeFromDatePickers()
+                                    }
+                                )) {
+                                    ForEach(1...31, id: \.self) { day in
+                                        Text(String(format: "%02d", day)).tag(day)
+                                    }
+                                }
+                                .frame(maxWidth: .infinity)
+                            }
                         }
 
                         HStack {
@@ -327,6 +348,28 @@ struct SettingsView: View {
             .task {
                 viewModel.setAuthService(authService)
                 await viewModel.loadProfile()
+                // Initialize date pickers from profile age
+                if let age = viewModel.profile?.age {
+                    let birthDate = Calendar.current.date(byAdding: .year, value: -age, to: Date())!
+                    selectedYear = Calendar.current.component(.year, from: birthDate)
+                    selectedMonth = Calendar.current.component(.month, from: birthDate)
+                    selectedDay = Calendar.current.component(.day, from: birthDate)
+                }
+            }
+        }
+    }
+
+    private func updateAgeFromDatePickers() {
+        var dateComponents = DateComponents()
+        dateComponents.year = selectedYear
+        dateComponents.month = selectedMonth
+        dateComponents.day = selectedDay
+
+        if let birthDate = Calendar.current.date(from: dateComponents) {
+            let age = Calendar.current.dateComponents([.year], from: birthDate, to: Date()).year ?? 0
+            viewModel.profile?.age = max(1, age)
+            Task {
+                await viewModel.updateMacroTargets()
             }
         }
     }
