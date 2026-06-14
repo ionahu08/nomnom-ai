@@ -16,6 +16,7 @@ router = APIRouter(prefix="/api/v1/profile", tags=["profile"])
 
 
 @router.post("/", response_model=ProfileResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=ProfileResponse, status_code=status.HTTP_201_CREATED)
 async def create_user_profile(
     data: ProfileCreate,
     current_user: User = Depends(get_current_user),
@@ -93,6 +94,7 @@ async def get_user_profile(
 
 
 @router.patch("/", response_model=ProfileResponse)
+@router.patch("", response_model=ProfileResponse)
 async def update_user_profile(
     data: ProfileUpdate,
     current_user: User = Depends(get_current_user),
