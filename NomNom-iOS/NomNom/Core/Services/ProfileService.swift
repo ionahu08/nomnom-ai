@@ -16,6 +16,9 @@ class ProfileService {
             return try await api.patch(path: "/api/v1/profile", body: profile)
         } catch APIError.serverError(404) {
             return try await api.post(path: "/api/v1/profile", body: profile)
+        } catch let error as APIError {
+            print("ProfileService.updateProfile error: \(error)")
+            throw error
         }
     }
 

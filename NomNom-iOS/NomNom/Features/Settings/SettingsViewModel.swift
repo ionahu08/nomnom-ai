@@ -121,12 +121,15 @@ class SettingsViewModel: ObservableObject {
         await updateMacroTargets()
 
         do {
+            print("SettingsViewModel: Attempting to save profile with authService token set")
             self.profile = try await profileService.updateProfile(profile)
+            print("SettingsViewModel: Profile saved successfully")
             savedSuccessfully = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 self.savedSuccessfully = false
             }
         } catch {
+            print("SettingsViewModel: Failed to save profile: \(error)")
             errorMessage = "Failed to save profile: \(error.localizedDescription)"
         }
     }
