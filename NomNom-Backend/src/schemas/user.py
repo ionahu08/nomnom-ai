@@ -7,7 +7,7 @@ class ProfileCreate(BaseModel):
     height_cm: float
     weight_kg: float
     activity_level: str
-    goal: str | None = None  # lose_weight, maintain, gain_muscle, shape_figure
+    goal: str | None = None  # maintain, lean_out, gain_muscle, lose_weight
     cat_style: str = "sassy"
     allergies: list[str] | None = None
     dietary_restrictions: list[str] | None = None

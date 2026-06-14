@@ -18,10 +18,10 @@ struct SettingsView: View {
                 Section("Health Profile") {
                     if let profile = viewModel.profile {
                         let goals = [
-                            ("maintain", "Maintain Weight"),
-                            ("lose_weight", "Lose Weight"),
+                            ("maintain", "Maintain"),
+                            ("lean_out", "Lean Out"),
                             ("gain_muscle", "Gain Muscle"),
-                            ("shape_figure", "Shape Figure")
+                            ("lose_weight", "Lose Weight")
                         ]
 
                         Picker("Goal", selection: Binding(
@@ -39,20 +39,30 @@ struct SettingsView: View {
                         }
 
                         HStack {
-                            Text("Age")
+                            Text("Birth Date")
                             Spacer()
-                            TextField("Age", value: Binding(
-                                get: { profile.age ?? 0 },
-                                set: {
-                                    viewModel.profile?.age = $0
-                                    Task {
-                                        await viewModel.updateMacroTargets()
+                            DatePicker(
+                                "Birth Date",
+                                selection: Binding(
+                                    get: {
+                                        if let age = profile.age {
+                                            let calendar = Calendar.current
+                                            let birthDate = calendar.date(byAdding: .year, value: -age, to: Date())!
+                                            return birthDate
+                                        }
+                                        return Date()
+                                    },
+                                    set: { newDate in
+                                        let age = Calendar.current.dateComponents([.year], from: newDate, to: Date()).year ?? 0
+                                        viewModel.profile?.age = max(1, age)
+                                        Task {
+                                            await viewModel.updateMacroTargets()
+                                        }
                                     }
-                                }
-                            ), format: .number)
-                            .frame(width: 60)
-                            .keyboardType(.numberPad)
-                            .textFieldStyle(.roundedBorder)
+                                ),
+                                displayedComponents: .date
+                            )
+                            .labelsHidden()
                         }
 
                         HStack {
@@ -95,7 +105,7 @@ struct SettingsView: View {
 
                 // Medical Information Section - Allergies
                 Section("Allergies") {
-                    let commonAllergies = ["Peanuts", "Tree Nuts", "Shellfish", "Fish", "Milk", "Eggs", "Wheat", "Soy", "Sesame", "Mustard"]
+                    let commonAllergies = ["Peanuts", "Tree Nuts", "Shellfish", "Fish", "Milk", "Eggs", "Wheat", "Soy", "Sesame", "Mustard", "Other"]
 
                     if let allergies = viewModel.profile?.allergies, !allergies.isEmpty {
                         ForEach(allergies, id: \.self) { allergy in
@@ -119,15 +129,32 @@ struct SettingsView: View {
                         }
                     }
                     .onChange(of: newAllergy) { newValue in
-                        if !newValue.isEmpty {
+                        if newValue == "Other" {
+                            // Show custom input
+                        } else if !newValue.isEmpty {
                             addAllergy()
+                        }
+                    }
+
+                    if newAllergy == "Other" {
+                        HStack {
+                            TextField("Enter custom allergy", text: Binding(
+                                get: { "" },
+                                set: { text in
+                                    if !text.isEmpty {
+                                        addAllergy(custom: text)
+                                        newAllergy = ""
+                                    }
+                                }
+                            ))
+                            .textFieldStyle(.roundedBorder)
                         }
                     }
                 }
 
                 // Medical Information Section - Conditions
                 Section("Medical Conditions") {
-                    let commonConditions = ["Diabetes", "Hypertension", "Heart Disease", "Asthma", "COPD", "Arthritis", "Thyroid Disease", "Kidney Disease", "Liver Disease", "Cancer"]
+                    let commonConditions = ["Diabetes", "Hypertension", "Heart Disease", "Asthma", "COPD", "Arthritis", "Thyroid Disease", "Kidney Disease", "Liver Disease", "Cancer", "Other"]
 
                     if let conditions = viewModel.profile?.medicalConditions, !conditions.isEmpty {
                         ForEach(conditions, id: \.self) { condition in
@@ -151,8 +178,25 @@ struct SettingsView: View {
                         }
                     }
                     .onChange(of: newCondition) { newValue in
-                        if !newValue.isEmpty {
+                        if newValue == "Other" {
+                            // Show custom input
+                        } else if !newValue.isEmpty {
                             addCondition()
+                        }
+                    }
+
+                    if newCondition == "Other" {
+                        HStack {
+                            TextField("Enter custom condition", text: Binding(
+                                get: { "" },
+                                set: { text in
+                                    if !text.isEmpty {
+                                        addCondition(custom: text)
+                                        newCondition = ""
+                                    }
+                                }
+                            ))
+                            .textFieldStyle(.roundedBorder)
                         }
                     }
                 }
@@ -276,8 +320,9 @@ struct SettingsView: View {
         }
     }
 
-    private func addAllergy() {
-        let trimmed = newAllergy.trimmingCharacters(in: .whitespaces)
+    private func addAllergy(custom: String? = nil) {
+        let value = custom ?? newAllergy
+        let trimmed = value.trimmingCharacters(in: .whitespaces)
         if !trimmed.isEmpty {
             if viewModel.profile?.allergies == nil {
                 viewModel.profile?.allergies = []
@@ -287,8 +332,9 @@ struct SettingsView: View {
         }
     }
 
-    private func addCondition() {
-        let trimmed = newCondition.trimmingCharacters(in: .whitespaces)
+    private func addCondition(custom: String? = nil) {
+        let value = custom ?? newCondition
+        let trimmed = value.trimmingCharacters(in: .whitespaces)
         if !trimmed.isEmpty {
             if viewModel.profile?.medicalConditions == nil {
                 viewModel.profile?.medicalConditions = []

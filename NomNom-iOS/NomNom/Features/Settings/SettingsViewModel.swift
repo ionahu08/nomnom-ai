@@ -83,7 +83,7 @@ class SettingsViewModel: ObservableObject {
         switch goal.lowercased() {
         case "lose_weight": calorieTarget = Int(Double(tdee) * 0.85)
         case "gain_muscle": calorieTarget = Int(Double(tdee) * 1.1)
-        case "shape_figure": calorieTarget = Int(Double(tdee) * 0.95)
+        case "lean_out": calorieTarget = Int(Double(tdee) * 0.90)
         default: calorieTarget = tdee // maintain
         }
 
@@ -94,7 +94,7 @@ class SettingsViewModel: ObservableObject {
             (proteinPercent, carbPercent, fatPercent) = (0.30, 0.40, 0.30)
         case "gain_muscle":
             (proteinPercent, carbPercent, fatPercent) = (0.35, 0.45, 0.20)
-        case "shape_figure":
+        case "lean_out":
             (proteinPercent, carbPercent, fatPercent) = (0.35, 0.40, 0.25)
         default: // maintain
             (proteinPercent, carbPercent, fatPercent) = (0.25, 0.50, 0.25)

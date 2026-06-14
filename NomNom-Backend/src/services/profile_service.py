@@ -24,16 +24,16 @@ def calculate_macro_targets(tdee: int, goal: str | None = None, weight_kg: float
         "lose_weight": {"protein": 0.30, "carbs": 0.40, "fat": 0.30},
         "maintain": {"protein": 0.25, "carbs": 0.50, "fat": 0.25},
         "gain_muscle": {"protein": 0.35, "carbs": 0.45, "fat": 0.20},
-        "shape_figure": {"protein": 0.35, "carbs": 0.40, "fat": 0.25},
+        "lean_out": {"protein": 0.35, "carbs": 0.40, "fat": 0.25},
     }
 
     # Also adjust TDEE based on goal
     if goal == "lose_weight" and weight_kg:
-        tdee = round(tdee * 0.85)  # 500 kcal deficit
+        tdee = round(tdee * 0.85)  # 15% deficit
     elif goal == "gain_muscle" and weight_kg:
-        tdee = round(tdee * 1.1)   # 250 kcal surplus
-    elif goal == "shape_figure" and weight_kg:
-        tdee = round(tdee * 0.95)  # 250 kcal deficit
+        tdee = round(tdee * 1.1)   # 10% surplus
+    elif goal == "lean_out" and weight_kg:
+        tdee = round(tdee * 0.90)  # 10% deficit (fat loss while preserving muscle)
 
     macro_split = goal_splits.get(goal or "maintain", DEFAULT_MACRO_SPLIT)
 

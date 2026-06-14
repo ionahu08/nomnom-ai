@@ -29,7 +29,7 @@ class ProfileService {
             heightCm: 170,
             weightKg: 70,
             activityLevel: "moderate",
-            goal: "maintain",
+            goal: "maintain",  // maintain, lean_out, gain_muscle, lose_weight
             calorieTarget: 2000,
             proteinTarget: 150,
             carbTarget: 200,
