@@ -30,15 +30,24 @@ iOS App (SwiftUI) ──▶ NomNom-Backend (FastAPI) ──▶ PostgreSQL + pgve
 
 ## Current Iteration
 
-**Iteration 17: Personalized Nutrition Profile** — 🚀 STARTING (June 13, 2026)
-See `docs/iterations/17-personalized-nutrition/` for plan and phases.
+**Iteration 18: Enhanced Food Diary Visualization** — 🚀 STARTING (June 14, 2026)
+See `docs/iterations/18-food-diary-visualization/` for plan and phases.
 
-**Goal:** Enable users to set personal health info (age, weight, goals, medical history) and calculate personalized daily calorie/macronutrient recommendations shown on Food Diary.
+**Goal:** Replace plain text nutrition displays with modern visual progress indicators (circular progress for calories, horizontal bars for macros) on Food Diary.
 
 **Scope:**
-- Backend: Health profile API, nutrition calculation service (Mifflin-St Jeor, TDEE, macro splits by goal)
-- iOS: Settings screen upgrade (anthropometric data, medical info), Food Diary daily summary with progress bars
-- Duration: 5–7 days
+- iOS: ProgressCircle component, NutritionProgressBar components, integration with Food Diary
+- Duration: 4 days
+
+---
+
+**Iteration 17: Personalized Nutrition Profile** — ✅ COMPLETE (June 13–14, 2026)
+See `docs/iterations/17-personalized-nutrition/` for details.
+
+**Completed:**
+- Backend: Health profile API, nutrition calculations (Mifflin-St Jeor, TDEE, macro splits), all endpoints tested (6/6 passing)
+- iOS: Complete Settings screen with health data input, Food Diary integration with daily targets
+- Key fixes: JSON field type corrections, test fixture isolation, removed auto-profile creation during registration
 
 **Completed Iterations Summary (11–16):**
 - Iteration 11: Eval pipeline (test → grade → iterate)
