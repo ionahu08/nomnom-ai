@@ -1,0 +1,7 @@
+// Debug configuration - disable code signing for simulator
+CODE_SIGN_IDENTITY = -
+CODE_SIGN_IDENTITY[sdk=iphonesimulator*] = -
+CODE_SIGNING_REQUIRED = NO
+CODE_SIGN_STYLE = Automatic
+PROVISIONING_PROFILE = 
+PROVISIONING_PROFILE_SPECIFIER = 
