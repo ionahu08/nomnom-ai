@@ -463,6 +463,103 @@ Simply use the enum's rawValue directly:
 
 ---
 
+## Critical Bug #5: Hardcoded Day Counts Override Actual Calculations
+
+**Symptom:** Consistency metrics showed wrong percentages for different months. February user logging 28 days showed "28/30 = 93%" instead of "28/28 = 100%"
+
+**Root Cause:**
+```python
+# analytics.py endpoint calculated total_days for consistency:
+if period == "week":
+    total_days = 7
+elif period == "month":
+    total_days = 30  # ❌ Hardcoded! Ignores actual month length
+elif period == "6m":
+    total_days = 180  # ❌ Hardcoded! Ignores actual calendar structure
+```
+
+But the repository correctly calculated it:
+```python
+# analytics_repository.py line 119
+total_days = (end_date - start_date).days  # ✅ Correct
+```
+
+The endpoint was throwing away the correct value and using hardcoded ones.
+
+**Impact:**
+- February user (28 days): 28/30 = 93% consistency (incorrect, should be 100%)
+- July user (31 days): 31/30 = 103% consistency (over 100%!)
+- 6-month period: Ignored actual month lengths
+
+**Fix (Commit 736ae9a):**
+```python
+# Before (WRONG):
+if period == "week":
+    total_days = 7
+elif period == "month":
+    total_days = 30
+elif period == "6m":
+    total_days = 180
+
+days_logged, _ = await AnalyticsRepository.get_days_logged(...)
+
+# After (CORRECT):
+# Just calculate the periods, let repository give us actual total_days
+if period == "week":
+    start_date = end_date - timedelta(days=7)
+elif period == "month":
+    start_date = end_date - timedelta(days=30)
+elif period == "6m":
+    start_date = end_date - timedelta(days=180)
+
+days_logged, total_days = await AnalyticsRepository.get_days_logged(...)
+# Now total_days is actual calendar days (28-31 for month, etc.)
+```
+
+**Status:** ✅ Fixed - Consistency now shows actual month lengths
+
+---
+
+## Critical Bug #6: Averages Calculated Per Log Entry, Not Per Day
+
+**Symptom:** Daily average calories way too low. For example, 3,000 calories logged as 4 meals showed as 750 cal/day instead of 428 (or 1,500 if counting only logged days)
+
+**Root Cause:**
+```python
+# analytics_repository.py line 53
+num_logs = len(logs)  # Number of MEAL entries, not days
+avg_calories = total_calories / num_logs  # ❌ Per meal, not per day
+```
+
+The repository divided by number of log entries (meals) instead of number of days.
+
+**Example:**
+- User logs Monday: 1,000 cal (1 meal)
+- User logs Tuesday: 2,000 cal (3 meals)
+- Total: 3,000 cal from 4 meal entries
+- Repository calc: 3,000 / 4 = 750 cal/entry ❌
+- Should be: 3,000 / 7 calendar days = 428 cal/day ✅
+
+**Fix (Commit 41b0e9c):**
+
+Instead of using repository averages, endpoint now recalculates:
+```python
+# Correct: Average per CALENDAR day
+avg_calories = stats["calories"]["total"] / total_days if total_days > 0 else 0
+avg_protein = stats["protein_g"]["total"] / total_days if total_days > 0 else 0
+avg_carbs = stats["carbs_g"]["total"] / total_days if total_days > 0 else 0
+avg_fat = stats["fat_g"]["total"] / total_days if total_days > 0 else 0
+```
+
+Now:
+- Week average: total calories / 7 days
+- Month average: total calories / 28-31 days (actual month)
+- 6-month average: total calories / actual 180-day window
+
+**Status:** ✅ Fixed - All averages now per calendar day
+
+---
+
 ## Phase 4: Integration & Polish
 
 **Status:** 🚀 Testing (4a-4c complete, 4d in progress)
