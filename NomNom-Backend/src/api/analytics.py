@@ -39,13 +39,10 @@ async def get_analytics_summary(
     # Calculate start date based on period
     if period == "week":
         start_date = end_date - timedelta(days=7)
-        total_days = 7
     elif period == "month":
         start_date = end_date - timedelta(days=30)
-        total_days = 30
     elif period == "6m":
         start_date = end_date - timedelta(days=180)
-        total_days = 180
     else:
         raise HTTPException(status_code=400, detail="Period must be 'week', 'month', or '6m'")
 
@@ -55,8 +52,8 @@ async def get_analytics_summary(
     # Get user targets
     targets = await AnalyticsRepository.get_user_targets(db, current_user.id)
 
-    # Get days logged
-    days_logged, _ = await AnalyticsRepository.get_days_logged(db, current_user.id, start_date, end_date)
+    # Get days logged and actual total days in period
+    days_logged, total_days = await AnalyticsRepository.get_days_logged(db, current_user.id, start_date, end_date)
 
     # Calculate consistency percentage
     consistency = (days_logged / total_days * 100) if total_days > 0 else 0
