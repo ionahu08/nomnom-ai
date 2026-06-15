@@ -388,9 +388,51 @@ When building iOS-backend data models:
 
 ---
 
-**Next Phase (4) - Polish & Testing:**
-- Test week navigation with charts
-- Verify data accuracy
-- Edge cases: new user, no logs, future dates
-- Performance optimization if needed
-- Final polish and UI refinements
+---
+
+## Phase 4: Integration & Polish
+
+**Status:** 🚀 Starting
+
+**Testing Plan:**
+
+### 1. Core Functionality Tests
+- [ ] **Week Navigation:** Click prev/next buttons, data updates correctly
+- [ ] **Data Accuracy:** Verify displayed values match backend calculations
+- [ ] **Period Selector:** Shows correct week range (e.g., "Jun 8 - Jun 14")
+- [ ] **Tab Integration:** Weekly tab appears between Food Diary and Settings
+- [ ] **Tab Icons:** Chart.bar.fill icon displays correctly
+
+### 2. Chart Rendering Tests
+- [ ] **Daily Calorie Chart:** All 7 bars display, colors correct (green/orange/red)
+- [ ] **Macro Donut Chart:** Shows all 3 macros, colors correct, percentages display
+- [ ] **Color Coding:** Green (on-track), orange (over), red (way over) work correctly
+- [ ] **Responsive:** Charts scale properly on different screen sizes
+
+### 3. Data Display Tests
+- [ ] **Calorie Summary:** Total, average, target, percentage display
+- [ ] **Consistency Metric:** Progress bar shows correctly (X/7 days)
+- [ ] **Nutrient Targets:** Protein/Carbs/Fat with average, target, icons
+- [ ] **Top Foods:** Lists most eaten foods with count and calories
+- [ ] **Error State:** Shows error message when API fails
+- [ ] **Loading State:** Shows spinner while loading
+
+### 4. Edge Cases
+- [ ] **New User (no logs):** Shows empty state gracefully
+- [ ] **Partial Week:** Shows correct consistency even with <7 days
+- [ ] **No Target Set:** Handles null percentage correctly (shows "N/A")
+- [ ] **Future Date:** Navigation doesn't break with future dates
+- [ ] **Past Date:** Can navigate to old weeks with historical data
+
+### 5. Console & Performance
+- [ ] **No Console Errors:** Xcode console has no errors or warnings
+- [ ] **No Crashes:** App doesn't crash when navigating
+- [ ] **Loading Time:** Data loads within 2 seconds
+- [ ] **Memory:** No memory leaks when switching tabs repeatedly
+
+### 6. UI Polish
+- [ ] **Spacing & Alignment:** All elements properly spaced
+- [ ] **Font Sizes:** Hierarchy is clear (heading → body → caption)
+- [ ] **Colors:** Dark mode looks good, text is readable
+- [ ] **Buttons:** Prev/next buttons are easy to tap
+- [ ] **Scrolling:** Content scrolls smoothly without jank
