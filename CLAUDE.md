@@ -47,6 +47,13 @@ See `docs/iterations/18-weekly-nutrition-summary/` for plan, phases, and summary
 
 **Next Step:** Phase 1 — Build backend analytics repository and API endpoint
 
+**⚠️ Critical Note for Iteration 18 Development:**
+Phase 1 had a critical import error in analytics.py that caused all API requests to timeout. **Before committing Phase 2+ changes**, always:
+1. Read `NomNom-Backend/BACKEND_IMPORT_GUIDE.md` for correct import patterns
+2. Verify backend starts: `python -m uvicorn src.app:app --reload` should complete with "Application startup complete"
+3. Test API responds: `curl http://localhost:8000/api/v1/profile -H "Authorization: Bearer test"`
+4. See full prevention checklist in `docs/iterations/18-weekly-nutrition-summary/BUGLOG.md`
+
 ---
 
 **Iteration 17: Personalized Nutrition Profile** — ✅ COMPLETE (June 13–14, 2026)
