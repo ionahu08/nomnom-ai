@@ -1,6 +1,6 @@
 # Iteration 18: Bug Log & Decisions
 
-**Status:** Phase 1 Complete ✅ | Settings Regression Fixed ✅
+**Status:** Phase 1 Complete ✅ | Phase 2 Complete ✅ | Ready for Testing 🚀
 
 ---
 
@@ -182,7 +182,40 @@ from src.llm.something import ...     # ❌ Wrong layer
 - [ ] Console logs show successful profile fetch
 - [ ] Tests pass: `pytest tests/test_analytics.py`
 
-**Next Phase (2) Testing:**
-- Will test with actual logged-in user
-- Verify iOS can parse WeeklySummaryResponse
-- Test week navigation (prev/next week)
+---
+
+## Phase 2 Completion ✅
+
+**What Was Built (Commit 467e7d2):**
+1. **WeeklySummary.swift** - Data models matching backend API response
+   - Proper JSON decoding with CodingKeys for snake_case conversion
+   - NutrientSummary, DailyBreakdown, TopFood structs
+
+2. **WeeklyNutritionViewModel.swift** - Business logic & API integration
+   - Fetches data from `/api/v1/analytics/summary` endpoint
+   - Week navigation (previous/next)
+   - Loading, error, and success state handling
+   - Helper methods for formatting dates and status labels
+
+3. **WeeklyNutritionView.swift** - UI components
+   - Period selector with navigation buttons
+   - Calorie summary (average, target, percentage)
+   - Calorie status indicator (On Track ✅, Over ⚠️, Under ↓)
+   - Logging consistency with progress bar
+   - Nutrient breakdown with icons (🍗 Protein, 🍙 Carbs, 🍖 Fat)
+   - Top foods list
+   - Proper error and loading state UI
+
+4. **ContentView.swift** - Tab integration
+   - New "Weekly" tab added between Food Diary and Settings
+   - Icon: chart.bar.fill
+
+5. **Project regenerated** - xcodegen project updated to include new files
+
+**Status:** ✅ Ready for end-to-end testing
+
+**Next Phase (3) - Data Visualization:**
+- Add bar chart for daily calorie breakdown
+- Pie/donut chart for macro composition
+- Smooth animations when switching weeks
+- Color-coded zones (green/yellow/red)
