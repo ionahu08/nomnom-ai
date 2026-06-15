@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		01D34A540C4E799255AA1768 /* WeeklyChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E41C19AD8CA3C0FD08402BF /* WeeklyChart.swift */; };
 		116E569CF12A8D765269E47D /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43F4BA86B249FD661DECB093 /* Auth.swift */; };
 		147AE434D01C00E345306087 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8932008FDA1112B4BE6827 /* KeychainService.swift */; };
 		16725CC268260FE50D545DFF /* DiaryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE886FE2845039E86F06B297 /* DiaryViewModel.swift */; };
@@ -14,6 +15,7 @@
 		1D50A47A3D22AF760757A139 /* FoodLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4CCD1699B41931BB7C95E2 /* FoodLog.swift */; };
 		280CA48C4D0756E267B96E43 /* FoodLogCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BCEEBF8D63B932F4B168638 /* FoodLogCard.swift */; };
 		2BCAB224A34D46CF23EA30A3 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F32EBC4EE6D11AE2A0CABE /* SettingsView.swift */; };
+		48C38BB4B7C27C12F7F3975D /* MacroBreakdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39E432E7035548BCD581FE75 /* MacroBreakdown.swift */; };
 		4D951F66005831DC2AAF41F4 /* InsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8ADD11C9DF904DB40134E18 /* InsightsView.swift */; };
 		4E9B51BC21BD0CA54F5440D2 /* WeeklyNutritionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADEB777D4674C91E3BE0B25D /* WeeklyNutritionViewModel.swift */; };
 		4F52FC88CFEE5C6A2CD1B9C8 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B248A228CFDFB4F0FB9209CD /* AuthService.swift */; };
@@ -59,9 +61,11 @@
 		15F206442F73FB3E13281A1F /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		1D4CCD1699B41931BB7C95E2 /* FoodLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodLog.swift; sourceTree = "<group>"; };
 		1DBAC3EDF8C7103753678F5E /* CameraViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewModel.swift; sourceTree = "<group>"; };
+		2E41C19AD8CA3C0FD08402BF /* WeeklyChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyChart.swift; sourceTree = "<group>"; };
 		33F842C2E3481D247AF7C033 /* ProgressCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressCircle.swift; sourceTree = "<group>"; };
 		3613CA5ABAD9C19E665F06F8 /* NomNomApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NomNomApp.swift; sourceTree = "<group>"; };
 		38CFCD23044C9980901DC279 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		39E432E7035548BCD581FE75 /* MacroBreakdown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroBreakdown.swift; sourceTree = "<group>"; };
 		43F4BA86B249FD661DECB093 /* Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth.swift; sourceTree = "<group>"; };
 		4488768D62D2F82641E19291 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		520DF7F015C57A53F3A6AE05 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
@@ -179,6 +183,8 @@
 		A907E78169878D6243F28583 /* WeeklyNutrition */ = {
 			isa = PBXGroup;
 			children = (
+				39E432E7035548BCD581FE75 /* MacroBreakdown.swift */,
+				2E41C19AD8CA3C0FD08402BF /* WeeklyChart.swift */,
 				70C1EE9DF99DEC5DA03F4577 /* WeeklyNutritionView.swift */,
 				ADEB777D4674C91E3BE0B25D /* WeeklyNutritionViewModel.swift */,
 			);
@@ -367,6 +373,7 @@
 				786E95948C1CA8038B3F8246 /* InsightsViewModel.swift in Sources */,
 				147AE434D01C00E345306087 /* KeychainService.swift in Sources */,
 				8774038C0895DBFE6E3A9AA5 /* LoginView.swift in Sources */,
+				48C38BB4B7C27C12F7F3975D /* MacroBreakdown.swift in Sources */,
 				C8400DF14EE13853F8C61823 /* NomNomApp.swift in Sources */,
 				D2236831E3C678E7B676B3E0 /* NomNomColors.swift in Sources */,
 				79D585F4E821A9C361A7FA13 /* NutritionProgressBar.swift in Sources */,
@@ -378,6 +385,7 @@
 				2BCAB224A34D46CF23EA30A3 /* SettingsView.swift in Sources */,
 				C403DA8214CB0F35117552BC /* SettingsViewModel.swift in Sources */,
 				A3C8EA04D70D69F46B194FDE /* UserProfile.swift in Sources */,
+				01D34A540C4E799255AA1768 /* WeeklyChart.swift in Sources */,
 				CD54F47932E772467EB1BA24 /* WeeklyNutritionView.swift in Sources */,
 				4E9B51BC21BD0CA54F5440D2 /* WeeklyNutritionViewModel.swift in Sources */,
 				A42EB38598DF847CBF724EB5 /* WeeklySummary.swift in Sources */,

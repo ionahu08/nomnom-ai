@@ -109,9 +109,28 @@ struct WeeklyNutritionView: View {
                             .background(Color(.systemGray6))
                             .cornerRadius(12)
 
-                            // Nutrients
+                            // Daily Calories Chart
+                            WeeklyChart(
+                                dailyBreakdown: summary.dailyBreakdown,
+                                calorieTarget: summary.calories.target
+                            )
+                            .padding()
+                            .background(Color(.systemGray6))
+                            .cornerRadius(12)
+
+                            // Macro Breakdown Chart
+                            MacroBreakdown(
+                                proteinTotal: summary.proteinG.total,
+                                carbsTotal: summary.carbsG.total,
+                                fatTotal: summary.fatG.total
+                            )
+                            .padding()
+                            .background(Color(.systemGray6))
+                            .cornerRadius(12)
+
+                            // Nutrient Summary
                             VStack(spacing: 16) {
-                                Text("Nutrient Composition")
+                                Text("Daily Targets")
                                     .font(.headline)
                                     .frame(maxWidth: .infinity, alignment: .leading)
 
