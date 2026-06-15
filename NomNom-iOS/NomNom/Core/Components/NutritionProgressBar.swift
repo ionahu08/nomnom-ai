@@ -23,7 +23,8 @@ struct NutritionProgressBar: View {
     }
 
     var body: some View {
-        VStack(alignment: .center, spacing: 4) {
+        VStack(alignment: .center, spacing: 5) {
+            // Icon + name
             HStack(spacing: 4) {
                 Text(icon)
                     .font(.system(size: 14))
@@ -32,6 +33,22 @@ struct NutritionProgressBar: View {
                     .foregroundColor(.primary)
             }
 
+            // Progress bar
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    // Background bar
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(Color.gray.opacity(0.2))
+
+                    // Progress fill
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(color)
+                        .frame(width: geometry.size.width * min(percentage, 1.0))
+                }
+            }
+            .frame(height: 6)
+
+            // Values
             Text("\(Int(consumed)) / \(Int(target))\(unit)")
                 .font(.caption2)
                 .foregroundColor(.secondary)
