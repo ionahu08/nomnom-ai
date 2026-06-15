@@ -260,7 +260,7 @@ struct DiaryView: View {
                     consumed: totalProtein,
                     target: viewModel.proteinTarget,
                     unit: "g",
-                    icon: "🟢"
+                    icon: "🍗"
                 )
 
                 Spacer()
@@ -270,7 +270,7 @@ struct DiaryView: View {
                     consumed: totalCarbs,
                     target: viewModel.carbTarget,
                     unit: "g",
-                    icon: "🟠"
+                    icon: "🍣"
                 )
 
                 Spacer()
@@ -280,7 +280,7 @@ struct DiaryView: View {
                     consumed: totalFat,
                     target: viewModel.fatTarget,
                     unit: "g",
-                    icon: "🟡"
+                    icon: "🥓"
                 )
 
                 Spacer()
