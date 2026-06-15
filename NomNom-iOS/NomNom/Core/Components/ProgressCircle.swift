@@ -21,30 +21,37 @@ struct ProgressCircle: View {
     }
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 12) {
             ZStack {
+                // Background circle
                 Circle()
-                    .stroke(Color.gray.opacity(0.3), lineWidth: 12)
+                    .stroke(Color.gray.opacity(0.2), lineWidth: 8)
 
+                // Progress circle
                 Circle()
                     .trim(from: 0, to: min(percentage, 1.0))
-                    .stroke(color, style: StrokeStyle(lineWidth: 12, lineCap: .round))
+                    .stroke(color, style: StrokeStyle(lineWidth: 8, lineCap: .round))
                     .rotationEffect(.degrees(-90))
 
-                VStack(spacing: 4) {
-                    Text("\(Int(percentage * 100))%")
-                        .font(.system(size: 28, weight: .semibold))
+                // Center content
+                VStack(spacing: 2) {
+                    Text("\(consumed)")
+                        .font(.system(size: 24, weight: .semibold))
                         .foregroundColor(.primary)
 
-                    Text("\(consumed) / \(target) kcal")
-                        .font(.caption)
+                    Text("/ \(target) kcal")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+
+                    Text("Remaining")
+                        .font(.caption2)
                         .foregroundColor(.secondary)
                 }
             }
-            .frame(height: 180)
+            .frame(height: 140)
 
             Text(label)
-                .font(.caption)
+                .font(.caption2)
                 .foregroundColor(.secondary)
         }
         .animation(.easeInOut(duration: 0.3), value: percentage)

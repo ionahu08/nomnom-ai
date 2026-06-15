@@ -5,6 +5,7 @@ struct NutritionProgressBar: View {
     let consumed: Double
     let target: Double
     let unit: String
+    let icon: String
 
     var percentage: Double {
         guard target > 0 else { return 0 }
@@ -22,38 +23,34 @@ struct NutritionProgressBar: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
+        HStack(spacing: 12) {
+            Text(icon)
+                .font(.system(size: 18))
+
+            VStack(alignment: .leading, spacing: 2) {
                 Text(nutrient)
-                    .font(.subheadline)
-                    .foregroundColor(.primary)
-                Spacer()
-                Text("\(Int(consumed))/\(Int(target))\(unit)")
                     .font(.caption)
                     .foregroundColor(.secondary)
+                Text("\(Int(consumed)) / \(Int(target))\(unit)")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundColor(.primary)
             }
 
-            GeometryReader { geometry in
-                ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(Color.gray.opacity(0.2))
-
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(color)
-                        .frame(width: geometry.size.width * min(percentage, 1.0))
-                }
-            }
-            .frame(height: 8)
+            Spacer()
         }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(Color.gray.opacity(0.05))
+        .cornerRadius(8)
         .animation(.easeInOut(duration: 0.3), value: percentage)
     }
 }
 
 #Preview {
-    VStack(spacing: 16) {
-        NutritionProgressBar(nutrient: "Protein", consumed: 45, target: 150, unit: "g")
-        NutritionProgressBar(nutrient: "Carbs", consumed: 120, target: 200, unit: "g")
-        NutritionProgressBar(nutrient: "Fat", consumed: 55, target: 65, unit: "g")
+    VStack(spacing: 10) {
+        NutritionProgressBar(nutrient: "Protein", consumed: 45, target: 150, unit: "g", icon: "🟢")
+        NutritionProgressBar(nutrient: "Carbs", consumed: 120, target: 200, unit: "g", icon: "🟠")
+        NutritionProgressBar(nutrient: "Fat", consumed: 55, target: 65, unit: "g", icon: "🟡")
     }
     .padding()
 }

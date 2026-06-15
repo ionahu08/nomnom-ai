@@ -240,14 +240,7 @@ struct DiaryView: View {
         let totalCarbs = viewModel.logsForSelectedDate.reduce(0.0) { $0 + $1.carbsG }
         let totalFat = viewModel.logsForSelectedDate.reduce(0.0) { $0 + $1.fatG }
 
-        return VStack(spacing: 16) {
-            HStack {
-                Text("\(viewModel.logsForSelectedDate.count) meal\(viewModel.logsForSelectedDate.count == 1 ? "" : "s")")
-                    .font(.subheadline)
-                    .foregroundColor(NomNomColors.textSecondary)
-                Spacer()
-            }
-
+        return VStack(spacing: 14) {
             // Calorie circular progress
             ProgressCircle(
                 consumed: totalCals,
@@ -256,33 +249,37 @@ struct DiaryView: View {
             )
 
             Divider()
-                .padding(.vertical, 8)
+                .padding(.vertical, 4)
 
-            // Macro progress bars
-            VStack(spacing: 12) {
+            // Macro progress bars - compact layout
+            VStack(spacing: 6) {
                 NutritionProgressBar(
                     nutrient: "Protein",
                     consumed: totalProtein,
                     target: viewModel.proteinTarget,
-                    unit: "g"
+                    unit: "g",
+                    icon: "🟢"
                 )
 
                 NutritionProgressBar(
                     nutrient: "Carbs",
                     consumed: totalCarbs,
                     target: viewModel.carbTarget,
-                    unit: "g"
+                    unit: "g",
+                    icon: "🟠"
                 )
 
                 NutritionProgressBar(
                     nutrient: "Fat",
                     consumed: totalFat,
                     target: viewModel.fatTarget,
-                    unit: "g"
+                    unit: "g",
+                    icon: "🟡"
                 )
             }
+            .padding(.horizontal, 4)
         }
-        .padding()
+        .padding(14)
         .background(NomNomColors.surface)
         .cornerRadius(16)
     }
