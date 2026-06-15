@@ -346,15 +346,22 @@ struct SettingsView: View {
                 }
             }
             .task {
+                print("[SettingsView] .task block started")
+                print("[SettingsView] authService.isAuthenticated = \(authService.isAuthenticated)")
                 viewModel.setAuthService(authService)
+                print("[SettingsView] About to call viewModel.loadProfile()")
                 await viewModel.loadProfile()
+                print("[SettingsView] viewModel.loadProfile() completed")
+                print("[SettingsView] profile = \(viewModel.profile?.age ?? -1)")
                 // Initialize date pickers from profile age
                 if let age = viewModel.profile?.age {
                     let birthDate = Calendar.current.date(byAdding: .year, value: -age, to: Date())!
                     selectedYear = Calendar.current.component(.year, from: birthDate)
                     selectedMonth = Calendar.current.component(.month, from: birthDate)
                     selectedDay = Calendar.current.component(.day, from: birthDate)
+                    print("[SettingsView] Date pickers initialized for age \(age)")
                 }
+                print("[SettingsView] .task block completed")
             }
             }
 

@@ -18,14 +18,21 @@ class SettingsViewModel: ObservableObject {
     }
 
     func loadProfile() async {
+        print("[SettingsViewModel] loadProfile() called")
         isLoading = true
         errorMessage = nil
-        defer { isLoading = false }
+        defer {
+            print("[SettingsViewModel] loadProfile() finished, isLoading = false")
+            isLoading = false
+        }
 
         do {
+            print("[SettingsViewModel] Calling profileService.getProfile()")
             profile = try await profileService.getProfile()
+            print("[SettingsViewModel] Profile loaded successfully: \(profile?.age ?? 0)")
             await updateMacroTargets()
         } catch {
+            print("[SettingsViewModel] Failed to load profile: \(error)")
             errorMessage = "Failed to load profile: \(error.localizedDescription)"
         }
     }
