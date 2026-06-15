@@ -1,18 +1,18 @@
 # Iteration 18: Bug Log & Decisions
 
-**Status:** Phase 1 Complete ✅
+**Status:** Phase 1 Complete ✅ | Settings Regression Fixed ✅
 
 ---
 
 ## Known Issues
 
-(None yet)
+(None currently)
 
 ---
 
 ## Blockers
 
-(None yet)
+(None currently)
 
 ---
 
@@ -40,6 +40,26 @@
 
 ---
 
+## Regression: Settings Tab Loading Spinners
+
+**Symptom:** After building/running app, Settings tab showed indefinite loading spinners in Health Profile and Cat Style sections.
+
+**Root Cause:** 
+1. APIClient.baseURL was pointing to ngrok instead of localhost:8000 for simulator
+2. SettingsView was creating a detached AuthService() instead of using @EnvironmentObject
+3. When ProfileService tried to load from ngrok, it would fail or hang indefinitely
+
+**Fix (Commit e1f3acf):**
+- Changed APIClient baseURL for simulator from ngrok to localhost:8000
+- Removed detached AuthService creation in SettingsView.init()
+- Made authService optional in SettingsViewModel (set via setAuthService callback)
+- Moved logout button handling directly to SettingsView
+- Settings tab now loads profile correctly on app run
+
+**Status:** ✅ Fixed
+
+---
+
 ## Testing Notes
 
 **Phase 1 Testing:**
@@ -48,6 +68,12 @@
 - ✅ Test fixtures created for 6 logs across 6 days
 - ✅ 8 test cases written (totals, averages, top foods, targets, defaults, empty data)
 - ✅ Ready for full pytest run with proper auth token
+
+**Settings Tab Regression Testing:**
+- ✅ Health Profile section loads without spinner after app launch
+- ✅ Cat Style section displays correctly
+- ✅ Profile data fetches from localhost:8000 API
+- ✅ No errors in console
 
 **Next Phase (2) Testing:**
 - Will test with actual logged-in user
