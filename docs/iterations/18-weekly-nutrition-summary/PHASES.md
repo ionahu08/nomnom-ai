@@ -167,14 +167,26 @@ Components:
 - [x] Period label calculation: Dynamic from backend response (works for all periods)
 - [x] Fix: Backend now accepts "6m" period (added in analytics.py)
 
-### 4d: Testing 🚧 IN PROGRESS
-- [ ] Test Week period: shows 7-day data
-- [ ] Test Month period: shows 30-day data
-- [ ] Test 6M period: shows 180-day data
-- [ ] Navigate between periods: data updates correctly
+### 4d: UI Redesign ✅
+- [x] Remove "Weekly Average" section (confusing hardcoded label)
+- [x] Replace bar chart with line plots (4 separate charts)
+- [x] Implement period-aware x-axis labels:
+  - [x] Weekly: Day names (Sun-Sat)
+  - [x] Monthly: Date numbers (01, 05, 10, 15, etc.)
+  - [x] 6M: Month abbreviations (J, F, M, A, M, J, J, A, S, O, N, D)
+- [x] Show markers only for logged dates, lines connecting them
+- [x] Color-coded metrics (blue=cal, orange=protein, green=carbs, red=fat)
+
+### 4e: Testing 🚧 IN PROGRESS
+- [ ] Line charts render for all 4 metrics
+- [ ] Weekly tab: shows day names on x-axis
+- [ ] Monthly tab: shows date numbers on x-axis
+- [ ] 6M tab: shows month abbreviations on x-axis
+- [ ] Only logged dates show markers/dots
+- [ ] Lines connect marked dots smoothly
 - [ ] No console errors
 - [ ] No crashes when switching periods
-- [ ] Charts display correctly for all periods
+- [ ] Charts update correctly when changing tabs
 
 ---
 

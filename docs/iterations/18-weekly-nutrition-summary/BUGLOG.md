@@ -560,9 +560,38 @@ Now:
 
 ---
 
+## Design Decision: UI Redesign with Line Charts
+
+**Feedback:** "Weekly Average" label doesn't make sense on Monthly/6M tabs
+
+**Problem:**
+- Label was hardcoded to "Weekly Average" across all three tabs
+- Confusing UX: Monthly tab showing "Weekly Average"
+- Original bar chart (WeeklyChart) and donut chart (MacroBreakdown) didn't provide trend visualization
+
+**Solution (Commit 4a749b0):**
+- Remove "Weekly Average" section entirely
+- Replace bar chart with **line plots** for each metric
+- Create 4 separate charts: Calories, Protein, Carbs, Fat
+- Period-aware x-axis labels:
+  - Weekly: Day names (Sun, Mon, Tue, Wed, Thu, Fri, Sat)
+  - Monthly: Date numbers (01, 05, 10, 15, 20, 25, 30)
+  - 6-Month: Month abbreviations (J, F, M, A, M, J, J, A, S, O, N, D)
+- Only show markers (dots) for dates with logged data
+- Lines connect markers to show trends
+
+**Benefits:**
+- Cleaner UI without confusing hardcoded labels
+- Better trend visualization (line shows patterns over time)
+- Four charts show complete nutritional picture
+- Period-agnostic x-axis automatically adjusts to week/month/6m
+- Markers only on logged dates = clear gap visualization for missing days
+
+---
+
 ## Phase 4: Integration & Polish
 
-**Status:** 🚀 Testing (4a-4c complete, 4d in progress)
+**Status:** 🚀 Testing (4a-4d complete, 4e in progress)
 
 **Testing Plan:**
 
