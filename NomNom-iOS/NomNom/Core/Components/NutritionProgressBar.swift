@@ -23,31 +23,25 @@ struct NutritionProgressBar: View {
     }
 
     var body: some View {
-        HStack(spacing: 12) {
-            Text(icon)
-                .font(.system(size: 18))
-
-            VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .center, spacing: 4) {
+            HStack(spacing: 4) {
+                Text(icon)
+                    .font(.system(size: 14))
                 Text(nutrient)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                Text("\(Int(consumed)) / \(Int(target))\(unit)")
-                    .font(.subheadline.weight(.semibold))
+                    .font(.caption.weight(.semibold))
                     .foregroundColor(.primary)
             }
 
-            Spacer()
+            Text("\(Int(consumed)) / \(Int(target))\(unit)")
+                .font(.caption2)
+                .foregroundColor(.secondary)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(Color.gray.opacity(0.05))
-        .cornerRadius(8)
         .animation(.easeInOut(duration: 0.3), value: percentage)
     }
 }
 
 #Preview {
-    VStack(spacing: 10) {
+    HStack(spacing: 20) {
         NutritionProgressBar(nutrient: "Protein", consumed: 45, target: 150, unit: "g", icon: "🟢")
         NutritionProgressBar(nutrient: "Carbs", consumed: 120, target: 200, unit: "g", icon: "🟠")
         NutritionProgressBar(nutrient: "Fat", consumed: 55, target: 65, unit: "g", icon: "🟡")

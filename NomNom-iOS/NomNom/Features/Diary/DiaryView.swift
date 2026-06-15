@@ -251,8 +251,10 @@ struct DiaryView: View {
             Divider()
                 .padding(.vertical, 4)
 
-            // Macro progress bars - compact layout
-            VStack(spacing: 6) {
+            // Macro progress indicators - horizontal layout
+            HStack(spacing: 0) {
+                Spacer()
+
                 NutritionProgressBar(
                     nutrient: "Protein",
                     consumed: totalProtein,
@@ -260,6 +262,8 @@ struct DiaryView: View {
                     unit: "g",
                     icon: "🟢"
                 )
+
+                Spacer()
 
                 NutritionProgressBar(
                     nutrient: "Carbs",
@@ -269,6 +273,8 @@ struct DiaryView: View {
                     icon: "🟠"
                 )
 
+                Spacer()
+
                 NutritionProgressBar(
                     nutrient: "Fat",
                     consumed: totalFat,
@@ -276,8 +282,9 @@ struct DiaryView: View {
                     unit: "g",
                     icon: "🟡"
                 )
+
+                Spacer()
             }
-            .padding(.horizontal, 4)
         }
         .padding(14)
         .background(NomNomColors.surface)
