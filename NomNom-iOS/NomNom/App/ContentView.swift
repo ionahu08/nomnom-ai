@@ -20,7 +20,7 @@ struct ContentView: View {
             WeeklyNutritionView()
                 .tabItem {
                     Image(systemName: "chart.bar.fill")
-                    Text("Weekly")
+                    Text("Insight")
                 }
 
             SettingsView()

@@ -1,15 +1,38 @@
 import Foundation
 
+enum PeriodType: String, CaseIterable {
+    case week = "week"
+    case month = "month"
+    case sixMonth = "6m"
+
+    var label: String {
+        switch self {
+        case .week: return "Week"
+        case .month: return "Month"
+        case .sixMonth: return "6M"
+        }
+    }
+
+    var days: Int {
+        switch self {
+        case .week: return 7
+        case .month: return 30
+        case .sixMonth: return 180
+        }
+    }
+}
+
 @MainActor
 class WeeklyNutritionViewModel: ObservableObject {
     @Published var summary: WeeklySummaryResponse?
     @Published var isLoading = false
     @Published var errorMessage: String?
     @Published var selectedDate = Date()
+    @Published var selectedPeriod: PeriodType = .week
 
     private let api = APIClient.shared
 
-    func loadWeeklySummary(endDate: Date = Date()) async {
+    func loadInsightData(endDate: Date = Date(), period: PeriodType) async {
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
@@ -18,30 +41,42 @@ class WeeklyNutritionViewModel: ObservableObject {
         formatter.dateFormat = "yyyy-MM-dd"
         let dateString = formatter.string(from: endDate)
 
-        print("[WeeklyNutritionViewModel] Loading summary for period=week, date=\(dateString)")
+        let apiPeriod = period.rawValue
+        print("[InsightViewModel] Loading summary for period=\(apiPeriod), date=\(dateString)")
 
         do {
-            summary = try await api.get(path: "/api/v1/analytics/summary?period=week&date=\(dateString)")
-            print("[WeeklyNutritionViewModel] Summary loaded successfully")
+            summary = try await api.get(path: "/api/v1/analytics/summary?period=\(apiPeriod)&date=\(dateString)")
+            print("[InsightViewModel] Summary loaded successfully")
         } catch {
-            print("[WeeklyNutritionViewModel] Failed to load summary: \(error)")
-            errorMessage = "Failed to load weekly summary: \(error.localizedDescription)"
+            print("[InsightViewModel] Failed to load summary: \(error)")
+            errorMessage = "Failed to load insight data: \(error.localizedDescription)"
         }
     }
 
-    func previousWeek() async {
+    func loadWeeklySummary(endDate: Date = Date()) async {
+        await loadInsightData(endDate: endDate, period: .week)
+    }
+
+    func selectPeriod(_ period: PeriodType) async {
+        selectedPeriod = period
+        await loadInsightData(endDate: selectedDate, period: period)
+    }
+
+    func previousPeriod() async {
         if let currentEndDate = getEndDateFromSummary() {
-            let newEndDate = Calendar.current.date(byAdding: .day, value: -7, to: currentEndDate) ?? Date()
+            let days = selectedPeriod.days
+            let newEndDate = Calendar.current.date(byAdding: .day, value: -days, to: currentEndDate) ?? Date()
             selectedDate = newEndDate
-            await loadWeeklySummary(endDate: newEndDate)
+            await loadInsightData(endDate: newEndDate, period: selectedPeriod)
         }
     }
 
-    func nextWeek() async {
+    func nextPeriod() async {
         if let currentEndDate = getEndDateFromSummary() {
-            let newEndDate = Calendar.current.date(byAdding: .day, value: 7, to: currentEndDate) ?? Date()
+            let days = selectedPeriod.days
+            let newEndDate = Calendar.current.date(byAdding: .day, value: days, to: currentEndDate) ?? Date()
             selectedDate = newEndDate
-            await loadWeeklySummary(endDate: newEndDate)
+            await loadInsightData(endDate: newEndDate, period: selectedPeriod)
         }
     }
 

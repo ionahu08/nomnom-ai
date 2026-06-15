@@ -8,11 +8,32 @@ struct WeeklyNutritionView: View {
             ZStack {
                 ScrollView {
                     VStack(spacing: 20) {
-                        // Period Selector
+                        // Period Type Selector
+                        HStack(spacing: 8) {
+                            ForEach(PeriodType.allCases, id: \.self) { period in
+                                Button(action: {
+                                    Task {
+                                        await viewModel.selectPeriod(period)
+                                    }
+                                }) {
+                                    Text(period.label)
+                                        .font(.system(.body, design: .default))
+                                        .fontWeight(.semibold)
+                                }
+                                .foregroundColor(viewModel.selectedPeriod == period ? .white : .secondary)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 8)
+                                .background(viewModel.selectedPeriod == period ? Color.blue : Color(.systemGray6))
+                                .cornerRadius(8)
+                            }
+                        }
+                        .padding(.horizontal)
+
+                        // Date Navigation
                         HStack(spacing: 12) {
                             Button(action: {
                                 Task {
-                                    await viewModel.previousWeek()
+                                    await viewModel.previousPeriod()
                                 }
                             }) {
                                 Image(systemName: "chevron.left")
@@ -26,7 +47,7 @@ struct WeeklyNutritionView: View {
 
                             Button(action: {
                                 Task {
-                                    await viewModel.nextWeek()
+                                    await viewModel.nextPeriod()
                                 }
                             }) {
                                 Image(systemName: "chevron.right")
