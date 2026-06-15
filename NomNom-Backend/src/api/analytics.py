@@ -47,13 +47,13 @@ async def get_analytics_summary(
         raise HTTPException(status_code=400, detail="Period must be 'week' or 'month'")
 
     # Fetch aggregated stats
-    stats = AnalyticsRepository.get_aggregated_stats(db, current_user.id, start_date, end_date)
+    stats = await AnalyticsRepository.get_aggregated_stats(db, current_user.id, start_date, end_date)
 
     # Get user targets
-    targets = AnalyticsRepository.get_user_targets(db, current_user.id)
+    targets = await AnalyticsRepository.get_user_targets(db, current_user.id)
 
     # Get days logged
-    days_logged, _ = AnalyticsRepository.get_days_logged(db, current_user.id, start_date, end_date)
+    days_logged, _ = await AnalyticsRepository.get_days_logged(db, current_user.id, start_date, end_date)
 
     # Calculate consistency percentage
     consistency = (days_logged / total_days * 100) if total_days > 0 else 0

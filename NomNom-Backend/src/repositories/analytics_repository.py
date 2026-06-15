@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
-from sqlalchemy import and_, func
-from sqlalchemy.orm import Session
+from sqlalchemy import and_, func, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models.food_log import FoodLog
 from src.models.user import User, UserProfile
@@ -10,24 +10,26 @@ class AnalyticsRepository:
     """Repository for fetching and aggregating food log analytics."""
 
     @staticmethod
-    def get_food_logs_for_period(
-        db: Session, user_id: int, start_date: datetime, end_date: datetime
+    async def get_food_logs_for_period(
+        db: AsyncSession, user_id: int, start_date: datetime, end_date: datetime
     ) -> list[FoodLog]:
         """Fetch all food logs for a user within a date range."""
-        return db.query(FoodLog).filter(
+        stmt = select(FoodLog).where(
             and_(
                 FoodLog.user_id == user_id,
                 FoodLog.logged_at >= start_date,
                 FoodLog.logged_at < end_date,
             )
-        ).all()
+        )
+        result = await db.execute(stmt)
+        return result.scalars().all()
 
     @staticmethod
-    def get_aggregated_stats(
-        db: Session, user_id: int, start_date: datetime, end_date: datetime
+    async def get_aggregated_stats(
+        db: AsyncSession, user_id: int, start_date: datetime, end_date: datetime
     ) -> dict:
         """Calculate aggregated nutrition statistics for a date range."""
-        logs = AnalyticsRepository.get_food_logs_for_period(db, user_id, start_date, end_date)
+        logs = await AnalyticsRepository.get_food_logs_for_period(db, user_id, start_date, end_date)
 
         if not logs:
             return {
@@ -102,11 +104,11 @@ class AnalyticsRepository:
         }
 
     @staticmethod
-    def get_days_logged(
-        db: Session, user_id: int, start_date: datetime, end_date: datetime
+    async def get_days_logged(
+        db: AsyncSession, user_id: int, start_date: datetime, end_date: datetime
     ) -> tuple[int, int]:
         """Get number of days with logs and total days in period."""
-        logs = AnalyticsRepository.get_food_logs_for_period(db, user_id, start_date, end_date)
+        logs = await AnalyticsRepository.get_food_logs_for_period(db, user_id, start_date, end_date)
 
         if not logs:
             return 0, (end_date - start_date).days
@@ -119,9 +121,11 @@ class AnalyticsRepository:
         return days_logged, total_days
 
     @staticmethod
-    def get_user_targets(db: Session, user_id: int) -> dict:
+    async def get_user_targets(db: AsyncSession, user_id: int) -> dict:
         """Get user's nutrition targets from profile."""
-        profile = db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        stmt = select(UserProfile).where(UserProfile.user_id == user_id)
+        result = await db.execute(stmt)
+        profile = result.scalar_one_or_none()
 
         if not profile:
             # Default targets
