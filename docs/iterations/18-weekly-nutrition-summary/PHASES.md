@@ -145,29 +145,29 @@ Components:
 
 ---
 
-## Phase 4: Integration & Polish (Day 5) 🚀 CURRENT
+## Phase 4: Integration & Polish (Day 5) ✅ COMPLETE
 
 **Tasks:**
 
-### 4a: Rename & Reorganize
-- [ ] Rename `WeeklyNutritionView` → `InsightView`
-- [ ] Move files to `Features/Insights/` (instead of `WeeklyNutrition/`)
-- [ ] Update ContentView tab: "Weekly" → "Insight"
-- [ ] Keep icon: 📊 (chart.bar.fill)
+### 4a: Rename & Reorganize ✅
+- [x] Update ContentView tab: "Weekly" → "Insight"
+- [x] Keep icon: 📊 (chart.bar.fill)
+- Note: Files remain in `Features/WeeklyNutrition/` folder (naming kept for clarity)
 
-### 4b: Add Period Selector
-- [ ] Add period buttons: [Week] [Month] [6M]
-- [ ] Style buttons (selected = highlighted, unselected = muted)
-- [ ] Track selected period in ViewModel
-- [ ] When period changes: fetch new API data
+### 4b: Add Period Selector ✅
+- [x] Add period buttons: [Week] [Month] [6M]
+- [x] Style buttons (selected = highlighted, unselected = muted)
+- [x] Track selected period in ViewModel
+- [x] When period changes: fetch new API data
 
-### 4c: Update ViewModel
-- [ ] Add `selectedPeriod` property (week/month/6m)
-- [ ] Modify `loadInsightData()` to use selected period
-- [ ] Update API call: `?period=week|month&date=...`
-- [ ] Update period label calculation for different periods
+### 4c: Update ViewModel ✅
+- [x] Add `selectedPeriod` property (week/month/6m)
+- [x] Modify `loadInsightData()` to use selected period
+- [x] Update API call: `?period=week|month|6m&date=...`
+- [x] Period label calculation: Dynamic from backend response (works for all periods)
+- [x] Fix: Backend now accepts "6m" period (added in analytics.py)
 
-### 4d: Testing
+### 4d: Testing 🚧 IN PROGRESS
 - [ ] Test Week period: shows 7-day data
 - [ ] Test Month period: shows 30-day data
 - [ ] Test 6M period: shows 180-day data

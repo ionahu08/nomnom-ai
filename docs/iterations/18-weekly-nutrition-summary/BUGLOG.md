@@ -390,9 +390,82 @@ When building iOS-backend data models:
 
 ---
 
+## Critical Bug #3: 6-Month Period Not Supported in Backend API
+
+**Symptom:** iOS app would fail to load data when user selected "6M" (6-month) period. API endpoint would reject request with 400 error.
+
+**Root Cause:**
+1. Backend `analytics.py` endpoint only accepted `Literal["week", "month"]` in period parameter (line 18)
+2. iOS app sent "6m" as period value, but backend would reject it as invalid
+3. Period calculation logic was missing for 6-month (180-day) periods
+
+**Why It Happened:**
+- Phase 3 and 4 requirements expanded to include 6-month view (Apple Sleep app pattern)
+- Backend was only designed for week/month, not extended periods
+- Frontend and backend period handling became out of sync
+
+**Fix (Commit 06c34a5):**
+```python
+# Before (WRONG):
+period: Annotated[Literal["week", "month"], Query(...)]
+# ... only handled week (7 days) and month (30 days)
+
+# After (CORRECT):
+period: Annotated[Literal["week", "month", "6m"], Query(...)]
+# ... handles all three:
+if period == "week":
+    start_date = end_date - timedelta(days=7)
+    total_days = 7
+elif period == "month":
+    start_date = end_date - timedelta(days=30)
+    total_days = 30
+elif period == "6m":
+    start_date = end_date - timedelta(days=180)
+    total_days = 180
+```
+
+**Status:** ✅ Fixed - Backend now responds to week, month, and 6m requests
+
+---
+
+## Critical Bug #4: iOS Period API Mapping Incorrect
+
+**Symptom:** iOS app would send incorrect period parameter to backend (sixMonth → "month" instead of "6m")
+
+**Root Cause:**
+```swift
+// WeeklyNutritionViewModel line 44 (WRONG):
+let apiPeriod = period == .sixMonth ? "month" : period.rawValue
+```
+
+This logic mapped `.sixMonth` (rawValue="6m") to "month" instead of using its actual rawValue. This caused:
+- 6M button to fetch 30-day data, not 180-day
+- Confusion between Month and 6M periods
+- API parameter mismatch with backend expectations
+
+**Fix (Commit 2191787):**
+```swift
+// WeeklyNutritionViewModel line 44 (CORRECT):
+let apiPeriod = period.rawValue
+```
+
+Simply use the enum's rawValue directly:
+- `.week` → "week" (7 days)
+- `.month` → "month" (30 days)
+- `.sixMonth` → "6m" (180 days)
+
+**Status:** ✅ Fixed - iOS now sends correct period parameter
+
+**Prevention:**
+- Always use enum rawValues directly unless there's explicit transformation logic needed
+- Test period parameter by adding logging: `print("[ViewModel] Sending period=\(apiPeriod)")`
+- Backend Literal types must match iOS enum rawValues exactly
+
+---
+
 ## Phase 4: Integration & Polish
 
-**Status:** 🚀 Starting
+**Status:** 🚀 Testing (4a-4c complete, 4d in progress)
 
 **Testing Plan:**
 
