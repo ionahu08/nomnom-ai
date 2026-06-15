@@ -2,7 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var authService: AuthService
-    @StateObject private var viewModel: SettingsViewModel
+    @StateObject private var viewModel = SettingsViewModel()
 
     @State private var newAllergy = ""
     @State private var newCondition = ""
@@ -11,10 +11,6 @@ struct SettingsView: View {
     @State private var selectedYear = Calendar.current.component(.year, from: Date())
     @State private var selectedMonth = Calendar.current.component(.month, from: Date())
     @State private var selectedDay = Calendar.current.component(.day, from: Date())
-
-    init() {
-        _viewModel = StateObject(wrappedValue: SettingsViewModel(authService: AuthService()))
-    }
 
     var body: some View {
         ZStack {
@@ -328,6 +324,7 @@ struct SettingsView: View {
                 Section("Account") {
                     Button(role: .destructive) {
                         authService.logout()
+                        // NavigationStack will pop back to login screen via authService state change
                     } label: {
                         HStack {
                             Image(systemName: "arrow.backward.circle")

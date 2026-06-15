@@ -33,7 +33,7 @@ class APIClient {
 
     init(baseURL: String? = nil) {
         #if targetEnvironment(simulator)
-        self.baseURL = baseURL ?? "https://loris-spleenish-nonoperatically.ngrok-free.dev"
+        self.baseURL = baseURL ?? "http://localhost:8000"
         #else
         self.baseURL = baseURL ?? "https://loris-spleenish-nonoperatically.ngrok-free.dev"
         #endif

@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 @MainActor
 class SettingsViewModel: ObservableObject {
@@ -8,11 +9,9 @@ class SettingsViewModel: ObservableObject {
     @Published var savedSuccessfully = false
 
     private let profileService = ProfileService()
-    private var authService: AuthService
+    private var authService: AuthService?
 
-    init(authService: AuthService) {
-        self.authService = authService
-    }
+    init() {}
 
     func setAuthService(_ authService: AuthService) {
         self.authService = authService
@@ -132,9 +131,5 @@ class SettingsViewModel: ObservableObject {
             print("SettingsViewModel: Failed to save profile: \(error)")
             errorMessage = "Failed to save profile: \(error.localizedDescription)"
         }
-    }
-
-    func logout() {
-        authService.logout()
     }
 }
