@@ -4,7 +4,8 @@ from typing import Annotated, Literal
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from src.api.dependencies import get_current_user, get_db
+from src.api.deps import get_current_user
+from src.database import get_db
 from src.models.user import User
 from src.repositories.analytics_repository import AnalyticsRepository
 from src.schemas.analytics import AnalyticsSummaryResponse, NutrientSummary
