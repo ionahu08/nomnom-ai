@@ -47,12 +47,26 @@ See `docs/iterations/18-weekly-nutrition-summary/` for plan, phases, and summary
 
 **Next Step:** Phase 1 — Build backend analytics repository and API endpoint
 
-**⚠️ Critical Note for Iteration 18 Development:**
-Phase 1 had a critical import error in analytics.py that caused all API requests to timeout. **Before committing Phase 2+ changes**, always:
-1. Read `NomNom-Backend/BACKEND_IMPORT_GUIDE.md` for correct import patterns
-2. Verify backend starts: `python -m uvicorn src.app:app --reload` should complete with "Application startup complete"
-3. Test API responds: `curl http://localhost:8000/api/v1/profile -H "Authorization: Bearer test"`
-4. See full prevention checklist in `docs/iterations/18-weekly-nutrition-summary/BUGLOG.md`
+**⚠️ Critical Notes for Iteration 18 Development:**
+
+**Phase 1 - Import Errors:**
+- Critical import error in analytics.py caused all API requests to timeout
+- Before committing new API files, read `NomNom-Backend/BACKEND_IMPORT_GUIDE.md`
+- Always verify backend starts and responds to test requests
+
+**Phase 3 - Two Critical Bugs Found & Fixed:**
+1. **AsyncSession + Synchronous SQLAlchemy** (500 error)
+   - Never use `.query()` / `.first()` with AsyncSession
+   - Use `select()` + `await db.execute()` instead
+   - Mark repository methods as `async`
+
+2. **iOS-Backend Type Mismatches** (JSON decoding errors)
+   - Test actual API responses before building iOS models
+   - Match types exactly: backend Double → iOS Double (not Int)
+   - Optional fields: backend null → iOS Double? (not Double)
+   - Use `if let` for optional fields in UI
+
+**See:** `docs/iterations/18-weekly-nutrition-summary/BUGLOG.md` for full prevention strategies
 
 ---
 
