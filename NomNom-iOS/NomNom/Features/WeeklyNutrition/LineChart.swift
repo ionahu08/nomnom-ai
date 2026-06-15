@@ -18,58 +18,80 @@ struct LineChart: View {
                 .font(.headline)
                 .padding(.horizontal)
 
-            GeometryReader { geometry in
-                Canvas { context, size in
-                    let padding: CGFloat = 40
-                    let width = size.width - padding * 2
-                    let height = size.height - padding * 2
+            HStack(alignment: .top, spacing: 4) {
+                // Y-axis labels
+                VStack(alignment: .trailing, spacing: 0) {
+                    ForEach(0..<5, id: \.self) { index in
+                        let maxValue = getMaxValue()
+                        let value = maxValue * Double(4 - index) / 4
+                        Text(String(format: "%.0f", value))
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .frame(height: 40)
+                            .frame(maxHeight: .infinity)
+                    }
+                }
+                .frame(width: 35)
 
-                    guard !dailyBreakdown.isEmpty else { return }
+                // Chart area
+                GeometryReader { geometry in
+                    Canvas { context, size in
+                        let padding: CGFloat = 20
+                        let width = size.width - padding * 2
+                        let height = size.height - padding * 2
 
-                    // Get max value for scaling
-                    let maxValue = getMaxValue()
-                    guard maxValue > 0 else { return }
+                        guard !dailyBreakdown.isEmpty else { return }
 
-                    // Calculate points for line
-                    let points = calculatePoints(width: width, height: height, maxValue: maxValue, padding: padding)
+                        let maxValue = getMaxValue()
+                        guard maxValue > 0 else { return }
 
-                    if !points.isEmpty {
-                        // Draw line connecting points
-                        var path = Path()
-                        path.move(to: points[0])
-                        for point in points.dropFirst() {
-                            path.addLine(to: point)
+                        // Draw grid lines
+                        for i in 0..<5 {
+                            let y = padding + CGFloat(i) * (height / 4)
+                            var path = Path()
+                            path.move(to: CGPoint(x: padding, y: y))
+                            path.addLine(to: CGPoint(x: size.width - padding, y: y))
+                            context.stroke(path, with: .color(.gray.opacity(0.2)), lineWidth: 0.5)
                         }
-                        context.stroke(
-                            path,
-                            with: .color(lineColor),
-                            lineWidth: 2
-                        )
 
-                        // Draw circles at data points
-                        for point in points {
-                            context.fill(
-                                Path(ellipseIn: CGRect(x: point.x - 4, y: point.y - 4, width: 8, height: 8)),
-                                with: .color(lineColor)
-                            )
+                        // Calculate points for line
+                        let points = calculatePoints(width: width, height: height, maxValue: maxValue, padding: padding)
+
+                        if !points.isEmpty {
+                            // Draw line connecting points
+                            var path = Path()
+                            path.move(to: points[0])
+                            for point in points.dropFirst() {
+                                path.addLine(to: point)
+                            }
+                            context.stroke(path, with: .color(lineColor), lineWidth: 2)
+
+                            // Draw circles at data points
+                            for point in points {
+                                context.fill(
+                                    Path(ellipseIn: CGRect(x: point.x - 4, y: point.y - 4, width: 8, height: 8)),
+                                    with: .color(lineColor)
+                                )
+                            }
                         }
                     }
                 }
+                .frame(height: 200)
+                .background(Color(.systemGray6))
+                .cornerRadius(8)
             }
-            .frame(height: 200)
-            .padding()
-            .background(Color(.systemGray6))
-            .cornerRadius(8)
 
             // X-axis labels
             HStack(spacing: 0) {
-                ForEach(0..<xAxisLabels.count, id: \.self) { index in
-                    Text(xAxisLabels[index])
-                        .font(.caption2)
-                        .frame(maxWidth: .infinity)
+                Spacer().frame(width: 35)
+                HStack(spacing: 0) {
+                    ForEach(0..<xAxisLabels.count, id: \.self) { index in
+                        Text(xAxisLabels[index])
+                            .font(.caption2)
+                            .frame(maxWidth: .infinity)
+                    }
                 }
             }
-            .padding(.horizontal)
         }
     }
 
@@ -129,7 +151,7 @@ struct LineChart: View {
     }
 
     private func getMonthLabels() -> [String] {
-        let months = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"]
+        let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         guard !dailyBreakdown.isEmpty else { return [] }
 
         var labels: [String] = []
@@ -150,7 +172,7 @@ struct LineChart: View {
     private func extractMonth(from dateString: String) -> String? {
         let components = dateString.split(separator: "-")
         if components.count >= 2, let monthNum = Int(components[1]) {
-            let months = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"]
+            let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
             if monthNum >= 1 && monthNum <= 12 {
                 return months[monthNum - 1]
             }

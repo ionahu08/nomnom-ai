@@ -53,7 +53,8 @@ struct WeeklyNutritionView: View {
                                 Image(systemName: "chevron.right")
                                     .font(.system(size: 16, weight: .semibold))
                             }
-                            .foregroundColor(.blue)
+                            .foregroundColor(viewModel.canGoNext ? .blue : .gray)
+                            .disabled(!viewModel.canGoNext)
                         }
                         .padding(.horizontal)
                         .padding(.vertical, 12)

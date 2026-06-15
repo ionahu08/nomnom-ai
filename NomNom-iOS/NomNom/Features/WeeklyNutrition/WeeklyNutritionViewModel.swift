@@ -53,13 +53,15 @@ class WeeklyNutritionViewModel: ObservableObject {
         }
     }
 
-    func loadWeeklySummary(endDate: Date = Date()) async {
-        await loadInsightData(endDate: endDate, period: .week)
+    func loadWeeklySummary(endDate: Date? = nil) async {
+        let dateToUse = endDate ?? getDefaultEndDate()
+        await loadInsightData(endDate: dateToUse, period: .week)
     }
 
     func selectPeriod(_ period: PeriodType) async {
         selectedPeriod = period
-        await loadInsightData(endDate: selectedDate, period: period)
+        let dateToUse = selectedDate > getDefaultEndDate() ? getDefaultEndDate() : selectedDate
+        await loadInsightData(endDate: dateToUse, period: period)
     }
 
     func previousPeriod() async {
@@ -73,11 +75,35 @@ class WeeklyNutritionViewModel: ObservableObject {
 
     func nextPeriod() async {
         if let currentEndDate = getEndDateFromSummary() {
+            let maxDate = getDefaultEndDate()
             let days = selectedPeriod.days
             let newEndDate = Calendar.current.date(byAdding: .day, value: days, to: currentEndDate) ?? Date()
-            selectedDate = newEndDate
-            await loadInsightData(endDate: newEndDate, period: selectedPeriod)
+
+            // Only allow moving forward if it doesn't exceed the default (today - 1 day)
+            if newEndDate <= maxDate {
+                selectedDate = newEndDate
+                await loadInsightData(endDate: newEndDate, period: selectedPeriod)
+            }
         }
+    }
+
+    private func getDefaultEndDate() -> Date {
+        // End date should be today - 1 day
+        let calendar = Calendar.current
+        let today = Date()
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: today) ?? today
+        return yesterday
+    }
+
+    var canGoNext: Bool {
+        if let currentEndDate = getEndDateFromSummary() {
+            let maxDate = getDefaultEndDate()
+            let days = selectedPeriod.days
+            if let nextDate = Calendar.current.date(byAdding: .day, value: days, to: currentEndDate) {
+                return nextDate <= maxDate
+            }
+        }
+        return false
     }
 
     private func getEndDateFromSummary() -> Date? {
