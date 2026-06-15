@@ -7,8 +7,8 @@ enum PeriodType: String, CaseIterable {
 
     var label: String {
         switch self {
-        case .week: return "Week"
-        case .month: return "Month"
+        case .week: return "W"
+        case .month: return "M"
         case .sixMonth: return "6M"
         }
     }

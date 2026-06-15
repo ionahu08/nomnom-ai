@@ -216,7 +216,7 @@ struct WeeklyNutritionView: View {
                     }
                     .padding()
                 }
-                .navigationTitle("📊 Weekly Summary")
+                .navigationTitle("📊 Insight")
             }
             .task {
                 print("[WeeklyNutritionView] View appeared, loading summary")
