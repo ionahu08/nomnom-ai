@@ -15,16 +15,16 @@ router = APIRouter(prefix="/api/v1/analytics", tags=["analytics"])
 
 @router.get("/summary", response_model=AnalyticsSummaryResponse)
 async def get_analytics_summary(
-    period: Annotated[Literal["week", "month"], Query(description="Time period")],
+    period: Annotated[Literal["week", "month", "6m"], Query(description="Time period")],
     date: Annotated[str, Query(description="End date (YYYY-MM-DD), default: today")] = None,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> AnalyticsSummaryResponse:
     """
-    Get nutrition analytics summary for a week or month.
+    Get nutrition analytics summary for a week, month, or 6-month period.
 
     Query parameters:
-    - period: "week" or "month"
+    - period: "week" (7 days), "month" (30 days), or "6m" (180 days)
     - date: End date in YYYY-MM-DD format (optional, defaults to today)
     """
     # Parse end date
@@ -43,8 +43,11 @@ async def get_analytics_summary(
     elif period == "month":
         start_date = end_date - timedelta(days=30)
         total_days = 30
+    elif period == "6m":
+        start_date = end_date - timedelta(days=180)
+        total_days = 180
     else:
-        raise HTTPException(status_code=400, detail="Period must be 'week' or 'month'")
+        raise HTTPException(status_code=400, detail="Period must be 'week', 'month', or '6m'")
 
     # Fetch aggregated stats
     stats = await AnalyticsRepository.get_aggregated_stats(db, current_user.id, start_date, end_date)
