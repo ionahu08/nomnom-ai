@@ -251,6 +251,143 @@ from src.llm.something import ...     # ❌ Wrong layer
 
 **Status:** ✅ Ready for full end-to-end testing
 
+---
+
+## Critical Bug #1: AsyncSession Incompatibility (500 Error)
+
+**Symptom:** iOS app showed "Failed to load weekly summary: Server error (500)" when accessing Weekly tab
+
+**Root Cause:**
+The analytics repository was using synchronous SQLAlchemy methods (`.query()`, `.first()`) with `AsyncSession`, which doesn't support them. This is incompatible with async database operations in FastAPI.
+
+**Error Stack:**
+```
+AttributeError: 'AsyncSession' object has no attribute 'query'
+```
+
+**Why It Happened:**
+- Phase 1 created analytics_repository.py with synchronous syntax
+- The API endpoint uses `AsyncSession` from `get_db` dependency
+- Mismatch between synchronous repository and async database session
+
+**Fix (Commit 581abeb):**
+- Converted all AnalyticsRepository methods to `async`
+- Changed `.query()` to `select()` with `await db.execute()`
+- Changed `.first()` to `.scalar_one_or_none()`
+- Added `await` to all repository method calls in analytics.py
+- Added imports: `AsyncSession`, `select` from sqlalchemy
+
+**Prevention:**
+When creating new API endpoints that use the database:
+1. **Always check the database session type** in your endpoint
+   - If using `db: AsyncSession = Depends(get_db)` → use async SQLAlchemy
+   - If using `db: Session = Depends(get_db)` → use synchronous SQLAlchemy
+2. **Use correct syntax for async:**
+   ```python
+   # ✅ CORRECT (async)
+   from sqlalchemy import select
+   stmt = select(Model).where(...)
+   result = await db.execute(stmt)
+   
+   # ❌ WRONG (synchronous, won't work with AsyncSession)
+   db.query(Model).filter(...).all()
+   ```
+3. **Mark repository methods as async:**
+   ```python
+   @staticmethod
+   async def get_data(db: AsyncSession, ...):
+       # ... use await for all db operations
+   ```
+4. **Add await in endpoints:**
+   ```python
+   # All repository calls must use await
+   data = await AnalyticsRepository.get_data(db, ...)
+   ```
+
+---
+
+## Critical Bug #2: JSON Decoding Type Mismatch (Failed to Process Response)
+
+**Symptom:** iOS app showed "Failed to load weekly summary: Failed to process response" even though backend was responding with valid JSON
+
+**Root Cause:**
+The iOS Codable models didn't match the backend API response types:
+1. **average field:** Backend returns `Double` (e.g., 120.5), iOS model expected `Int`
+2. **percentage field:** Backend returns optional `Double?` (null when no target), iOS model expected non-optional `Double`
+
+**Why It Happened:**
+- iOS model was designed before backend implementation
+- Backend calculations naturally produce floats (sum / count = float)
+- Backend handles edge cases by returning null for percentage when no target exists
+- iOS didn't account for these edge cases
+
+**Error:**
+```
+Codable decoding error - type mismatch:
+  expected: Int
+  got: Double (120.5)
+```
+
+**Fix (Commit eca4f7f):**
+1. **WeeklySummary.swift models:**
+   - Changed `average: Int` → `average: Double`
+   - Changed `percentage: Double` → `percentage: Double?`
+
+2. **WeeklyNutritionViewModel.swift:**
+   - Updated `getCalorieStatus()` to unwrap optional percentage
+   - Updated `getNutrientStatus(percentage: Double?)` to accept optional
+
+3. **WeeklyNutritionView.swift:**
+   - Handle optional percentage with if-let binding
+   - Updated `NutrientRow` to accept `current: Double` instead of `Int`
+   - Display "N/A" when percentage is nil
+
+**Prevention:**
+When building iOS-backend data models:
+1. **Always test the actual API response first:**
+   ```bash
+   curl -H "Authorization: Bearer TOKEN" http://localhost:8000/api/v1/endpoint | python3 -m json.tool
+   ```
+   Verify the actual types (Int vs Double, null vs non-null)
+
+2. **Match types exactly in Codable models:**
+   ```swift
+   // Check what backend sends
+   // Backend sends: {"average": 120.5} → must be Double
+   // Backend sends: {"percentage": null} → must be Double?
+   
+   struct NutrientSummary: Codable {
+       let average: Double  // NOT Int
+       let percentage: Double?  // NOT Double
+   }
+   ```
+
+3. **Use CodingKeys for field mapping:**
+   ```swift
+   enum CodingKeys: String, CodingKey {
+       case average
+       case percentage
+   }
+   ```
+
+4. **Test decoding early:**
+   - Create test data matching backend response
+   - Use JSONDecoder to verify model works
+   - Don't assume types—verify!
+
+5. **Handle edge cases in UI:**
+   - Use optional binding for optional fields
+   - Provide fallback UI (e.g., "N/A")
+   - Don't force-unwrap!
+
+**Lessons Learned:**
+- Backend and iOS models must stay in sync
+- Always test with real API responses, not hypothetical ones
+- Document which fields are optional in the API contract
+- Consider adding API documentation / OpenAPI spec for clarity
+
+---
+
 **Next Phase (4) - Polish & Testing:**
 - Test week navigation with charts
 - Verify data accuracy
