@@ -30,20 +30,22 @@ iOS App (SwiftUI) ──▶ NomNom-Backend (FastAPI) ──▶ PostgreSQL + pgve
 
 ## Current Iteration
 
-**Iteration 18: Enhanced Food Diary Visualization** — 🔄 IN PROGRESS (June 14, 2026)
-See `docs/iterations/18-food-diary-visualization/` for plan, phases, and summary.
+**Iteration 18: Weekly Nutrition Summary** — 🚀 STARTING (June 15, 2026)
+See `docs/iterations/18-weekly-nutrition-summary/` for plan, phases, and summary.
 
-**Status:** Phases 1-3 ✅ Complete, Phase 4 🚧 Ready for Device Testing
+**Goal:** Add new "Weekly Summary" screen (📊 tab) between Food Diary and Settings that displays:
+- Weekly calorie intake (total, average, vs. target)
+- Nutrient composition breakdown (Protein/Carbs/Fat)
+- Daily consistency metrics & top foods
+- Visual charts (bar chart for daily calories, macro breakdown)
 
-**What's Built:**
-- ProgressCircle component: Circular progress for daily calorie tracking
-- NutritionProgressBar component: Horizontal bars for protein/carbs/fat
-- DiaryView integration: Visual summary replaces plain text
-- DiaryViewModel updates: Target loading from ProfileService
-- Build verified: Compiles without errors
-- Edge cases handled: Zero targets, >100% consumption, animations
+**Phases:**
+- Phase 1 (Day 1): Backend analytics API (`GET /api/v1/analytics/summary`)
+- Phase 2 (Days 2-3): iOS WeeklyNutritionView & ViewModel
+- Phase 3 (Days 3-4): Visualization components (charts)
+- Phase 4 (Day 5): Integration, testing, polish
 
-**Next Step:** Device testing to verify visual appearance and real-time updates work correctly
+**Next Step:** Phase 1 — Build backend analytics repository and API endpoint
 
 ---
 
