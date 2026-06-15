@@ -1,43 +1,19 @@
 # Iteration 18: Implementation Phases
 
+**Updated Goal:** Build an "Insight" tab that displays nutrition analytics for multiple periods (Weekly, Monthly, 6-Month)
+
 ---
 
-## Phase 1: Backend Analytics Repository (Day 1)
+## Phase 1: Backend Analytics Repository (Day 1) ✅ COMPLETE
 
-**Goal:** Build backend infrastructure to fetch and aggregate food log data for weekly analysis.
+**Goal:** Build backend infrastructure to fetch and aggregate food log data for any time period.
 
 **File:** `src/repositories/analytics_repository.py`
 
-Methods to implement:
-
-```python
-class AnalyticsRepository:
-    @staticmethod
-    def get_food_logs_for_period(db, user_id, start_date, end_date) → list[FoodLog]
-        # Fetch all logs between dates
-    
-    @staticmethod
-    def get_weekly_stats(db, user_id, end_date) → dict
-        # Calculate stats for 7-day period ending on end_date
-        # Returns: {
-        #   "calories": {"total": X, "average": Y, "daily": [...]},
-        #   "protein_g": {...},
-        #   "carbs_g": {...},
-        #   "fat_g": {...},
-        #   "days_logged": N,
-        #   "consistency": percentage,
-        #   "top_foods": [...]
-        # }
-    
-    @staticmethod
-    def get_daily_breakdown(db, user_id, start_date, end_date) → list[dict]
-        # Return daily totals for each day in range
-        # [{date, calories, protein_g, carbs_g, fat_g}, ...]
-    
-    @staticmethod
-    def get_user_targets(db, user_id) → dict
-        # Fetch personalized targets from UserProfile
-```
+The backend already supports flexible periods:
+- `get_analytics_summary(period="week|month", date=end_date)` 
+- Works for any period (7 days, 30 days, 180 days)
+- Already deployed and tested ✅
 
 **Tests:**
 - Test weekly stats calculation
@@ -48,51 +24,69 @@ class AnalyticsRepository:
 
 ---
 
-## Phase 2: Analytics API Endpoint (Day 1)
+## Phase 2: Analytics API Endpoint (Day 1) ✅ COMPLETE
 
 **File:** `src/api/analytics.py`
 
-Endpoint:
+Endpoint supports multiple periods:
 ```
-GET /api/v1/analytics/summary?period=week&date=2026-06-14
-
-Response:
-{
-  "period": "week",
-  "start_date": "2026-06-08",
-  "end_date": "2026-06-14",
-  "days_logged": 6,
-  "total_days": 7,
-  "consistency": 85.7,
-  "calories": {
-    "total": 12950,
-    "average": 1850,
-    "target": 2000,
-    "percentage": 92.5
-  },
-  "protein_g": { "total": 840, "average": 120, "target": 150, "percentage": 80 },
-  "carbs_g": { "total": 1260, "average": 180, "target": 200, "percentage": 90 },
-  "fat_g": { "total": 420, "average": 60, "target": 65, "percentage": 92 },
-  "daily_breakdown": [
-    { "date": "2026-06-08", "calories": 1950, "protein_g": 125, "carbs_g": 185, "fat_g": 62 },
-    ...
-  ],
-  "top_foods": [
-    { "food": "Chicken Breast", "count": 4, "calories": 1000 },
-    { "food": "Noodles", "count": 3, "calories": 1200 }
-  ]
-}
+GET /api/v1/analytics/summary?period=week|month&date=2026-06-14
 ```
 
-**Features:**
-- Authenticated (requires JWT token)
-- Flexible date range (end_date defaults to today)
-- Automatic target calculation
-- Edge case handling
+Already returns all needed data for any period:
+- Calories, protein, carbs, fat (total, average, target, percentage)
+- Daily breakdown for charting
+- Top foods
+- Consistency metrics
+- Already tested ✅
 
 ---
 
-## Phase 3: iOS WeeklyNutritionView (Days 2-3)
+## Phase 3: iOS InsightView with Period Selector (Days 2-3) ✅ COMPLETE
+
+**Renamed:** WeeklyNutritionView → InsightView
+
+**New Feature:** Period selector at top of view
+- Buttons: Week | Month | 6M
+- Shows insight data for selected period
+- Week: 7-day period
+- Month: 30-day period  
+- 6M: 180-day period
+
+**File:** `NomNom-iOS/NomNom/Features/Insights/InsightView.swift`
+
+**Layout:**
+```
+┌─────────────────────────────┐
+│ Insight                     │
+├─────────────────────────────┤
+│ [Week] [Month] [6M]         │  ← Period selector (new)
+├─────────────────────────────┤
+│ < Jun 8 - Jun 14 >          │
+├─────────────────────────────┤
+│ Week Total: 1,850 cal/day   │
+│ vs Target: 2,000 cal/day    │
+│ Status: 92.5% (On Track ✅) │
+├─────────────────────────────┤
+│ [Daily Calorie Chart]       │
+├─────────────────────────────┤
+│ [Macro Breakdown Chart]     │
+├─────────────────────────────┤
+│ Nutrient Targets            │
+│ 🍗 Protein, 🍙 Carbs, 🍖 Fat│
+├─────────────────────────────┤
+│ Top Foods                   │
+└─────────────────────────────┘
+```
+
+**Changes from Original:**
+1. Rename tab from "Weekly" to "Insight" 
+2. Add period selector (Week/Month/6M buttons)
+3. When period changes:
+   - Fetch new data from API with `period=week|month`
+   - Update period label to show date range
+   - Update all charts and summaries
+4. Same charts and data display for all periods
 
 **File:** `NomNom-iOS/NomNom/Features/WeeklyNutrition/WeeklyNutritionView.swift`
 
@@ -136,33 +130,51 @@ Components:
 
 ---
 
-## Phase 4: Data Visualization Components (Days 3-4)
+## Phase 3b: Data Visualization Components (Days 3-4) ✅ COMPLETE
 
 **Files:**
-- `WeeklyChart.swift` — Bar/line chart for daily calories
-- `MacroBreakdown.swift` — Pie chart for protein/carbs/fat split
+- `WeeklyChart.swift` — Bar chart for daily calories
+- `MacroBreakdown.swift` — Donut chart for protein/carbs/fat
 
 **Features:**
-- Smooth animations
-- Color-coded zones
-- Responsive to screen size
-- Accessible (VoiceOver support optional)
+- ✅ Daily calorie bars (7 days)
+- ✅ Color-coded zones (green/orange/red)
+- ✅ Macro donut chart with percentages
+- ✅ Responsive layouts
+- ✅ Working and tested
 
 ---
 
-## Phase 5: Integration & Polish (Day 5)
+## Phase 4: Integration & Polish (Day 5) 🚀 CURRENT
 
-**Modify:** `ContentView.swift`
-- Add new tab: WeeklyNutritionView
-- Icon: 📊 (chart.bar.fill)
-- Position: Between Food Diary and Settings
+**Tasks:**
 
-**Testing:**
-- Run on simulator
-- Test week navigation
-- Verify data matches backend
-- Edge cases: new user, no logs, future date
-- No crashes, no console errors
+### 4a: Rename & Reorganize
+- [ ] Rename `WeeklyNutritionView` → `InsightView`
+- [ ] Move files to `Features/Insights/` (instead of `WeeklyNutrition/`)
+- [ ] Update ContentView tab: "Weekly" → "Insight"
+- [ ] Keep icon: 📊 (chart.bar.fill)
+
+### 4b: Add Period Selector
+- [ ] Add period buttons: [Week] [Month] [6M]
+- [ ] Style buttons (selected = highlighted, unselected = muted)
+- [ ] Track selected period in ViewModel
+- [ ] When period changes: fetch new API data
+
+### 4c: Update ViewModel
+- [ ] Add `selectedPeriod` property (week/month/6m)
+- [ ] Modify `loadInsightData()` to use selected period
+- [ ] Update API call: `?period=week|month&date=...`
+- [ ] Update period label calculation for different periods
+
+### 4d: Testing
+- [ ] Test Week period: shows 7-day data
+- [ ] Test Month period: shows 30-day data
+- [ ] Test 6M period: shows 180-day data
+- [ ] Navigate between periods: data updates correctly
+- [ ] No console errors
+- [ ] No crashes when switching periods
+- [ ] Charts display correctly for all periods
 
 ---
 
@@ -171,43 +183,52 @@ Components:
 ```
 iOS App
   ↓
-WeeklyNutritionViewModel.loadWeeklyStats()
+InsightView (Period Selector)
   ↓
-APIClient.get(/api/v1/analytics/summary?period=week&date=...)
+User taps [Week] [Month] [6M]
+  ↓
+InsightViewModel.loadInsightData(period: "week|month")
+  ↓
+APIClient.get(/api/v1/analytics/summary?period=week|month&date=...)
   ↓
 FastAPI Analytics Endpoint
   ↓
-AnalyticsRepository.get_weekly_stats()
+AnalyticsRepository.get_aggregated_stats(period)
   ↓
-SQLAlchemy Query → FoodLog table
+SQLAlchemy Async Query → FoodLog table
   ↓
-Aggregate data + fetch targets
+Aggregate data for selected period + fetch targets
   ↓
 Build AnalyticsSummaryResponse
   ↓
 Return JSON to iOS
   ↓
-WeeklyNutritionView renders with data
+InsightView renders with updated data
 ```
 
 ---
 
 ## Performance Targets
 
-- API response time: < 200ms
+- API response time: < 200ms (all periods)
+- Period switch latency: < 1 second
 - View rendering: smooth 60 FPS
 - No N+1 queries
-- No memory leaks with large datasets
+- No memory leaks when switching periods
 
 ---
 
-## Testing Checklist
+## Testing Checklist - Phase 4
 
-- [ ] Backend tests pass (8+ test cases)
-- [ ] API endpoint returns correct data
-- [ ] iOS view renders without errors
-- [ ] Week navigation works
-- [ ] Edge cases handled (empty week, new user, future date)
-- [ ] No console errors
-- [ ] Animations smooth
-- [ ] Responsive on all screen sizes
+- [ ] Rename "Weekly" tab to "Insight" ✅
+- [ ] Period selector buttons display [Week] [Month] [6M]
+- [ ] Week period: shows 7-day data correctly
+- [ ] Month period: shows 30-day data correctly
+- [ ] 6M period: shows 180-day data correctly
+- [ ] Switching periods: data updates, charts refresh
+- [ ] Period label updates for each period
+- [ ] No console errors when switching periods
+- [ ] No crashes on rapid period switching
+- [ ] Charts responsive to all period types
+- [ ] Edge cases: empty period, new user, past dates
+- [ ] API calls use correct period parameter
