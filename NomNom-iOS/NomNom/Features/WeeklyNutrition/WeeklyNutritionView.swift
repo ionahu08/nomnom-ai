@@ -61,60 +61,6 @@ struct WeeklyNutritionView: View {
                         .cornerRadius(8)
 
                         if let summary = viewModel.summary {
-                            // Calorie Summary
-                            VStack(spacing: 16) {
-                                HStack {
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text("Weekly Average")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                        Text("\(summary.calories.average) cal/day")
-                                            .font(.system(.title3, design: .default))
-                                            .fontWeight(.semibold)
-                                    }
-                                    Spacer()
-                                    VStack(alignment: .trailing, spacing: 4) {
-                                        Text("Target")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                        Text("\(summary.calories.target) cal/day")
-                                            .font(.system(.title3, design: .default))
-                                            .fontWeight(.semibold)
-                                    }
-                                }
-
-                                HStack {
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text("Status")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                        Text(viewModel.getCalorieStatus())
-                                            .font(.system(.body, design: .default))
-                                            .fontWeight(.semibold)
-                                    }
-                                    Spacer()
-                                    VStack(alignment: .trailing, spacing: 4) {
-                                        Text("Percentage")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                        if let percentage = summary.calories.percentage {
-                                            Text(String(format: "%.1f%%", percentage))
-                                                .font(.system(.body, design: .default))
-                                                .fontWeight(.semibold)
-                                                .foregroundColor(percentage >= 95 && percentage <= 105 ? .green : .orange)
-                                        } else {
-                                            Text("N/A")
-                                                .font(.system(.body, design: .default))
-                                                .fontWeight(.semibold)
-                                                .foregroundColor(.secondary)
-                                        }
-                                    }
-                                }
-                            }
-                            .padding()
-                            .background(Color(.systemGray6))
-                            .cornerRadius(12)
-
                             // Consistency
                             VStack(spacing: 12) {
                                 HStack {
@@ -137,24 +83,33 @@ struct WeeklyNutritionView: View {
                             .background(Color(.systemGray6))
                             .cornerRadius(12)
 
-                            // Daily Calories Chart
-                            WeeklyChart(
+                            // Calories Line Chart
+                            LineChart(
                                 dailyBreakdown: summary.dailyBreakdown,
-                                calorieTarget: summary.calories.target
+                                period: viewModel.selectedPeriod,
+                                metricType: .calories
                             )
-                            .padding()
-                            .background(Color(.systemGray6))
-                            .cornerRadius(12)
 
-                            // Macro Breakdown Chart
-                            MacroBreakdown(
-                                proteinTotal: summary.proteinG.total,
-                                carbsTotal: summary.carbsG.total,
-                                fatTotal: summary.fatG.total
+                            // Protein Line Chart
+                            LineChart(
+                                dailyBreakdown: summary.dailyBreakdown,
+                                period: viewModel.selectedPeriod,
+                                metricType: .protein
                             )
-                            .padding()
-                            .background(Color(.systemGray6))
-                            .cornerRadius(12)
+
+                            // Carbs Line Chart
+                            LineChart(
+                                dailyBreakdown: summary.dailyBreakdown,
+                                period: viewModel.selectedPeriod,
+                                metricType: .carbs
+                            )
+
+                            // Fat Line Chart
+                            LineChart(
+                                dailyBreakdown: summary.dailyBreakdown,
+                                period: viewModel.selectedPeriod,
+                                metricType: .fat
+                            )
 
                             // Nutrient Summary
                             VStack(spacing: 16) {
