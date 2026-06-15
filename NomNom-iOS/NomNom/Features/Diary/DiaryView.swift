@@ -270,7 +270,7 @@ struct DiaryView: View {
                     consumed: totalCarbs,
                     target: viewModel.carbTarget,
                     unit: "g",
-                    icon: "🍣"
+                    icon: "🍙"
                 )
 
                 Spacer()

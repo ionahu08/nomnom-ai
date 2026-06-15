@@ -60,7 +60,7 @@ struct NutritionProgressBar: View {
 #Preview {
     HStack(spacing: 20) {
         NutritionProgressBar(nutrient: "Protein", consumed: 45, target: 150, unit: "g", icon: "🍗")
-        NutritionProgressBar(nutrient: "Carbs", consumed: 120, target: 200, unit: "g", icon: "🍣")
+        NutritionProgressBar(nutrient: "Carbs", consumed: 120, target: 200, unit: "g", icon: "🍙")
         NutritionProgressBar(nutrient: "Fat", consumed: 55, target: 65, unit: "g", icon: "🥓")
     }
     .padding()
