@@ -32,9 +32,9 @@ struct WeeklySummaryResponse: Codable {
 
 struct NutrientSummary: Codable {
     let total: Int
-    let average: Int
+    let average: Double
     let target: Int
-    let percentage: Double
+    let percentage: Double?
 }
 
 struct DailyBreakdown: Codable {

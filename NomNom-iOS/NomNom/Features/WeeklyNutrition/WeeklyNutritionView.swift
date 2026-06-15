@@ -76,10 +76,17 @@ struct WeeklyNutritionView: View {
                                         Text("Percentage")
                                             .font(.caption)
                                             .foregroundColor(.secondary)
-                                        Text(String(format: "%.1f%%", summary.calories.percentage))
-                                            .font(.system(.body, design: .default))
-                                            .fontWeight(.semibold)
-                                            .foregroundColor(summary.calories.percentage >= 95 && summary.calories.percentage <= 105 ? .green : .orange)
+                                        if let percentage = summary.calories.percentage {
+                                            Text(String(format: "%.1f%%", percentage))
+                                                .font(.system(.body, design: .default))
+                                                .fontWeight(.semibold)
+                                                .foregroundColor(percentage >= 95 && percentage <= 105 ? .green : .orange)
+                                        } else {
+                                            Text("N/A")
+                                                .font(.system(.body, design: .default))
+                                                .fontWeight(.semibold)
+                                                .foregroundColor(.secondary)
+                                        }
                                     }
                                 }
                             }
@@ -245,10 +252,10 @@ struct WeeklyNutritionView: View {
 struct NutrientRow: View {
     let icon: String
     let label: String
-    let current: Int
+    let current: Double
     let target: Int
     let unit: String
-    let percentage: Double
+    let percentage: Double?
     let status: String
 
     var body: some View {
@@ -260,7 +267,7 @@ struct NutrientRow: View {
                 Text(label)
                     .font(.body)
                     .fontWeight(.semibold)
-                Text("\(current)\(unit) / \(target)\(unit)")
+                Text(String(format: "%.0f\(unit) / \(target)\(unit)", current))
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -270,9 +277,15 @@ struct NutrientRow: View {
             VStack(alignment: .trailing, spacing: 4) {
                 Text(status)
                     .font(.headline)
-                Text(String(format: "%.0f%%", percentage))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                if let percentage = percentage {
+                    Text(String(format: "%.0f%%", percentage))
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } else {
+                    Text("N/A")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
             }
         }
     }

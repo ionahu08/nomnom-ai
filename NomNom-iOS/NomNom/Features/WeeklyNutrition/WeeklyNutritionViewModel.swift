@@ -66,8 +66,7 @@ class WeeklyNutritionViewModel: ObservableObject {
     }
 
     func getCalorieStatus() -> String {
-        guard let summary = summary else { return "" }
-        let percentage = summary.calories.percentage
+        guard let summary = summary, let percentage = summary.calories.percentage else { return "" }
         if percentage >= 95 && percentage <= 105 {
             return "On Track ✅"
         } else if percentage > 105 {
@@ -77,7 +76,8 @@ class WeeklyNutritionViewModel: ObservableObject {
         }
     }
 
-    func getNutrientStatus(percentage: Double) -> String {
+    func getNutrientStatus(percentage: Double?) -> String {
+        guard let percentage = percentage else { return "?" }
         if percentage >= 90 && percentage <= 110 {
             return "✅"
         } else if percentage > 110 {
