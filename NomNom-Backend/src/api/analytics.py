@@ -58,13 +58,20 @@ async def get_analytics_summary(
     # Calculate consistency percentage
     consistency = (days_logged / total_days * 100) if total_days > 0 else 0
 
+    # Recalculate averages per calendar day (not per log entry)
+    # Repository calculates per log entry, but we want per day
+    avg_calories = stats["calories"]["total"] / total_days if total_days > 0 else 0
+    avg_protein = stats["protein_g"]["total"] / total_days if total_days > 0 else 0
+    avg_carbs = stats["carbs_g"]["total"] / total_days if total_days > 0 else 0
+    avg_fat = stats["fat_g"]["total"] / total_days if total_days > 0 else 0
+
     # Build nutrient summaries with targets and percentages
     calories_summary = NutrientSummary(
         total=stats["calories"]["total"],
-        average=stats["calories"]["average"],
+        average=round(avg_calories, 1),
         target=targets["calorie_target"],
         percentage=round(
-            (stats["calories"]["average"] / targets["calorie_target"] * 100), 1
+            (avg_calories / targets["calorie_target"] * 100), 1
         )
         if targets["calorie_target"]
         else None,
@@ -72,10 +79,10 @@ async def get_analytics_summary(
 
     protein_summary = NutrientSummary(
         total=stats["protein_g"]["total"],
-        average=stats["protein_g"]["average"],
+        average=round(avg_protein, 1),
         target=targets["protein_target"],
         percentage=round(
-            (stats["protein_g"]["average"] / targets["protein_target"] * 100), 1
+            (avg_protein / targets["protein_target"] * 100), 1
         )
         if targets["protein_target"]
         else None,
@@ -83,18 +90,18 @@ async def get_analytics_summary(
 
     carbs_summary = NutrientSummary(
         total=stats["carbs_g"]["total"],
-        average=stats["carbs_g"]["average"],
+        average=round(avg_carbs, 1),
         target=targets["carb_target"],
-        percentage=round((stats["carbs_g"]["average"] / targets["carb_target"] * 100), 1)
+        percentage=round((avg_carbs / targets["carb_target"] * 100), 1)
         if targets["carb_target"]
         else None,
     )
 
     fat_summary = NutrientSummary(
         total=stats["fat_g"]["total"],
-        average=stats["fat_g"]["average"],
+        average=round(avg_fat, 1),
         target=targets["fat_target"],
-        percentage=round((stats["fat_g"]["average"] / targets["fat_target"] * 100), 1)
+        percentage=round((avg_fat / targets["fat_target"] * 100), 1)
         if targets["fat_target"]
         else None,
     )
