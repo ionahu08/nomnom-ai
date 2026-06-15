@@ -17,6 +17,12 @@ struct ContentView: View {
                     Text("Food Diary")
                 }
 
+            WeeklyNutritionView()
+                .tabItem {
+                    Image(systemName: "chart.bar.fill")
+                    Text("Weekly")
+                }
+
             SettingsView()
                 .tabItem {
                     Image(systemName: "gearshape.fill")
