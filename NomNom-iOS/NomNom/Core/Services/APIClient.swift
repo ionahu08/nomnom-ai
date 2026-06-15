@@ -59,8 +59,12 @@ class APIClient {
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
+        print("[APIClient] \(method) \(url)")
         if let token = token {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            print("[APIClient] Token set: \(token.prefix(20))...")
+        } else {
+            print("[APIClient] No token available!")
         }
 
         if let body = body {

@@ -4,10 +4,18 @@ class ProfileService {
     private let api = APIClient.shared
 
     func getProfile() async throws -> UserProfile {
+        print("[ProfileService] getProfile() called")
         do {
-            return try await api.get(path: "/api/v1/profile")
+            print("[ProfileService] Making API request to /api/v1/profile")
+            let result: UserProfile = try await api.get(path: "/api/v1/profile")
+            print("[ProfileService] Successfully fetched profile")
+            return result
         } catch APIError.serverError(404) {
+            print("[ProfileService] Got 404, returning default profile")
             return createDefaultProfile()
+        } catch {
+            print("[ProfileService] Error fetching profile: \(error)")
+            throw error
         }
     }
 
