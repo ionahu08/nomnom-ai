@@ -1,6 +1,6 @@
 # NomNom — AI-Powered Food Tracking with Semantic Caching & RAG
 
-**An intelligent food tracking application that uses Claude AI to analyze meals, provide personalized nutrition coaching, and learn user preferences through semantic caching and retrieval-augmented generation.**
+**An intelligent food tracking application that solves my diet imbalance while demonstrating production LLM engineering: 85% cache hit rate, 4.3x cost reduction, 67% latency improvement.**
 
 ## The Story
 
@@ -21,16 +21,13 @@ This is a portfolio project showcasing full-stack AI engineering: production-gra
 
 ## The Problem
 
-Food tracking apps fail at the same core issues:
+Food tracking apps fail at three core issues:
 
-| Problem | Cost | Impact |
-|---------|------|--------|
-| **Redundant API calls** | "Salmon with rice" and "salmon & vegetables" each cost $0.12 | 85% of requests are variations; exact-match cache = 15% hit rate |
-| **Generic advice** | System says "600 calories" without context | No insight into whether it's good/bad for this user's goals |
-| **Slow analysis** | Photo analysis takes 60+ seconds | Users abandon the app mid-session |
-| **No personalization** | Recommendations ignore allergies, goals, history | Advice feels irrelevant and untrusted |
+- **Expensive:** Analyzing "salmon bowl" and "salmon & vegetables" each costs the same ($0.12) despite being nutritionally similar. Exact-match cache = 15% hit rate.
+- **Slow:** Photo analysis takes 60+ seconds, killing user engagement mid-session.
+- **Generic:** Recommendations ignore user history, allergies, and constraints, feeling irrelevant.
 
-I solved these through **six engineering phases**, each tackling a different constraint. Here's how.
+I solved these through **six engineering phases**, each tackling a different constraint.
 
 ---
 
@@ -42,7 +39,7 @@ I solved the problems above through **six phases of deliberate architectural cho
 2. **Make NomNom Not Crash** — Fixed output validation: 97.2% → 100% JSON success (97% of bugs were system design, not hallucination)
 3. **Make NomNom Smarter** — Semantic caching + RAG: 85% cache hit, 60% cost reduction, 70% → 91% recommendation accuracy
 4. **Make NomNom Cheap and Fast** — Model tiering + prompt caching: $1.50 → $0.35/user/day (4.3x savings)
-5. **Make NomNom Handle Complex Questions** — Workflows vs agents: 60s → 18s latency with orchestrator-workers (95% of LLM tasks don't need agents)
+5. **Make NomNom Handle Complex Questions** — Workflows vs agents: 60s → 18s latency with orchestrator-workers
 6. **Make NomNom Extensible** — MCP server: 30min → 2min integration time
 
 **Key insight across all phases:** Architecture beats raw capability. Sonnet + semantic caching beats paying 3x for Opus. Every decision was data-driven and measured on real data.
@@ -68,16 +65,7 @@ I solved the problems above through **six phases of deliberate architectural cho
 
 - ✅ **100+ integration tests**, all passing
 - ✅ **25+ bugs identified and fixed** through structured testing (see [BUGLOG examples](docs/iterations/*/BUGLOG.md))
-- ✅ **Clean architecture:** API → Services → LLM with dependency injection
 - ✅ **Production-ready:** error handling, monitoring, cost tracking
-
-### Why These Numbers Matter
-
-**Latency:** Not just micro-optimization. 60s → 25s is difference between "demo that impresses" and "product people use."
-
-**Cache Hit Rate:** Semantic caching beats model upgrades. 85% hit rate is worth more than paying for Opus.
-
-**Cost Journey:** Worth understanding because it shows *systems thinking*. We didn't just use a cheaper model; we combined cheaper model + better caching + faster response → exponential savings. (See [detailed cost analysis](docs/iterations/13-cost-and-latency/SUMMARY.md))
 
 ---
 
@@ -106,60 +94,6 @@ I solved the problems above through **six phases of deliberate architectural cho
 │               + Chat History                           │
 └─────────────────────────────────────────────────────────────┘
 ```
-
-**Key Innovation:** Semantic caching layer between app and LLM prevents redundant Claude calls.
-
----
-
-## How Problems Were Solved: Key Challenges
-
-Three challenges demonstrate the engineering rigor behind this project:
-
-### Challenge 1: Cache Hit Rate Plateau (40% → 85%)
-
-**Problem:** Implemented semantic caching with threshold 0.95. Hit rate stuck at 40%—barely better than static cache.
-
-**Root Cause:** Threshold too strict. "Salmon bowl," "salmon with rice," "salmon & vegetables" all have different embeddings despite similar nutrition.
-
-**Solution:** 
-- Tested thresholds 0.95 → 0.82 on 150 meal pairs
-- Measured precision/recall at each point
-- Added regression test: `test_semantic_cache_threshold_tuning`
-
-**Result:** Hit rate jumped to 85% with <1% false positives.
-
-**Learning:** Threshold tuning > infrastructure. Empirical data beats guesses.
-
----
-
-### Challenge 2: Cost Spike After "Optimization"
-
-**Problem:** Switched from Opus ($0.12/request) to Sonnet ($0.04/request). Expected cost $12 → $4. Got $10 instead.
-
-**Root Cause:** Cheaper model → faster response → more user engagement → higher volume. Also slightly lower accuracy → more follow-up calls.
-
-**Solution:** Accepted trade-off because:
-- Per-request cost is fundamental (scales to millions of users)
-- Added rate limiting + monitoring (daily cost alert)
-- Semantic caching + Sonnet combo yields 83% final savings anyway
-
-**Learning:** Can't optimize single variables in isolation. Volume, quality, and latency are coupled. The final system (Sonnet + 85% cache hit rate) costs $2/day vs. baseline $12/day.
-
----
-
-### Challenge 3: Multi-Turn Chat Context Loss
-
-**Problem:** Nutrition coach "forgot" user constraints. Re-asking about allergies even though user mentioned it 3 turns ago.
-
-**Root Cause:** Only passing current message to Claude, not conversation history.
-
-**Solution:**
-- Implemented message threading: store full conversation history server-side
-- Added lazy-loading: retrieve last N messages (tested N=10 as optimal)
-- Dynamic context injection: Include user health profile in every request
-- Regression test: `test_nutrition_coach_context_preservation_20_turns`
-
-**Result:** Perfect context across 20+ turns. Token usage ~3.2K per request (acceptable).
 
 ---
 
@@ -384,6 +318,7 @@ This is a **portfolio project** that demonstrates genuine engineering rigor:
 | Topic | Read This |
 |-------|-----------|
 | Full project overview | [CLAUDE.md](CLAUDE.md) |
+| Interview preparation guide | [docs/interview/README.md](docs/interview/README.md) |
 | Semantic caching implementation | [docs/iterations/12-semantic-cache-production/](docs/iterations/12-semantic-cache-production/) |
 | Cost optimization journey | [docs/iterations/13-cost-and-latency/](docs/iterations/13-cost-and-latency/) |
 | Meal recommendation workflow | [docs/iterations/14-meal-recommendation-workflow/](docs/iterations/14-meal-recommendation-workflow/) |
@@ -407,4 +342,3 @@ This is a **portfolio project** that demonstrates genuine engineering rigor:
 **Last Updated:** June 16, 2026  
 **Status:** Core features complete, production-ready, actively iterating (Iteration 20 in progress)  
 **Next Phase:** iOS App Store launch and feedback-driven improvements
-
