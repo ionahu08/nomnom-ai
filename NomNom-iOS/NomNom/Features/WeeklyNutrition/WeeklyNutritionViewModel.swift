@@ -45,10 +45,24 @@ class WeeklyNutritionViewModel: ObservableObject {
         print("[InsightViewModel] Loading summary for period=\(apiPeriod), date=\(dateString)")
 
         do {
-            summary = try await api.get(path: "/api/v1/analytics/summary?period=\(apiPeriod)&date=\(dateString)")
-            print("[InsightViewModel] Summary loaded successfully")
+            let path = "/api/v1/analytics/summary?period=\(apiPeriod)&date=\(dateString)"
+            print("[InsightViewModel] API Request: GET \(path)")
+
+            summary = try await api.get(path: path)
+
+            if let summary = summary {
+                print("[InsightViewModel] ✅ Summary loaded successfully")
+                print("[InsightViewModel] - Period: \(summary.period)")
+                print("[InsightViewModel] - Date range: \(summary.startDate) to \(summary.endDate)")
+                print("[InsightViewModel] - Days logged: \(summary.daysLogged)/\(summary.totalDays)")
+                print("[InsightViewModel] - Daily breakdown count: \(summary.dailyBreakdown.count)")
+            } else {
+                print("[InsightViewModel] ⚠️ Summary is nil after API call")
+            }
         } catch {
-            print("[InsightViewModel] Failed to load summary: \(error)")
+            print("[InsightViewModel] ❌ Failed to load summary: \(error)")
+            print("[InsightViewModel] Error type: \(type(of: error))")
+            print("[InsightViewModel] Error description: \(error.localizedDescription)")
             errorMessage = "Failed to load insight data: \(error.localizedDescription)"
         }
     }
@@ -69,7 +83,15 @@ class WeeklyNutritionViewModel: ObservableObject {
             let days = selectedPeriod.days
             let newEndDate = Calendar.current.date(byAdding: .day, value: -days, to: currentEndDate) ?? Date()
             selectedDate = newEndDate
+
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd"
+            let dateStr = formatter.string(from: newEndDate)
+            print("[InsightViewModel] Previous button: Moving from \(formatter.string(from: currentEndDate)) to \(dateStr) (period=\(days) days)")
+
             await loadInsightData(endDate: newEndDate, period: selectedPeriod)
+        } else {
+            print("[InsightViewModel] Previous button: Could not get current end date from summary")
         }
     }
 
