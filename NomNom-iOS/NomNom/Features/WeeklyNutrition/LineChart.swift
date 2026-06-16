@@ -61,7 +61,7 @@ struct LineChart: View {
                         var targetPath = Path()
                         targetPath.move(to: CGPoint(x: padding, y: targetY))
                         targetPath.addLine(to: CGPoint(x: size.width - padding, y: targetY))
-                        context.stroke(targetPath, with: .color(.green.opacity(0.6)), lineWidth: 1.5)
+                        context.stroke(targetPath, with: .color(.green), lineWidth: 2)
 
                         // Calculate points for line
                         let points = calculatePoints(width: width, height: height, maxValue: maxValue, padding: padding)

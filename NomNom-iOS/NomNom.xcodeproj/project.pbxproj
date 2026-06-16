@@ -58,7 +58,7 @@
 		1101E50AE81FF3822EC4376A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		11F32EBC4EE6D11AE2A0CABE /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		12E4CE441ABE474CFDB4908C /* InsightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsViewModel.swift; sourceTree = "<group>"; };
-		13C9743DF51DF115E6ED8ED1 /* NomNom.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = NomNom.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13C9743DF51DF115E6ED8ED1 /* NomNom.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NomNom.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		15F206442F73FB3E13281A1F /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		1D4CCD1699B41931BB7C95E2 /* FoodLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodLog.swift; sourceTree = "<group>"; };
 		1DBAC3EDF8C7103753678F5E /* CameraViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewModel.swift; sourceTree = "<group>"; };
@@ -86,7 +86,7 @@
 		CB0A93903E8640902656F253 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CF8BFACD1F8D790AA9F8FA93 /* ProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileService.swift; sourceTree = "<group>"; };
 		D3D97565F95D9377AE8CBB26 /* DiaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryView.swift; sourceTree = "<group>"; };
-		D6284B197EC3012AB4575CA3 /* NomNomTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = NomNomTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D6284B197EC3012AB4575CA3 /* NomNomTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = text; name = NomNomTests.xctest; path = .xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F510BF00E85B48A6FFD157B8 /* NomNomColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NomNomColors.swift; sourceTree = "<group>"; };
 		F5DFBE6B80A5D1E964B4C28A /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		FE886FE2845039E86F06B297 /* DiaryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryViewModel.swift; sourceTree = "<group>"; };
@@ -313,7 +313,6 @@
 				LastUpgradeCheck = 1400;
 				TargetAttributes = {
 					7E9ABC9EF4F0EFD62D11B0F9 = {
-						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -416,7 +415,7 @@
 				CODE_SIGNING_REQUIRED = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = N6Y6L8G2VB;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NomNom/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = NomNom;
@@ -478,7 +477,7 @@
 				CODE_SIGNING_REQUIRED = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = N6Y6L8G2VB;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NomNom/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = NomNom;
