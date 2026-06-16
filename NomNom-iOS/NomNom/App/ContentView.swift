@@ -3,7 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject var authService: AuthService
     @State private var selectedTab = 0
-    private let tabs = ["Camera", "Food Diary", "Insight", "Settings"]
+    private let tabs = ["Camera", "Food Diary", "Insight", "Coach", "Settings"]
 
     var body: some View {
         ZStack {
@@ -29,8 +29,15 @@ struct ContentView: View {
                         Text("Insight")
                     }
 
-                SettingsView()
+                NutritionCoachView()
                     .tag(3)
+                    .tabItem {
+                        Image(systemName: "message.fill")
+                        Text("Coach")
+                    }
+
+                SettingsView()
+                    .tag(4)
                     .tabItem {
                         Image(systemName: "gearshape.fill")
                         Text("Settings")
