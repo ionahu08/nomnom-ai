@@ -97,6 +97,56 @@ I solved the problems above through **six phases of deliberate architectural cho
 
 ---
 
+## What I Learned About Production AI
+
+### The Paradigm Shift
+
+I entered this project believing: **"Bigger models solve hard problems."**
+
+I finished believing: **"The constraint was never the model—it was system design."**
+
+This isn't just a technical learning. It completely changed how I approach every LLM engineering problem now.
+
+### Specific Lessons
+
+1. **The Real Problem Isn't the Model—It's System Design**
+   - Phase 2 taught me: 97% of my failures were JSON parsing, not hallucination. I was blaming Claude when the system was broken.
+   - Now: Every problem, I diagnose the constraint first. Is it quality? Cost? Latency? Then design accordingly.
+
+2. **Prompts Are Product Assets, Not Code**
+   - I spent 2 hours iterating. Realized prompts need separation from code because they change 10x faster.
+   - Now: Prompt versioning and testing happen independently from engineering cycles.
+
+3. **Measurement Beats Intuition**
+   - Thought 0.95 threshold was "safe." Tested on real data, got 0.82. Measurement won.
+   - Now: Every decision—how would I measure it? Data over gut.
+
+4. **Architecture Beats Raw Capability**
+   - Assumed Opus was necessary for food recognition. Tested Sonnet + semantic caching. Sonnet won *at 70% less cost*.
+   - Now: I ask "what's the system constraint?" before "which model should I use?"
+
+5. **You Can't Optimize One Variable in Isolation**
+   - Switched to cheaper model → costs went UP (better UX → more usage).
+   - Now: I think in coupled systems. Cost + latency + quality. Change one, everything shifts.
+
+6. **Most LLM Bugs Are System Design Failures**
+   - Spent time on better prompts. Root cause: JSON parsing edge cases.
+   - Now: Fix the system (strict output validation), not the prompt.
+
+### Why This Matters
+
+This isn't just "tips for LLM engineering." It's a fundamental reorientation: from "which model is best?" to "what's the system constraint?"
+
+Every architectural decision in NomNom flowed from this principle. That's why:
+- Sonnet (cheaper) beats Opus without caching
+- Workflows beat agents 95% of the time
+- Semantic caching was worth 6 weeks of tuning
+- Cost optimization wasn't the final step—it was integral to every phase
+
+(See [Phase 6 retrospective](docs/learning/03_phase_retrospectives/phase_6_retro.md) for full learning journey)
+
+---
+
 ## Design Decisions & Tradeoffs
 
 | Decision | Why | Tradeoff |
@@ -107,6 +157,34 @@ I solved the problems above through **six phases of deliberate architectural cho
 | **Stateless API with server-side history** | Simplifies scaling, clear separation of concerns | Need careful invalidation strategy |
 
 (See [detailed design explorations](docs/iterations/14-meal-recommendation-workflow/PHASES.md) for evaluation process)
+
+---
+
+## Features & Status
+
+| Feature | Status | Tech |
+|---------|--------|------|
+| Photo-to-analysis with semantic caching | ✅ Complete | Claude vision, pgvector |
+| Multi-period analytics (daily/weekly/monthly) | ✅ Complete | FastAPI, SQLAlchemy |
+| Personalized health profile (TDEE, macros) | ✅ Complete | Mifflin-St Jeor calculations |
+| Nutrition Coach chatbot | ✅ Complete | Multi-turn agent, tool use |
+| Meal recommendations with RAG | ✅ Complete | Orchestrator-worker pattern |
+| Semantic caching with empirical tuning | ✅ Complete | pgvector, 0.82 threshold |
+| Chat history & context preservation | ✅ Complete | Message threading |
+| Production monitoring & cost tracking | ✅ Complete | Logging, alerts |
+
+---
+
+## What Makes This Real
+
+This is a **portfolio project** that demonstrates genuine engineering rigor:
+
+✅ **Production-grade architecture** — Not toy code; handles caching, concurrency, error recovery  
+✅ **Empirical validation** — Threshold tuning, A/B evaluation, regression testing  
+✅ **Transparent challenges** — Problems + root causes + solutions documented (see [BUGLOG examples](docs/iterations/*/BUGLOG.md))  
+✅ **Quantified results** — Specific metrics (85% cache hit, 67% latency reduction, 83% cost savings)  
+✅ **Learning journey documented** — 7-phase curriculum with reflections (see [learning docs](docs/learning/))  
+✅ **Code quality** — 100+ tests, clean architecture, comprehensive documentation  
 
 ---
 
@@ -222,84 +300,6 @@ NomNom/
 ```
 
 **For detailed navigation:** See [`.claude/rules/repo-navigation-quick-ref.md`](.claude/rules/repo-navigation-quick-ref.md)
-
----
-
-## What I Learned About Production AI
-
-### The Paradigm Shift
-
-I entered this project believing: **"Bigger models solve hard problems."**
-
-I finished believing: **"The constraint was never the model—it was system design."**
-
-This isn't just a technical learning. It completely changed how I approach every LLM engineering problem now.
-
-### Specific Lessons
-
-1. **The Real Problem Isn't the Model—It's System Design**
-   - Phase 2 taught me: 97% of my failures were JSON parsing, not hallucination. I was blaming Claude when the system was broken.
-   - Now: Every problem, I diagnose the constraint first. Is it quality? Cost? Latency? Then design accordingly.
-
-2. **Prompts Are Product Assets, Not Code**
-   - I spent 2 hours iterating. Realized prompts need separation from code because they change 10x faster.
-   - Now: Prompt versioning and testing happen independently from engineering cycles.
-
-3. **Measurement Beats Intuition**
-   - Thought 0.95 threshold was "safe." Tested on real data, got 0.82. Measurement won.
-   - Now: Every decision—how would I measure it? Data over gut.
-
-4. **Architecture Beats Raw Capability**
-   - Assumed Opus was necessary for food recognition. Tested Sonnet + semantic caching. Sonnet won *at 70% less cost*.
-   - Now: I ask "what's the system constraint?" before "which model should I use?"
-
-5. **You Can't Optimize One Variable in Isolation**
-   - Switched to cheaper model → costs went UP (better UX → more usage).
-   - Now: I think in coupled systems. Cost + latency + quality. Change one, everything shifts.
-
-6. **Most LLM Bugs Are System Design Failures**
-   - Spent time on better prompts. Root cause: JSON parsing edge cases.
-   - Now: Fix the system (strict output validation), not the prompt.
-
-### Why This Matters
-
-This isn't just "tips for LLM engineering." It's a fundamental reorientation: from "which model is best?" to "what's the system constraint?"
-
-Every architectural decision in NomNom flowed from this principle. That's why:
-- Sonnet (cheaper) beats Opus without caching
-- Workflows beat agents 95% of the time
-- Semantic caching was worth 6 weeks of tuning
-- Cost optimization wasn't the final step—it was integral to every phase
-
-(See [Phase 6 retrospective](docs/learning/03_phase_retrospectives/phase_6_retro.md) for full learning journey)
-
----
-
-## Features & Status
-
-| Feature | Status | Tech |
-|---------|--------|------|
-| Photo-to-analysis with semantic caching | ✅ Complete | Claude vision, pgvector |
-| Multi-period analytics (daily/weekly/monthly) | ✅ Complete | FastAPI, SQLAlchemy |
-| Personalized health profile (TDEE, macros) | ✅ Complete | Mifflin-St Jeor calculations |
-| Nutrition Coach chatbot | ✅ Complete | Multi-turn agent, tool use |
-| Meal recommendations with RAG | ✅ Complete | Orchestrator-worker pattern |
-| Semantic caching with empirical tuning | ✅ Complete | pgvector, 0.82 threshold |
-| Chat history & context preservation | ✅ Complete | Message threading |
-| Production monitoring & cost tracking | ✅ Complete | Logging, alerts |
-
----
-
-## What Makes This Real
-
-This is a **portfolio project** that demonstrates genuine engineering rigor:
-
-✅ **Production-grade architecture** — Not toy code; handles caching, concurrency, error recovery  
-✅ **Empirical validation** — Threshold tuning, A/B evaluation, regression testing  
-✅ **Transparent challenges** — Problems + root causes + solutions documented (see [BUGLOG examples](docs/iterations/*/BUGLOG.md))  
-✅ **Quantified results** — Specific metrics (85% cache hit, 67% latency reduction, 83% cost savings)  
-✅ **Learning journey documented** — 7-phase curriculum with reflections (see [learning docs](docs/learning/))  
-✅ **Code quality** — 100+ tests, clean architecture, comprehensive documentation  
 
 ---
 
