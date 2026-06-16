@@ -82,13 +82,20 @@ class WeeklyNutritionViewModel: ObservableObject {
     func previousPeriod() async {
         if let currentEndDate = getEndDateFromSummary() {
             let days = selectedPeriod.days
-            let newEndDate = Calendar.current.date(byAdding: .day, value: -days, to: currentEndDate) ?? Date()
+
+            // Use UTC calendar to avoid timezone issues
+            var utcCalendar = Calendar(identifier: .gregorian)
+            utcCalendar.timeZone = TimeZone(abbreviation: "UTC") ?? TimeZone.current
+
+            let newEndDate = utcCalendar.date(byAdding: .day, value: -days, to: currentEndDate) ?? Date()
             selectedDate = newEndDate
 
             let formatter = DateFormatter()
             formatter.dateFormat = "yyyy-MM-dd"
-            let dateStr = formatter.string(from: newEndDate)
-            print("[InsightViewModel] Previous button: Moving from \(formatter.string(from: currentEndDate)) to \(dateStr) (period=\(days) days)")
+            formatter.timeZone = TimeZone(abbreviation: "UTC")
+            let currentStr = formatter.string(from: currentEndDate)
+            let newStr = formatter.string(from: newEndDate)
+            print("[InsightViewModel] Previous button: Moving from \(currentStr) to \(newStr) (period=\(days) days)")
 
             await loadInsightData(endDate: newEndDate, period: selectedPeriod)
         } else {
@@ -100,7 +107,12 @@ class WeeklyNutritionViewModel: ObservableObject {
         if let currentEndDate = getEndDateFromSummary() {
             let maxDate = getDefaultEndDate()
             let days = selectedPeriod.days
-            let newEndDate = Calendar.current.date(byAdding: .day, value: days, to: currentEndDate) ?? Date()
+
+            // Use UTC calendar to avoid timezone issues
+            var utcCalendar = Calendar(identifier: .gregorian)
+            utcCalendar.timeZone = TimeZone(abbreviation: "UTC") ?? TimeZone.current
+
+            let newEndDate = utcCalendar.date(byAdding: .day, value: days, to: currentEndDate) ?? Date()
 
             // Only allow moving forward if it doesn't exceed the default (today - 1 day)
             if newEndDate <= maxDate {
@@ -122,7 +134,11 @@ class WeeklyNutritionViewModel: ObservableObject {
         if let currentEndDate = getEndDateFromSummary() {
             let maxDate = getDefaultEndDate()
             let days = selectedPeriod.days
-            if let nextDate = Calendar.current.date(byAdding: .day, value: days, to: currentEndDate) {
+
+            var utcCalendar = Calendar(identifier: .gregorian)
+            utcCalendar.timeZone = TimeZone(abbreviation: "UTC") ?? TimeZone.current
+
+            if let nextDate = utcCalendar.date(byAdding: .day, value: days, to: currentEndDate) {
                 return nextDate <= maxDate
             }
         }
