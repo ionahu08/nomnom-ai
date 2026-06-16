@@ -338,6 +338,7 @@ struct SettingsView: View {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
+                        dismissKeyboard()
                         Task {
                             await viewModel.saveProfile()
                         }
@@ -437,6 +438,10 @@ struct SettingsView: View {
             viewModel.profile?.medicalConditions?.append(trimmed)
             newCondition = ""
         }
+    }
+
+    private func dismissKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
 
