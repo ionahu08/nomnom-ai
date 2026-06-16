@@ -26,6 +26,90 @@ Use **SECTION C: 22 Technical Q&As** — These are quick pivots when someone ask
 
 ---
 
+## IMPORTANCE LEVELS
+
+Each Q&A is marked with one of three importance levels:
+
+- **🔴 CRITICAL** — Expect in almost every technical interview. Demonstrates core LLM engineering competency. Prepare these first.
+- **🟡 IMPORTANT** — Strong follow-ups and depth indicators. Shows thoughtful problem-solving. Prepare second.
+- **🟢 SPECIALIST** — Advanced topics, edge cases, or role-specific questions. Deep dives when time permits.
+
+---
+
+## TABLE OF CONTENTS
+
+### **Quick Navigation by Importance**
+
+**🔴 CRITICAL (16 Q&As)** — Prepare these first
+- [Q1: Transient Failures](#q1-how-do-you-handle-transient-failures-in-llm-api-calls) — Error handling fundamentals
+- [Q2: Cost Optimization](#q2-how-do-you-optimize-llm-costs-without-sacrificing-quality) — Business-aware thinking
+- [Q3: Prompt Caching](#q3-tell-me-about-prompt-caching-when-does-it-help) — Core performance technique
+- [Q5: Prompt Design](#q5-how-do-you-design-prompts-for-iteration) — Core LLM skill
+- [Q8: Cache Threshold Tuning](#q8-how-do-you-tune-a-semantic-cache-threshold) — The iconic 0.82 story
+- [Q9: Search Methods](#q9-vector-search-vs-bm25-vs-hybrid-which-one) — RAG fundamentals
+- [Q11: Evaluation Pipeline](#q11-how-do-you-build-an-evaluation-pipeline) — Measuring quality
+- [Q13: Workflow vs Agent](#q13-when-should-you-use-workflow-vs-single-agent) — Key architectural decision
+- [Q23: Development Process](#q23-walk-me-through-your-development-process-how-do-you-organize-a-big-project) — Organization & thinking
+- [Q25: PLAN/PHASES/BUGLOG/SUMMARY](#q25-you-mention-plan-phases-buglog-summary%E2%80%94explain-this-structure-and-why-it-works-for-ai-assisted-development) — Structured AI-assisted approach
+- [Q27: Quality Gates](#q27-tell-me-about-your-quality-gates-how-do-you-know-when-a-feature-is-done) — Ensuring quality
+- [Q33: iOS Architecture](#q33-walk-me-through-your-ios-architecture-why-mvvm-how-does-it-handle-the-backend-integration) — Full-stack knowledge
+- [Q38: LLM-Assisted Development](#q38-you-built-the-ios-app-with-llm-assistance-claude-code-how-do-you-communicate-that-in-interviews) — Owning the approach
+- [Q39: RAG Evaluation](#q39-how-do-you-evaluate-rag-quality-what-metrics-matter) — Measurable quality
+- [Q44: A/B Testing Prompts](#q44-walk-me-through-your-prompt-ab-testing-methodology-how-do-you-measure-which-prompt-is-better) — Empirical validation
+- [Q47: Prompt Versioning](#q47-how-do-you-handle-prompt-versioning-and-rollback-what-if-a-prompt-update-breaks-things) — Production reliability
+
+**🟡 IMPORTANT (28 Q&As)** — Prepare second, shows depth
+- [Q6: Input Handling](#q6-how-do-you-handle-ambiguous-or-malformed-user-input) — Robustness
+### **Q7:** **🟡 IMPORTANT** — Prefill+stop vs. tool_choice—when to use each?
+- [Q10: RAG Knowledge Structure](#q10-how-do-you-structure-rag-knowledge) — Design decision
+- [Q12: Measuring Improvement](#q12-how-do-you-measure-if-output-is-getting-better) — Metrics mindset
+- [Q14: Orchestrator-Workers](#q14-explain-orchestrator-workers-pattern) — Architectural pattern
+- [Q15: Error Handling in Agents](#q15-how-do-you-handle-errors-in-agent-loops) — Robustness
+- [Q17: Multi-Agent Evaluation](#q17-how-do-you-evaluate-a-multi-agent-system) — System thinking
+- [Q18: Design Tradeoff](#q18-tell-me-about-a-design-tradeoff-you-made) — Thought process
+- [Q19: Redesign Reflection](#q19-how-would-you-approach-building-this-differently-today) — Learning & reflection
+- [Q24: Claude Code Workflow](#q24-how-do-you-use-claude-code-in-your-workflow) — AI-assisted development
+- [Q26: Test Generation](#q26-how-do-you-generate-test-cases-when-working-with-ai-tell-me-about-your-testing-strategy) — Quality assurance
+- [Q28: Debugging with Claude](#q28-tell-me-about-a-time-you-got-stuck-how-did-you-debug-it-with-claude) — Problem-solving
+- [Q29: Iteration Approach](#q29-how-do-you-handle-iteration-when-working-with-ai-does-your-approach-to-prompting-change-between-exploration-and-execution) — Learning & adaptation
+- [Q30: Project Structure](#q30-you-mention-iteration-20-and-20-phases%E2%80%94how-do-you-structure-long-running-projects-how-do-you-avoid-getting-lost) — Organization
+- [Q34: Database Schema](#q34-walk-me-through-your-database-schema-why-did-you-design-it-this-way) — Data modeling
+- [Q35: Authentication](#q35-tell-me-about-authentication-how-do-you-store-the-jwt-token-securely-on-ios) — Security fundamentals
+- [Q40: Hybrid Search](#q40-tell-me-about-your-hybrid-search-approach-why-bm25--vector--rrf-instead-of-pure-vector-search) — Optimization
+- [Q41: RAG Failures](#q41-tell-me-about-a-rag-failure-mode-you-encountered) — Problem-solving
+- [Q42: Knowledge Chunking](#q42-how-do-you-structure-knowledge-base-chunks-for-rag-whats-your-chunking-strategy) — RAG design
+- [Q43: Multi-Turn Conversations](#q43-how-do-you-handle-rag-for-multi-turn-conversations-does-context-from-turn-1-affect-turn-3) — Conversation design
+- [Q45: Few-Shot vs Zero-Shot](#q45-tell-me-about-few-shot-vs-zero-shot-prompting-when-do-you-use-each) — Prompt strategy
+- [Q46: Chain-of-Thought](#q46-tell-me-about-chain-of-thought-prompting-do-you-use-it-when) — Reasoning techniques
+- [Q51: Tool Selection](#q51-how-do-you-design-tools-so-claude-picks-the-right-one-tool-selection-strategy) — Agent design
+- [Q52: Multi-Agent Coordination](#q52-tell-me-about-multi-agent-coordination-how-do-multiple-agents-work-together) — Orchestration
+- [Q55: Tool Naming & Discovery](#q55-how-do-you-design-tools-so-theyre-discoverable-tool-naming-and-descriptions) — API design
+- [Q58: Workflow Structure](#q58-how-do-you-structure-workflows-sequential-vs-parallel-vs-hybrid) — System design
+- [Q59: Error Handling in Workflows](#q59-how-do-you-handle-errors-in-workflows-what-if-a-step-fails) — Resilience
+- [Q61: Workflow Monitoring](#q61-how-do-you-monitor-and-debug-workflows-observability) — Observability
+
+**🟢 SPECIALIST (18 Q&As)** — Deep dives and advanced topics
+- [Q4: Cost Tracking](#q4-how-do-you-track-llm-costs) — Metrics (nice-to-have)
+- [Q16: When NOT to Use Multi-Agent](#q16-when-not-to-use-multi-agent) — Edge case thinking
+- [Q20: When to Stop Optimizing](#q20-how-do-you-know-when-to-stop-optimizing) — Diminishing returns
+- [Q21: Scale to 100k Users](#q21-how-would-you-redesign-nomnom-to-handle-100k-users) — Infrastructure thinking
+- [Q22: Personalization](#q22-how-would-you-add-personalization-to-nomnom) — Feature design
+- [Q31: Learning Measurement](#q31-you-completed-a-10-week-structured-learning-journey-6-phases-how-did-you-measure-learning-progress-how-do-you-know-you-got-better) — Meta-learning
+- [Q32: Git Discipline](#q32-how-do-you-use-git-and-commit-discipline-in-a-learning-context-why-does-every-commit-have-a-message) — Development practices
+- [Q36: Mobile Challenge](#q36-tell-me-about-a-mobile-specific-challenge-you-solved) — Domain expertise
+- [Q37: Data Sync](#q37-how-do-you-keep-ios-and-backend-data-in-sync) — Synchronization
+- [Q48: Complexity vs Cost](#q48-tell-me-about-the-tradeoff-between-prompt-complexity-and-model-cost) — Tradeoff analysis
+- [Q49: Agent Failure Modes](#q49-tell-me-about-agent-failure-modes-how-do-you-debug-when-an-agent-gets-stuck) — Debugging
+- [Q50: Context Windows](#q50-how-do-you-manage-agent-state-and-context-windows-what-happens-to-memory-across-turns) — Memory management
+- [Q53: Reasoning Traces](#q53-how-do-you-debug-what-an-agent-is-thinking-reasoning-traces) — Debugging
+- [Q54: Agent vs Workflow Decision](#q54-agent-vs-workflow%E2%80%94how-do-you-decide-which-to-use) — Decision framework
+- [Q56: MCP vs REST](#q56-tell-me-about-mcp-model-context-protocol-when-do-you-use-it-vs-rest-api) — Architecture decision
+- [Q57: Tool Versioning](#q57-how-do-you-handle-tool-versioning-what-if-you-need-to-change-a-tools-behavior) — Version management
+- [Q60: Branching Logic](#q60-how-do-you-choose-between-conditional-branching-and-orchestrating-with-agents) — Logic design
+- [Q62: Anti-Patterns](#q62-whats-the-most-common-workflow-anti-pattern-youve-encountered) — Best practices
+
+---
+
 ## SECTION A: 5 Core Talking Points
 
 ### **Talking Point 1: Why 0.82? The Semantic Cache Threshold Story**
@@ -512,7 +596,7 @@ Tested 0.70–0.95 on 150 real meals. Found 0.82 captures 90% of duplicates with
 
 **These are quick pivots for follow-up questions. Each is 1-2 minutes spoken.**
 
-### **Q1: How do you handle transient failures in LLM API calls?**
+### **Q1:** **🔴 CRITICAL** — How do you handle transient failures in LLM API calls?
 
 Exponential backoff with small retry count (2–3). Wait 1s, then 2s, then fail. Don't hammer the API during outages.
 
@@ -522,7 +606,7 @@ The principle: Retry logic is the difference between "feels like an outage" and 
 
 ---
 
-### **Q2: How do you optimize LLM costs without sacrificing quality?**
+### **Q2:** **🔴 CRITICAL** — How do you optimize LLM costs without sacrificing quality?
 
 Don't optimize blindly. Measure where money goes. Use model tiering: cheap for simple tasks, expensive for high-stakes.
 
@@ -532,7 +616,7 @@ Constraint thinking: At 1k users, $1.50/day = $45k/month (unsustainable). That's
 
 ---
 
-### **Q3: Tell me about prompt caching. When does it help?**
+### **Q3:** **🔴 CRITICAL** — Tell me about prompt caching. When does it help?
 
 Reuses expensive static content (system prompts, tool schemas). First call pays full cost. Next 180 calls (1-hour TTL) pay 90% less per cached token.
 
@@ -542,7 +626,7 @@ When it doesn't help: System prompt changes hourly (cache invalidates).
 
 ---
 
-### **Q4: How do you track LLM costs?**
+### **Q4:** **🟡 IMPORTANT** — How do you track LLM costs?
 
 Log per-call: tokens (input, output, cache-read), latency, model, cost. Query to answer "Which feature costs most?" and "Can we afford N users?"
 
@@ -552,7 +636,7 @@ Without visibility, "Are we profitable?" is a guess.
 
 ---
 
-### **Q5: How do you design prompts for iteration?**
+### **Q5:** **🔴 CRITICAL** — How do you design prompts for iteration?
 
 Separate prompts from code. Use templating (Jinja2). Version-control prompts independently. Non-engineers can iterate without touching Python.
 
@@ -562,7 +646,7 @@ Principle: Prompts are product assets (change 10x more frequently than code).
 
 ---
 
-### **Q6: How do you handle ambiguous or malformed user input?**
+### **Q6:** **🟡 IMPORTANT** — How do you handle ambiguous or malformed user input?
 
 Design error messages for Claude to read, not humans. Tell Claude what's wrong and how to fix it. Enables self-correction.
 
@@ -572,7 +656,7 @@ Insight: Error messages are part of the control loop.
 
 ---
 
-### **Q7: Prefill+stop vs. tool_choice—when to use each?**
+### **Q7:** **🟡 IMPORTANT** — Prefill+stop vs. tool_choice—when to use each?
 
 Prefill+stop is simple but fragile (prompt injection, hallucination). tool_choice enforces schema strictly. Use tool_choice when correctness matters.
 
@@ -582,7 +666,7 @@ For health data, tool_choice is non-negotiable.
 
 ---
 
-### **Q8: How do you tune a semantic cache threshold?**
+### **Q8:** **🔴 CRITICAL** — How do you tune a semantic cache threshold?
 
 Measure empirically. Collect 100+ real requests, manually label semantic duplicates, plot cosine similarity, find sweet spot.
 
@@ -592,7 +676,7 @@ Without data, I'd have guessed 0.95 (conservative). That leaves 40% cache misses
 
 ---
 
-### **Q9: Vector search vs. BM25 vs. hybrid—which one?**
+### **Q9:** **🔴 CRITICAL** — Vector search vs. BM25 vs. hybrid—which one?
 
 Hybrid (vector + BM25 + RRF). Vector catches synonyms. BM25 catches exact matches. Each alone fails 20–30% of the time. Combined: 91% recall.
 
@@ -600,7 +684,7 @@ Why RRF? It's a RecSys pattern. Parameter-free. No tuning needed.
 
 ---
 
-### **Q10: How do you structure RAG knowledge?**
+### **Q10:** **🟡 IMPORTANT** — How do you structure RAG knowledge?
 
 Chunk by meaning, not size. Add context before embedding. Enable citations.
 
@@ -610,7 +694,7 @@ Citations build user trust (3.2/5 → 4.6/5). Health data needs verification.
 
 ---
 
-### **Q11: How do you build an evaluation pipeline?**
+### **Q11:** **🔴 CRITICAL** — How do you build an evaluation pipeline?
 
 6-step: (1) Write prompt, (2) Create test dataset, (3) Run inference, (4) Grade results, (5) Compute metrics, (6) Iterate.
 
@@ -620,7 +704,7 @@ Cost: $0.04/eval run (vs. $0.30 if model-only). Grading philosophy: Code for for
 
 ---
 
-### **Q12: How do you measure if output is getting better?**
+### **Q12:** **🟡 IMPORTANT** — How do you measure if output is getting better?
 
 Define metrics before experimenting. For accuracy: accuracy@k. For cost: cost per successful call. For latency: P50/P95. Measure before/after.
 
@@ -628,7 +712,7 @@ Phase 2→3: Food accuracy 72%→88%, JSON validity 97.2%→100%, Recommendation
 
 ---
 
-### **Q13: When should you use workflow vs. single agent?**
+### **Q13:** **🔴 CRITICAL** — When should you use workflow vs. single agent?
 
 Workflow: Steps known upfront, sequence fixed, deterministic.  
 Agent: Steps exploratory, Claude decides order, unpredictable.
@@ -639,7 +723,7 @@ Common mistake: using agents for everything.
 
 ---
 
-### **Q14: Explain orchestrator-workers pattern.**
+### **Q14:** **🟡 IMPORTANT** — Explain orchestrator-workers pattern.
 
 Orchestrator decomposes task into subtasks. Workers execute in parallel (asyncio.gather). Aggregator compiles results.
 
@@ -649,7 +733,7 @@ Use when: 3+ independent subtasks. If sequential, workflow is simpler.
 
 ---
 
-### **Q15: How do you handle errors in agent loops?**
+### **Q15:** **🟡 IMPORTANT** — How do you handle errors in agent loops?
 
 Errors should be informative (Claude-readable), retryable, bounded (max 3 retries per tool).
 
@@ -659,7 +743,7 @@ Without good errors: infinite loops. With them: 85% recovery rate.
 
 ---
 
-### **Q16: When NOT to use multi-agent?**
+### **Q16:** **🟢 SPECIALIST** — When NOT to use multi-agent?
 
 Don't use if:
 1. Single agent solves it (one call → done)
@@ -673,7 +757,7 @@ Signal: "We measured, it wasn't worth it, we used workflow" shows judgment.
 
 ---
 
-### **Q17: How do you evaluate a multi-agent system?**
+### **Q17:** **🟡 IMPORTANT** — How do you evaluate a multi-agent system?
 
 4-dimensional eval:
 1. Final output quality
@@ -685,7 +769,7 @@ Multi-agent should beat control (single-agent or workflow).
 
 ---
 
-### **Q18: Tell me about a design tradeoff you made.**
+### **Q18:** **🟡 IMPORTANT** — Tell me about a design tradeoff you made.
 
 Pick one: Sonnet vs. Haiku for food recognition.
 
@@ -697,7 +781,7 @@ Reflection: I didn't optimize for "cheapest." I optimized for "cheapest while ma
 
 ---
 
-### **Q19: How would you approach building this differently today?**
+### **Q19:** **🟡 IMPORTANT** — How would you approach building this differently today?
 
 Three things:
 
@@ -711,7 +795,7 @@ Showing you'd do things differently proves you're learning, not defensive.
 
 ---
 
-### **Q20: How do you know when to stop optimizing?**
+### **Q20:** **🟢 SPECIALIST** — How do you know when to stop optimizing?
 
 Stop when:
 1. Bottleneck is no longer your system
@@ -722,7 +806,7 @@ Evidence: Phase 4 achieved 4.3x cost reduction. Could fine-tune embedding model 
 
 ---
 
-### **Q21: How would you redesign NomNom to handle 100k users?**
+### **Q21:** **🟢 SPECIALIST** — How would you redesign NomNom to handle 100k users?
 
 Three changes:
 
@@ -736,7 +820,7 @@ Current bottleneck: Cost at 100k users = $3M/month. With above: ~$300k/month (90
 
 ---
 
-### **Q22: How would you add personalization to NomNom?**
+### **Q22:** **🟢 SPECIALIST** — How would you add personalization to NomNom?
 
 Three layers:
 
@@ -756,7 +840,7 @@ NomNom today: Layer 1 built. Layer 2 could be added in Phase 6. Layer 3 expensiv
 
 ---
 
-### **Q23: Walk me through your development process. How do you organize a big project?**
+### **Q23:** **🔴 CRITICAL** — Walk me through your development process. How do you organize a big project?
 
 Great question. I use a standardized iteration workflow that I developed specifically for AI-assisted development. It's designed to work seamlessly whether I'm writing code or having Claude help.
 
@@ -795,7 +879,7 @@ This prevented re-discovering the same bug in Iteration 19.
 
 ---
 
-### **Q24: How do you use Claude Code in your workflow?**
+### **Q24:** **🟡 IMPORTANT** — How do you use Claude Code in your workflow?
 
 Claude Code is integrated directly into my iteration process. I use it for two distinct purposes: exploration and execution.
 
@@ -844,7 +928,7 @@ Day 10: I commit, write SUMMARY.md, move to next iteration
 
 ---
 
-### **Q25: You mention "PLAN, PHASES, BUGLOG, SUMMARY"—explain this structure and why it works for AI-assisted development.**
+### **Q25:** **🔴 CRITICAL** You mention "PLAN, PHASES, BUGLOG, SUMMARY"—explain this structure and why it works for AI-assisted development.**
 
 This is the core of how I stay organized with AI. Let me break down each document and its purpose.
 
@@ -948,7 +1032,7 @@ Phase 4 should focus on cost optimization. We're now stable; time to optimize pe
 
 ---
 
-### **Q26: How do you generate test cases when working with AI? Tell me about your testing strategy.**
+### **Q26:** **🟡 IMPORTANT** — How do you generate test cases when working with AI? Tell me about your testing strategy.
 
 This is where the discipline really shows. I use three layers of testing, and Claude helps at each layer.
 
@@ -1060,7 +1144,7 @@ I built a systematic evaluation pipeline with 30+ test cases. Claude helped me:
 
 ---
 
-### **Q27: Tell me about your quality gates. How do you know when a feature is "done"?**
+### **Q27:** **🔴 CRITICAL** — Tell me about your quality gates. How do you know when a feature is "done"?
 
 I have five quality gates that every feature must pass before it's considered complete. This is from CLAUDE.md / dev-rules.md, and it's critical for maintaining code quality at scale.
 
@@ -1115,7 +1199,7 @@ Most engineers say "I shipped the feature." You're saying "I shipped the feature
 
 ---
 
-### **Q28: Tell me about a time you got stuck. How did you debug it with Claude?**
+### **Q28:** **🟡 IMPORTANT** — Tell me about a time you got stuck. How did you debug it with Claude?
 
 Great question. This is where the tool actually shines. Real example: Iteration 14 (Meal Recommendation Workflow).
 
@@ -1190,7 +1274,7 @@ BUGLOG.md for Iteration 14:
 
 ---
 
-### **Q29: How do you handle iteration when working with AI? Does your approach to prompting change between exploration and execution?**
+### **Q29:** **🟡 IMPORTANT** — How do you handle iteration when working with AI? Does your approach to prompting change between exploration and execution?
 
 Yes, dramatically. I've learned to use different prompting strategies for different phases.
 
@@ -1277,7 +1361,7 @@ Phase 5: Cost Optimization (Validation)
 
 ---
 
-### **Q30: You mention "Iteration 20" and "20 phases"—how do you structure long-running projects? How do you avoid getting lost?**
+### **Q30:** **🟡 IMPORTANT** You mention "Iteration 20" and "20 phases"—how do you structure long-running projects? How do you avoid getting lost?**
 
 This is the big-picture organization. I've now shipped 20 iterations over ~4 months. Here's how I keep it coherent.
 
@@ -1351,7 +1435,7 @@ Not a giant mess of files. Each iteration is self-contained.
 
 ---
 
-### **Q31: You completed a 10-week structured learning journey (6 phases). How did you measure learning progress? How do you know you got better?**
+### **Q31:** **🟢 SPECIALIST** You completed a 10-week structured learning journey (6 phases). How did you measure learning progress? How do you know you got better?**
 
 This is my favorite question because it shows the rigor behind the project.
 
@@ -1429,7 +1513,7 @@ Most people say "I took a course on LLM engineering." I say "I implemented RAG o
 
 ---
 
-### **Q32: How do you use git and commit discipline in a learning context? Why does every commit have a message?**
+### **Q32:** **🟢 SPECIALIST** — How do you use git and commit discipline in a learning context? Why does every commit have a message?
 
 This is where the rigor really shows. Commits aren't just "save work." They're documentation.
 
@@ -1517,7 +1601,7 @@ Reading these commits in order tells the *story* of how I built semantic caching
 
 ---
 
-### **Q33: Walk me through your iOS architecture. Why MVVM? How does it handle the backend integration?**
+### **Q33:** **🔴 CRITICAL** — Walk me through your iOS architecture. Why MVVM? How does it handle the backend integration?
 
 I use MVVM (Model-View-ViewModel) with SwiftUI and dependency injection. Here's the structure:
 
@@ -1643,7 +1727,7 @@ When the user logs in:
 
 ---
 
-### **Q34: Walk me through your database schema. Why did you design it this way?**
+### **Q34:** **🟡 IMPORTANT** — Walk me through your database schema. Why did you design it this way?
 
 The schema is designed to support three core features: food tracking, personalization, and LLM caching.
 
@@ -1743,7 +1827,7 @@ At 100k users × 3 meals/day = 300k food logs/day. Indexes keep queries fast. Em
 
 ---
 
-### **Q35: Tell me about authentication. How do you store the JWT token securely on iOS?**
+### **Q35:** **🟡 IMPORTANT** — Tell me about authentication. How do you store the JWT token securely on iOS?
 
 Short answer: JWT tokens go in **iOS Keychain**, not UserDefaults or local files.
 
@@ -1849,7 +1933,7 @@ case 401:
 
 ---
 
-### **Q36: Tell me about a mobile-specific challenge you solved.**
+### **Q36:** **🟢 SPECIALIST** — Tell me about a mobile-specific challenge you solved.
 
 Real example: **Photo upload with retry logic and progress tracking.**
 
@@ -1914,7 +1998,7 @@ func captureAndAnalyze(_ image: UIImage) async {
 
 ---
 
-### **Q37: How do you keep iOS and backend data in sync?**
+### **Q37:** **🟢 SPECIALIST** — How do you keep iOS and backend data in sync?
 
 Short answer: **Remote Source of Truth (backend) with Local Caching**
 
@@ -1975,7 +2059,7 @@ let merged = remoteLogs.map { remote in
 
 ---
 
-### **Q38: You built the iOS app with LLM assistance (Claude Code). How do you communicate that in interviews?**
+### **Q38:** **🔴 CRITICAL** You built the iOS app with LLM assistance (Claude Code). How do you communicate that in interviews?**
 
 **The straightforward answer:**
 
@@ -2029,7 +2113,7 @@ Professionals use Copilot and ChatGPT all the time. The bar is: "Can you maintai
 
 ### **RAG Deep Dive (6 Q&As)**
 
-### **Q39: How do you evaluate RAG quality? What metrics matter?**
+### **Q39:** **🔴 CRITICAL** — How do you evaluate RAG quality? What metrics matter?
 
 RAG quality has three dimensions, and you can't just measure one:
 
@@ -2101,7 +2185,7 @@ If Recall@5 drops to 80%, I investigate:
 
 ---
 
-### **Q40: Tell me about your hybrid search approach. Why BM25 + vector + RRF instead of pure vector search?**
+### **Q40:** **🟡 IMPORTANT** — Tell me about your hybrid search approach. Why BM25 + vector + RRF instead of pure vector search?
 
 Pure vector search (similarity-based) is beautiful but flawed. Pure BM25 (keyword-based) is reliable but brittle. I combined them.
 
@@ -2172,7 +2256,7 @@ Because BM25 scores (0-100) and vector scores (0-1) are on different scales. RRF
 
 ---
 
-### **Q41: Tell me about a RAG failure mode you encountered.**
+### **Q41:** **🟡 IMPORTANT** — Tell me about a RAG failure mode you encountered.
 
 Real example from NomNom: **Stale Knowledge Problem**
 
@@ -2246,7 +2330,7 @@ RAG systems need maintenance. Knowledge degrades. Plan for it.
 
 ---
 
-### **Q42: How do you structure knowledge base chunks for RAG? What's your chunking strategy?**
+### **Q42:** **🟡 IMPORTANT** — How do you structure knowledge base chunks for RAG? What's your chunking strategy?
 
 Chunking is a **hidden lever** that nobody talks about, but it massively impacts RAG quality.
 
@@ -2342,7 +2426,7 @@ for chunk in chunks:
 
 ---
 
-### **Q43: How do you handle RAG for multi-turn conversations? Does context from turn 1 affect turn 3?**
+### **Q43:** **🟡 IMPORTANT** — How do you handle RAG for multi-turn conversations? Does context from turn 1 affect turn 3?
 
 This is where RAG gets complex. In a multi-turn conversation:
 
@@ -2449,7 +2533,7 @@ async def nutrition_chat(user_id: int, message: str):
 
 ---
 
-### **Q44: Walk me through your prompt A/B testing methodology. How do you measure which prompt is better?**
+### **Q44:** **🔴 CRITICAL** — Walk me through your prompt A/B testing methodology. How do you measure which prompt is better?
 
 This is the process I learned in Phase 1 and refined iteratively:
 
@@ -2599,7 +2683,7 @@ I don't test all combinations (3 × 3 × 3 = 27 variants). Instead, I test one v
 
 ---
 
-### **Q45: Tell me about few-shot vs zero-shot prompting. When do you use each?**
+### **Q45:** **🟡 IMPORTANT** — Tell me about few-shot vs zero-shot prompting. When do you use each?
 
 This is a fundamental tradeoff I learned and use constantly.
 
@@ -2711,7 +2795,7 @@ Result: Never recommends shellfish
 
 ---
 
-### **Q46: Tell me about chain-of-thought prompting. Do you use it? When?**
+### **Q46:** **🟡 IMPORTANT** — Tell me about chain-of-thought prompting. Do you use it? When?
 
 Chain-of-thought (CoT) is powerful but expensive. I use it strategically.
 
@@ -2820,7 +2904,7 @@ if user_wants_explanation:
 
 ---
 
-### **Q47: How do you handle prompt versioning and rollback? What if a prompt update breaks things?**
+### **Q47:** **🔴 CRITICAL** — How do you handle prompt versioning and rollback? What if a prompt update breaks things?
 
 Prompts are **product assets**, not code. They change constantly. You need versioning.
 
@@ -2965,7 +3049,7 @@ Prompt versioning log:
 
 ---
 
-### **Q48: Tell me about the tradeoff between prompt complexity and model cost.**
+### **Q48:** **🟢 SPECIALIST** — Tell me about the tradeoff between prompt complexity and model cost.
 
 Simple prompts = cheaper. Complex prompts = better results. Where's the sweet spot?
 
@@ -3070,7 +3154,7 @@ This way: fast + cheap by default, but high-quality when user cares.
 
 ---
 
-### **Q49: Tell me about agent failure modes. How do you debug when an agent gets stuck?**
+### **Q49:** **🟢 SPECIALIST** — Tell me about agent failure modes. How do you debug when an agent gets stuck?
 
 Agents fail in predictable ways. I've learned to recognize and fix them.
 
@@ -3217,7 +3301,7 @@ for turn in agent_steps:
 
 ---
 
-### **Q50: How do you manage agent state and context windows? What happens to memory across turns?**
+### **Q50:** **🟢 SPECIALIST** — How do you manage agent state and context windows? What happens to memory across turns?
 
 Agents have limited memory (context window). In NomNom, I handle this strategically.
 
@@ -3342,7 +3426,7 @@ def create_message_with_monitoring(system, messages):
 
 ---
 
-### **Q51: How do you design tools so Claude picks the right one? Tool selection strategy?**
+### **Q51:** **🟡 IMPORTANT** — How do you design tools so Claude picks the right one? Tool selection strategy?
 
 When Claude has 10 tools, how do you ensure it calls the right one?
 
@@ -3485,7 +3569,7 @@ if success_rate("check_allergen_safety") < 0.8:
 
 ---
 
-### **Q52: Tell me about multi-agent coordination. How do multiple agents work together?**
+### **Q52:** **🟡 IMPORTANT** — Tell me about multi-agent coordination. How do multiple agents work together?
 
 In NomNom, I have different agents for different tasks. They need to work together.
 
@@ -3615,7 +3699,7 @@ AgentHandoff(
 
 ---
 
-### **Q53: How do you debug what an agent is thinking? Reasoning traces?**
+### **Q53:** **🟢 SPECIALIST** — How do you debug what an agent is thinking? Reasoning traces?
 
 When an agent makes a bad decision, how do you understand why?
 
@@ -3732,7 +3816,7 @@ if agent_result['output'] is_bad:
 
 ---
 
-### **Q54: Agent vs Workflow—how do you decide which to use?**
+### **Q54:** **🟢 SPECIALIST** — Agent vs Workflow—how do you decide which to use?
 
 This is the most important decision for LLM orchestration.
 
@@ -3835,7 +3919,7 @@ async def recommend_meal(user_id, user_request):
 
 ---
 
-### **Q55: How do you design tools so they're discoverable? Tool naming and descriptions?**
+### **Q55:** **🟡 IMPORTANT** — How do you design tools so they're discoverable? Tool naming and descriptions?
 
 Claude needs to understand what each tool does and when to use it.
 
@@ -3961,7 +4045,7 @@ TOOLS = [
 
 ---
 
-### **Q56: Tell me about MCP (Model Context Protocol). When do you use it vs REST API?**
+### **Q56:** **🟢 SPECIALIST** — Tell me about MCP (Model Context Protocol). When do you use it vs REST API?
 
 MCP is Anthropic's standard for exposing tools to Claude. When do you use it vs REST?
 
@@ -4053,7 +4137,7 @@ Backend: Returns to iOS
 
 ---
 
-### **Q57: How do you handle tool versioning? What if you need to change a tool's behavior?**
+### **Q57:** **🟢 SPECIALIST** — How do you handle tool versioning? What if you need to change a tool's behavior?
 
 Tools change. How do you avoid breaking Claude's tool calls?
 
@@ -4141,7 +4225,7 @@ def get_tool(name: str, prefer_version: Optional[str] = None):
 
 ---
 
-### **Q58: How do you structure workflows? Sequential vs parallel vs hybrid?**
+### **Q58:** **🟡 IMPORTANT** — How do you structure workflows? Sequential vs parallel vs hybrid?
 
 Workflows can run steps in different orders. Which pattern for which problem?
 
@@ -4230,7 +4314,7 @@ async def recommend_meal_hybrid(user_id):
 
 ---
 
-### **Q59: How do you handle errors in workflows? What if a step fails?**
+### **Q59:** **🟡 IMPORTANT** — How do you handle errors in workflows? What if a step fails?
 
 Workflows are deterministic. But things still fail (API down, timeout, bad data).
 
@@ -4323,7 +4407,7 @@ except PartialError as e:
 
 ---
 
-### **Q60: How do you choose between conditional branching and orchestrating with agents?**
+### **Q60:** **🟢 SPECIALIST** — How do you choose between conditional branching and orchestrating with agents?
 
 Sometimes workflows split into different paths (if-then-else). When do you keep it in the workflow vs delegate to an agent?
 
@@ -4408,7 +4492,7 @@ async def recommend_meal_hybrid(user_id, user_request):
 
 ---
 
-### **Q61: How do you monitor and debug workflows? Observability?**
+### **Q61:** **🟡 IMPORTANT** — How do you monitor and debug workflows? Observability?
 
 When a workflow fails or behaves unexpectedly, how do you understand what happened?
 
@@ -4508,7 +4592,7 @@ metrics = {
 
 ---
 
-### **Q62: What's the most common workflow anti-pattern you've encountered?**
+### **Q62:** **🟢 SPECIALIST** — What's the most common workflow anti-pattern you've encountered?
 
 Common mistakes when designing workflows.
 
