@@ -589,9 +589,181 @@ Now:
 
 ---
 
+## Critical Bug #7: Date Window Overlap and Boundary Issues
+
+**Symptom:** Date range showed overlapping dates (Jun 10-17, then Jun 17-24) instead of non-overlapping periods
+
+**Root Cause:**
+- Date windows weren't respecting "day before today" boundaries
+- No validation that next button shouldn't allow viewing future data
+- Date calculation didn't account for rolling window updates
+
+**Fix (Commit ced19d5):**
+- End date always set to: today - 1 day
+- Previous button: goes back by period days
+- Next button: disabled when reaching current period
+- Visual feedback: blue (enabled) vs gray (disabled)
+
+**Status:** ✅ Fixed
+
+---
+
+## Critical Bug #8: Date Timezone Mismatch Causing Navigation Stuck
+
+**Symptom:** Navigation stuck on Apr 12-19; clicking left button didn't advance dates
+
+**Root Cause:**
+Mixing local timezone and UTC timezone caused 1-day shifts:
+1. Date arithmetic done with `Calendar.current` (local timezone)
+2. Date formatting done with UTC timezone  
+3. Result: Apr 12 local → "2026-04-13" UTC
+4. API received wrong date, returned different data
+5. JSON decoding failed
+6. Date didn't advance
+
+**Example:**
+```
+User at Apr 12-19, clicks previous
+Local calc: Apr 19 - 7 = Apr 12 (PDT time)
+UTC format: Apr 12 PDT → "2026-04-13" (shifted!)
+API returns Apr 13-20 data instead of Apr 5-12
+```
+
+**Fix (Commit d12c2c6):**
+Use UTC-aware calendar for ALL date arithmetic:
+```swift
+var utcCalendar = Calendar(identifier: .gregorian)
+utcCalendar.timeZone = TimeZone(abbreviation: "UTC")
+let newDate = utcCalendar.date(byAdding: .day, value: -days, to: currentDate)
+```
+
+Updated functions:
+- previousPeriod() - uses UTC calendar
+- nextPeriod() - uses UTC calendar
+- canGoNext property - uses UTC calendar
+- All DateFormatters explicitly set to UTC timezone
+
+**Status:** ✅ Fixed
+
+---
+
+## Critical Bug #9: iOS-Backend Type Mismatch (JSON Decoding Error)
+
+**Symptom:** "Number 182.7 is not representable in Swift" - decodingError when loading data
+
+**Root Cause:**
+Backend returns nutrition values as Doubles with decimals:
+```json
+"protein_g": {"total": 182.7, ...}
+"daily_breakdown": [{"protein_g": 120.7, ...}]
+```
+
+But iOS models expected Integers:
+```swift
+struct NutrientSummary: Codable {
+    let total: Int  // ❌ WRONG - can't decode 182.7
+}
+
+struct DailyBreakdown: Codable {
+    let proteinG: Int  // ❌ WRONG - can't decode 120.7
+}
+```
+
+**Why It Happened:**
+- Backend calculates precise nutritional values with decimals
+- iOS models were designed for integer totals
+- Schema drift between backend and iOS
+
+**Fix (Commit d7d13da):**
+Changed iOS models to match backend schema:
+
+| Struct | Field | Before | After |
+|--------|-------|--------|-------|
+| NutrientSummary | total | Int | **Double** |
+| DailyBreakdown | proteinG | Int | **Double** |
+| DailyBreakdown | carbsG | Int | **Double** |
+| DailyBreakdown | fatG | Int | **Double** |
+
+Note: `calories` stays as Int (backend returns integer calorie counts)
+
+**Status:** ✅ Fixed
+
+---
+
+## Additional Improvements Made
+
+### UI/UX Improvements (Phase 4d-4e)
+
+1. **Remove hardcoded labels**
+   - Removed "Weekly Average" section (was wrong on Month/6M tabs)
+   - Removed "Daily Calories" bar chart (WeeklyChart)
+   - Removed macro donut chart (MacroBreakdown)
+
+2. **Add line charts with period-aware axes**
+   - 4 separate line charts: Calories, Protein, Carbs, Fat
+   - Weekly x-axis: Day names (Sun-Sat)
+   - Monthly x-axis: Date numbers (01, 05, 10, 15, 20, 25, 30)
+   - 6M x-axis: Month names (Jan, Feb, Mar, Apr, May, Jun, etc.)
+   - Y-axis: Shows numeric values with proper scaling
+
+3. **Update button labels**
+   - "Week" → "W"
+   - "Month" → "M"
+   - "6M" remains as is
+
+4. **Change page title**
+   - "Weekly Summary" → "Insight"
+   - Appropriate for all three period tabs
+
+### Backend/iOS Alignment Fixes
+
+1. **Backend API improvements**
+   - Added "6m" period support (was month-only)
+   - Fixed total_days calculation (use actual calendar days, not hardcoded)
+   - Fixed daily averages (calculate per calendar day, not per log entry)
+
+2. **iOS ViewModel improvements**
+   - Added detailed logging for debugging
+   - Fixed date calculations to use UTC consistently
+   - Added canGoNext property with proper validation
+
+3. **iOS APIClient improvements**
+   - Added detailed JSON response logging on decode errors
+   - Helps identify schema mismatches quickly
+
+---
+
+## Testing Performed (Phase 4e)
+
+✅ **Date Navigation**
+- Navigate from Jun 15 back through May, April, March
+- No getting stuck on any date range
+- Data loads for all historical dates
+
+✅ **Line Charts**
+- All 4 metrics display correctly
+- X-axis labels match period type
+- Y-axis shows proper scaling with values
+- Only logged dates show markers
+- Lines connect between markers
+
+✅ **Period Switching**
+- Switch between W/M/6M tabs
+- Data updates instantly
+- Charts refresh correctly
+- No console errors
+
+✅ **Edge Cases**
+- Empty date ranges show no data (graceful)
+- Old dates (March, April) load successfully
+- Rapid tab switching doesn't crash
+- Navigation buttons enable/disable correctly
+
+---
+
 ## Phase 4: Integration & Polish
 
-**Status:** 🚀 Testing (4a-4d complete, 4e in progress)
+**Status:** ✅ COMPLETE
 
 **Testing Plan:**
 

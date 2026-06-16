@@ -177,16 +177,19 @@ Components:
 - [x] Show markers only for logged dates, lines connecting them
 - [x] Color-coded metrics (blue=cal, orange=protein, green=carbs, red=fat)
 
-### 4e: Testing 🚧 IN PROGRESS
-- [ ] Line charts render for all 4 metrics
-- [ ] Weekly tab: shows day names on x-axis
-- [ ] Monthly tab: shows date numbers on x-axis
-- [ ] 6M tab: shows month abbreviations on x-axis
-- [ ] Only logged dates show markers/dots
-- [ ] Lines connect marked dots smoothly
-- [ ] No console errors
-- [ ] No crashes when switching periods
-- [ ] Charts update correctly when changing tabs
+### 4e: Testing ✅ COMPLETE
+- [x] Line charts render for all 4 metrics
+- [x] Weekly tab: shows day names on x-axis (Sun, Mon, Tue, etc.)
+- [x] Monthly tab: shows date numbers on x-axis (01, 05, 10, 15, etc.)
+- [x] 6M tab: shows month names on x-axis (Jan, Feb, Mar, etc.)
+- [x] Only logged dates show markers/dots
+- [x] Lines connect marked dots smoothly
+- [x] Y-axis shows numeric values with units
+- [x] No console errors
+- [x] No crashes when switching periods
+- [x] Charts update correctly when changing tabs
+- [x] Date navigation works for all historical dates
+- [x] Data loads successfully for all periods
 
 ---
 
