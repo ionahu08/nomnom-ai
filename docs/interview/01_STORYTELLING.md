@@ -5,6 +5,83 @@
 
 ---
 
+## HOW THIS STORY WAS BUILT (Template for Your Next Project)
+
+If you want to create similar storytelling for another project, here's the blueprint:
+
+### **Core Structure**
+
+```
+Opening (Problem + Motivation) 
+    ↓
+6 Sequential Phases (each: Problem → Decision → Why → Tradeoff → Result)
+    ↓
+Synthesis (Key Insights + What Changed About You)
+```
+
+### **The Phase Pattern (Use This for Every Phase)**
+
+Each phase follows this exact flow:
+
+1. **Problem:** What constraint or friction did you hit? (Be specific: "spent 2 hours on iteration" not "slow process")
+2. **Decision:** What did you choose to do? (Name the technique: "semantic caching," "tool_choice," "workflow")
+3. **Why:** What was your reasoning? (Cost vs. quality, speed vs. simplicity, etc.)
+4. **Tradeoff:** What did you sacrifice? (Make the tradeoff explicit: "more latency but simpler" or "higher cost for better accuracy")
+5. **Result:** What metric improved? (Always quantify: "85% hit rate," "72% → 88% accuracy," "60s → 18s")
+6. **Lesson:** What did this teach you about how you think? (This is the "learning," not just the technical insight)
+
+### **Language Style Rules**
+
+- **Conversational transitions:** "So...", "But here's the thing...", "And here's what I discovered...", "That's when I realized..."
+- **Visible struggle:** Own the confusion. "I spent 2 days confused" is credible. "I fixed it" is not.
+- **Technical terms with explanations:** Say "RAG (retrieval-augmented generation, which means pulling user data into context)" not just "RAG"
+- **Avoid stacking jargon:** One new concept per sentence. Explain as you go.
+- **Repetition is good:** You'll say "semantic caching" multiple times. That's how learning works.
+
+### **Three-Version Strategy**
+
+- **2-minute:** Skeleton only. Problem → 6 phases as 1-2 sentences each → key insight. No details.
+- **5-minute:** Skeleton + key details. Each phase gets 1-2 paragraphs. Stories start to emerge.
+- **15-minute:** Fully fleshed out. Each phase is 2-3 minutes of rich narrative. Every phase has its own "struggle moment" and explicit lesson.
+
+The 2-min version is NOT an outline for the 5-min version. It's a complete story that stands alone, just shorter.
+
+### **How to Write the Prompt for Your Next Project**
+
+When you want Claude to create a similar storytelling for a different project, use this prompt:
+
+```
+Create a storytelling document for [PROJECT_NAME] interview preparation.
+
+Project Context:
+- Problem you solved: [describe]
+- Timeline: [X weeks/months]
+- Key metrics: [quantify outcomes]
+- Phases: [list 4-6 major phases with what changed]
+
+Requirements:
+1. Create THREE versions: 2-min, 5-min, 15-min
+2. Each version is a COMPLETE story (not outline + details)
+3. Each phase follows: Problem → Decision → Why → Tradeoff → Result → Lesson
+4. Language: Conversational with transition words ("So...", "But here's the thing...")
+5. Include visible struggle: Show confusion/moments of realization
+6. Quantify everything: Metrics, timelines, accuracy improvements
+7. Technical terms with brief explanations when first mentioned
+8. Repetition welcome: Reinforce key concepts across versions
+9. End with synthesis: What this taught you about yourself/your thinking
+```
+
+### **What Makes This Work**
+
+The structure works because it:
+- **Shows judgment:** You didn't just execute, you chose between tradeoffs
+- **Demonstrates learning:** Each phase teaches something that changed how you think
+- **Quantifies value:** Every decision has a number (latency, cost, accuracy)
+- **Tells a narrative arc:** Problem → struggle → insight → resolution (repeat 6x)
+- **Invites follow-ups:** Listeners can ask "tell me more about Phase 3" and you have material ready
+
+---
+
 ## HOW TO USE THIS DOCUMENT
 
 **This file contains your core narrative—the "why you, how you did it, what you learned" story.** Here's how to use it:
