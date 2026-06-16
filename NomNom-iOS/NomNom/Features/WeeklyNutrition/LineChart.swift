@@ -4,6 +4,7 @@ struct LineChart: View {
     let dailyBreakdown: [DailyBreakdown]
     let period: PeriodType
     let metricType: MetricType
+    let targetValue: Double
 
     enum MetricType {
         case calories
@@ -53,6 +54,14 @@ struct LineChart: View {
                             path.addLine(to: CGPoint(x: size.width - padding, y: y))
                             context.stroke(path, with: .color(.gray.opacity(0.2)), lineWidth: 0.5)
                         }
+
+                        // Draw target reference line
+                        let targetRatio = targetValue / maxValue
+                        let targetY = padding + CGFloat(1 - targetRatio) * height
+                        var targetPath = Path()
+                        targetPath.move(to: CGPoint(x: padding, y: targetY))
+                        targetPath.addLine(to: CGPoint(x: size.width - padding, y: targetY))
+                        context.stroke(targetPath, with: .color(.green.opacity(0.6)), lineWidth: 1.5)
 
                         // Calculate points for line
                         let points = calculatePoints(width: width, height: height, maxValue: maxValue, padding: padding)
@@ -232,6 +241,7 @@ struct LineChart: View {
             DailyBreakdown(date: "2026-06-11", calories: 1800, proteinG: 115, carbsG: 170, fatG: 58),
         ],
         period: .week,
-        metricType: .calories
+        metricType: .calories,
+        targetValue: 2000
     )
 }

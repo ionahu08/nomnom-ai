@@ -88,28 +88,32 @@ struct WeeklyNutritionView: View {
                             LineChart(
                                 dailyBreakdown: summary.dailyBreakdown,
                                 period: viewModel.selectedPeriod,
-                                metricType: .calories
+                                metricType: .calories,
+                                targetValue: Double(summary.calories.target)
                             )
 
                             // Protein Line Chart
                             LineChart(
                                 dailyBreakdown: summary.dailyBreakdown,
                                 period: viewModel.selectedPeriod,
-                                metricType: .protein
+                                metricType: .protein,
+                                targetValue: Double(summary.proteinG.target)
                             )
 
                             // Carbs Line Chart
                             LineChart(
                                 dailyBreakdown: summary.dailyBreakdown,
                                 period: viewModel.selectedPeriod,
-                                metricType: .carbs
+                                metricType: .carbs,
+                                targetValue: Double(summary.carbsG.target)
                             )
 
                             // Fat Line Chart
                             LineChart(
                                 dailyBreakdown: summary.dailyBreakdown,
                                 period: viewModel.selectedPeriod,
-                                metricType: .fat
+                                metricType: .fat,
+                                targetValue: Double(summary.fatG.target)
                             )
 
                             // Nutrient Summary
