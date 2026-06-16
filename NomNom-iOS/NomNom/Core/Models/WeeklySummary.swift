@@ -31,7 +31,7 @@ struct WeeklySummaryResponse: Codable {
 }
 
 struct NutrientSummary: Codable {
-    let total: Int
+    let total: Double
     let average: Double
     let target: Int
     let percentage: Double?
@@ -40,9 +40,9 @@ struct NutrientSummary: Codable {
 struct DailyBreakdown: Codable {
     let date: String
     let calories: Int
-    let proteinG: Int
-    let carbsG: Int
-    let fatG: Int
+    let proteinG: Double
+    let carbsG: Double
+    let fatG: Double
 
     enum CodingKeys: String, CodingKey {
         case date
