@@ -36,52 +36,79 @@ struct LineChart: View {
 
                 // Chart area
                 GeometryReader { geometry in
-                    Canvas { context, size in
-                        let padding: CGFloat = 20
-                        let width = size.width - padding * 2
-                        let height = size.height - padding * 2
+                    ZStack(alignment: .topLeading) {
+                        Canvas { context, size in
+                            let padding: CGFloat = 20
+                            let width = size.width - padding * 2
+                            let height = size.height - padding * 2
 
-                        guard !dailyBreakdown.isEmpty else { return }
+                            guard !dailyBreakdown.isEmpty else { return }
 
-                        let maxValue = getMaxValue()
-                        guard maxValue > 0 else { return }
+                            let maxValue = getMaxValue()
+                            guard maxValue > 0 else { return }
 
-                        // Draw grid lines
-                        for i in 0..<5 {
-                            let y = padding + CGFloat(i) * (height / 4)
-                            var path = Path()
-                            path.move(to: CGPoint(x: padding, y: y))
-                            path.addLine(to: CGPoint(x: size.width - padding, y: y))
-                            context.stroke(path, with: .color(.gray.opacity(0.2)), lineWidth: 0.5)
+                            // Draw grid lines
+                            for i in 0..<5 {
+                                let y = padding + CGFloat(i) * (height / 4)
+                                var path = Path()
+                                path.move(to: CGPoint(x: padding, y: y))
+                                path.addLine(to: CGPoint(x: size.width - padding, y: y))
+                                context.stroke(path, with: .color(.gray.opacity(0.2)), lineWidth: 0.5)
+                            }
+
+                            // Draw target reference line (dashed)
+                            let targetRatio = targetValue / maxValue
+                            let targetY = padding + CGFloat(1 - targetRatio) * height
+                            var targetPath = Path()
+                            targetPath.move(to: CGPoint(x: padding, y: targetY))
+                            targetPath.addLine(to: CGPoint(x: size.width - padding, y: targetY))
+                            let strokeStyle = StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round, dash: [5, 5])
+                            context.stroke(targetPath, with: .color(.gray), style: strokeStyle)
+
+                            // Calculate points for line
+                            let points = calculatePoints(width: width, height: height, maxValue: maxValue, padding: padding)
+
+                            if !points.isEmpty {
+                                // Draw line connecting points
+                                var path = Path()
+                                path.move(to: points[0])
+                                for point in points.dropFirst() {
+                                    path.addLine(to: point)
+                                }
+                                context.stroke(path, with: .color(lineColor), lineWidth: 2)
+
+                                // Draw circles at data points
+                                for point in points {
+                                    context.fill(
+                                        Path(ellipseIn: CGRect(x: point.x - 4, y: point.y - 4, width: 8, height: 8)),
+                                        with: .color(lineColor)
+                                    )
+                                }
+                            }
                         }
 
-                        // Draw target reference line
-                        let targetRatio = targetValue / maxValue
-                        let targetY = padding + CGFloat(1 - targetRatio) * height
-                        var targetPath = Path()
-                        targetPath.move(to: CGPoint(x: padding, y: targetY))
-                        targetPath.addLine(to: CGPoint(x: size.width - padding, y: targetY))
-                        context.stroke(targetPath, with: .color(.green), lineWidth: 2)
+                        // Target value label
+                        VStack(spacing: 0) {
+                            let padding: CGFloat = 20
+                            let height: CGFloat = 200 - padding * 2
+                            let maxValue = getMaxValue()
+                            let targetRatio = targetValue / maxValue
+                            let offsetY = padding + CGFloat(1 - targetRatio) * height - 12
 
-                        // Calculate points for line
-                        let points = calculatePoints(width: width, height: height, maxValue: maxValue, padding: padding)
+                            Spacer()
+                                .frame(height: offsetY)
 
-                        if !points.isEmpty {
-                            // Draw line connecting points
-                            var path = Path()
-                            path.move(to: points[0])
-                            for point in points.dropFirst() {
-                                path.addLine(to: point)
+                            HStack(spacing: 4) {
+                                Spacer()
+                                Text("Target: \(String(format: "%.0f", targetValue))")
+                                    .font(.caption2)
+                                    .foregroundColor(.gray)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color(.systemGray6))
                             }
-                            context.stroke(path, with: .color(lineColor), lineWidth: 2)
 
-                            // Draw circles at data points
-                            for point in points {
-                                context.fill(
-                                    Path(ellipseIn: CGRect(x: point.x - 4, y: point.y - 4, width: 8, height: 8)),
-                                    with: .color(lineColor)
-                                )
-                            }
+                            Spacer()
                         }
                     }
                 }
