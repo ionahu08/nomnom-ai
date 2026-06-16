@@ -155,9 +155,9 @@ You're not supposed to memorize these. You're supposed to internalize the flow a
 
 > "Let me tell you about NomNom. So, I discovered that my own diet is pretty imbalanced. I eat way too many carbs—noodles, rice, ramen—and I'm missing protein and dietary fiber. That's a real, personal health problem that I live with every day.
 >
-> I wanted to build an app to fix this: track my nutrition, see my patterns, and get recommendations tailored to *me*—not generic advice, but based on my weight, my allergies, my actual preferences. The final app had five tabs—Camera for meal analysis, Diary for food logs, Insights for nutrition patterns, Coach for AI conversations, and Settings for health data—but the core was making it *work reliably and cheaply*.
+> I wanted to build an app to fix this: track my nutrition, analyze my eating patterns, and get personalized recommendations based on my actual health profile. The final app had five capabilities: a Camera tab for photo analysis, a Diary tab for food logs, an Insights tab for nutrition patterns, a Coach tab for AI conversations, and a Settings tab for health profile data. But I didn't just want to build any food app—I wanted to actually apply everything I'd learned about LLM engineering while solving this real problem.
 >
-> But here's the thing—I'd just finished learning about LLM engineering, and I wanted to actually apply it. Not just read about it. So I intentionally designed this project to use every major technique: prompt engineering and templating, output control with guardrails, semantic caching for performance, RAG for personalization, knowing when to use workflows versus agents, and MCP for ecosystem integration. It was a real problem plus a real learning challenge.
+> So I incorporated every major concept: RAG for personalized recommendations, multi-modality combining photos with health data, understanding when to use workflows versus agents, tool orchestration, evaluation pipelines, and MCP integration for ecosystem reach. It was the perfect testbed: a real problem I cared about, plus a real learning challenge.
 >
 > The project broke into six phases, and each one taught me something important. Let me walk you through them.
 >
@@ -193,7 +193,9 @@ You're not supposed to memorize these. You're supposed to internalize the flow a
 >
 > **The Motivation**
 >
-> But here's the thing that really motivated me: I'd just finished learning LLM engineering, and I wanted to actually *apply* it. Not just read about concepts like semantic caching or workflows or RAG—but build something real and put them into practice. So I intentionally designed this system to use every major technique: semantic caching for performance, smart retrieval for personalization, understanding when to use workflows versus agents. It was the perfect testbed: a real problem I cared about, plus real learning.
+> But here's the thing that really motivated me: I'd just finished learning LLM engineering, and I wanted to actually *apply* it. Not just read about concepts like semantic caching or workflows or RAG—but build something real and put them into practice. So I intentionally designed this system to use every major technique: RAG for personalized recommendations, multi-modality combining photos with health data, understanding when to use workflows versus agents, tool orchestration, evaluation pipelines, and MCP integration for ecosystem reach.
+>
+> The five tabs I mentioned—Camera, Diary, Insights, Coach, Settings—each required different LLM patterns. Camera uses vision analysis and multi-modality. Diary stores data for RAG context. Insights uses RAG and analysis for personalization. Coach uses multi-turn agents and conversation history. Settings manages health profile data that feeds into everything.
 >
 > I built this over six phases, roughly four weeks total. Each phase tackled a different dimension of production LLM engineering. Let me walk you through each one.
 >
