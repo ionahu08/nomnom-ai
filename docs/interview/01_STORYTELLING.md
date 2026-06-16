@@ -129,23 +129,23 @@ You're not supposed to memorize these. You're supposed to internalize the flow a
 
 ## 2-Minute Version
 
-> "So, I discovered something about myself—my diet is pretty imbalanced. I eat way too many carbs: noodles, rice, ramen. And I'm lacking protein and dietary fiber. Over time, that became a real health problem.
+> "So, I discovered something about myself—my diet is pretty imbalanced. I eat way too many carbs: noodles, rice, ramen. And I'm lacking protein and dietary fiber. Over time, that's a real health problem.
 >
-> I needed an app to track my nutrition, see my patterns, and get recommendations tailored to me—not generic advice. The app had five main tabs: a Camera tab for photo analysis, a Diary tab for logged meals, an Insights tab for nutrition patterns, a Coach tab for AI conversations, and a Settings tab for health profile. But here's the thing: I'd just learned about LLM engineering, and I wanted to actually apply it, not just read about it. So I intentionally built this system to use every major technique I'd learned.
+> I needed an app to track my nutrition, analyze my eating patterns, and get personalized recommendations based on my actual health profile. But I didn't just want to build any food app—I wanted to actually apply everything I'd learned about LLM engineering while solving this real problem. So I incorporated every major concept: RAG for personalized recommendations, multi-modality combining photos with health data, understanding when to use workflows versus agents, tool orchestration, evaluation pipelines, and MCP integration for ecosystem reach.
 >
-> I broke the project into six phases. **Phase 1** was getting the basics right—I realized prompts were locked in code, which meant every change needed a code deploy. So I separated them into prompt templates instead. That one change cut my iteration time from two hours down to ten minutes.
+> I built it through six phases. **Phase 1** was getting the basics right—I realized prompts were locked in code, which meant every change needed a code deploy. So I separated them into prompt templates instead. That one change cut my iteration time from two hours down to ten minutes.
 >
-> **Phase 2** was about reliability and output control. I thought my system was crashing because Claude was hallucinating. But when I actually looked at the failures, 97% of them were JSON parsing issues, not hallucination. So I fixed the system design instead of tweaking prompts. I added strict output validation—tools that force Claude to output exactly the right format. That got me from 72% accuracy to 88%.
+> **Phase 2** was about reliability and output control. I thought my system was crashing because Claude was hallucinating, but 97% of my failures were actually JSON parsing issues, not hallucination. So I fixed the system design instead of tweaking prompts. I added strict output validation—tools that force Claude to output exactly the right format. That got me from 72% accuracy to 88%.
 >
-> **Phase 3** is where it got interesting—I built semantic caching and RAG (retrieval-augmented generation, which means pulling user data into the context so recommendations are personalized). I tested different thresholds and found that 0.82 was perfect: 85% cache hit rate with just 1% false positives. Accuracy jumped from 70% to 91%.
+> **Phase 3** is where it got interesting—I built semantic caching and RAG (retrieval-augmented generation, which means pulling user data into the context so recommendations are personalized). I tested different thresholds and found that 0.82 was the sweet spot: 85% cache hit rate with minimal false positives, and accuracy jumped from 70% to 91%. The lesson: testing on real data beats guessing.
 >
 > **Phase 4** was about making it sustainable. The system worked great but cost too much. So I used cheaper models for simple tasks and saved expensive models for what really mattered. I also added prompt caching so I wasn't resending the same 400 tokens every single time. This brought costs down 4.3 times.
 >
-> **Phase 5** taught me something important: not everything needs to be an agent. For meal planning with known steps, I used a workflow pattern that parallelizes the work. Agents are for exploratory questions where the steps aren't predictable. That cut latency from 60 seconds down to 18 seconds.
+> **Phase 5** taught me something important: not everything needs to be an agent. For meal planning with known steps, I used a workflow pattern that parallelizes the work instead of sequential agents. That cut latency from 60 seconds down to 18 seconds.
 >
-> **Phase 6** was about making it extensible. I built an MCP server—that's the Model Context Protocol, Anthropic's standard for exposing tools to LLMs—so the system could integrate with other tools like Claude Code in seconds, not minutes.
+> **Phase 6** was about making it extensible. I built an MCP server—the Model Context Protocol, Anthropic's standard for exposing tools to LLMs—so other tools could integrate with NomNom in minutes instead of hours.
 >
-> Throughout all of this, the pattern was simple: every decision was backed by data. The 0.82 threshold came from testing, not guessing. The choice of Sonnet over Haiku came from measuring accuracy on real meals. That's the real skill—not just building, but measuring before deciding."
+> Throughout all of this, the pattern was consistent: every decision was data-driven. The 0.82 threshold came from testing 150 real meals, not guessing. The choice of Sonnet over Haiku came from measuring accuracy on real photos. That's the real skill—not just building, but measuring before deciding."
 
 **Time:** ~2 minutes | **Flow:** Problem → Real learning → 6 phases → Key insight
 
