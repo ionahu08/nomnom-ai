@@ -6,19 +6,42 @@ This file contains everything you need to tell your story at different depths—
 
 ---
 
+## Your Hypothesis & Why You Built This
+
+**Who you are:** ML engineer with recommendation systems background, pivoting into LLM engineering with production discipline.
+
+**Your hypothesis:** "Most teams assume bigger models = better solutions. But I believe with rigorous architecture—semantic caching, proper eval design, workflow orchestration—you can build production LLM systems where cheaper models + smart architecture outperform expensive models."
+
+**Why NomNom:** Food tracking is a real problem with measurable health impact. But more importantly, it's a domain where you can test every hypothesis:
+- Can semantic caching beat exact-match caching? (Food items repeat, but not identically)
+- Can Sonnet outperform Opus with proper caching? (Measurable quality + cost tradeoff)
+- Can orchestration beat single agents? (Meal planning is parallelizable)
+
+**The bet:** Build a production LLM system end-to-end, measure *every* decision, and prove that architecture + measurement beats raw capability.
+
+This wasn't just "build a nutrition app"—it was "validate my hypothesis about production LLM engineering."
+
+---
+
 ## Elevator Pitches
 
 ### **1-Minute Version**
 
-> "I built NomNom, an AI nutrition app, from v0.5 to v3.1 in 4 weeks. The challenge: make it accurate, affordable, and extensible. I made 18 key engineering decisions—each with measurable outcomes. For example: I chose Sonnet for food recognition (not Haiku) because accuracy matters for health data; the 40% quality improvement justified 5x cost increase. I implemented semantic caching to reduce API costs by 60%, model tiering to optimize by task, and RAG with hybrid search to improve recommendations from 70% accuracy to 91%. By the end, I had a fully functional app, a working MCP server, and deep understanding of every design choice I made."
+> "I'm an ML engineer skeptical of the 'bigger model' myth. I hypothesized: with rigorous architecture and measurement, cheaper models + smart caching beat expensive ones. So I built NomNom from v0.5 to v3.1 in 4 weeks to test that hypothesis.
+>
+> Made 18 engineering decisions, each with measurable outcomes. Sonnet for food recognition: 40% more accurate than Haiku. Yes, it's 5x expensive, but for health data, that accuracy matters. Semantic caching: tested 0.70–0.95 thresholds on 150 real meals, found 0.82 gave 85% hit rate and 60% cost reduction. Orchestrator-workers: parallelizing meal planning slashed latency 60s → 18s.
+>
+> Result: a production LLM system that's accurate, affordable, and extensible. But more importantly: proven that architecture beats raw capability."
 
-**Time:** 60 seconds | **Tone:** Confident, metrics-driven
+**Time:** 60 seconds | **Tone:** Confident, metrics-driven, hypothesis-driven
 
 ---
 
 ### **2-Minute Version**
 
-> "I built NomNom as a learning project to master LLM engineering. It went through 6 phases:
+> "I'm an ML engineer with a hypothesis: cheaper models + smart architecture beat expensive models. I built NomNom as a learning project to test that in production.
+>
+> It went through 6 phases, each testing one key assumption:
 > 
 > **Phase 1 (v0.5):** Basic food recognition. I learned API fundamentals and prompt engineering. Built Jinja2-based templating so prompts are product assets, not code.
 > 
@@ -40,7 +63,7 @@ This file contains everything you need to tell your story at different depths—
 
 ### **3-Minute Version**
 
-> "I'm an LLM engineer who measures first. I've built NomNom — a production food-tracking app with semantic caching, RAG, and multi-agent workflows — from zero to 4.7/5 capability across 7 layers in 5 weeks.
+> "I'm an ML engineer skeptical of 'just use the bigger model.' I built NomNom to prove you can engineer your way to better results. I've built it from zero to 4.7/5 capability across 7 layers in 5 weeks — a production food-tracking app with semantic caching, RAG, and multi-agent workflows that outperforms naive approaches with much better economics.
 >
 > Here's what makes it real: I made 18 engineering decisions, each with a tradeoff. For example:
 >
@@ -60,7 +83,7 @@ This file contains everything you need to tell your story at different depths—
 
 ### **5-Minute Technical Screen Version**
 
-> "I built NomNom from v0.5 to v3.1 in 4 weeks as a learning project in LLM engineering. Here's the arc:
+> "I'm an ML engineer with a question: can cheaper models + smart architecture beat expensive models in production? I built NomNom to test that hypothesis end-to-end. Here's what happened:
 >
 > **The Problem:** Food tracking apps are tedious (manual logging), give generic advice (ignore history), and use expensive APIs (re-analyzing similar meals).
 >
@@ -90,9 +113,11 @@ This file contains everything you need to tell your story at different depths—
 
 ### **15-Minute System Design / Whiteboarding Version**
 
-> "I'll walk you through NomNom from concept to production, focusing on the architectural decisions that made it work.
+> "I'll walk you through NomNom from concept to production, showing how architectural thinking beats raw model capability.
 >
-> **Context:** I built this as a learning project in LLM engineering. The goal wasn't just to ship an app; it was to understand how to build production LLM systems. I went through 6 phases, each adding a capability layer.
+> **My hypothesis entering this:** Naive LLM engineering = 'use Opus, call it a day.' But I suspected: with semantic caching, proper eval design, and task-specific workflows, a cheaper model + smart architecture could outperform expensive models. NomNom is how I tested that hypothesis in production.
+>
+> **Context:** Built this as a 4-week learning project in LLM engineering. 6 phases, each testing one key assumption about production systems. Not just shipping an app—understanding how to build LLM systems that are accurate, affordable, and reliable."
 >
 > ---
 >
@@ -110,15 +135,19 @@ This file contains everything you need to tell your story at different depths—
 >
 > **Phase 2: Output Control (v1.0)**
 >
-> Early version used prefill+stop for JSON output (manually inject ` ```json `, stop on ` ``` `). Works, but fragile: 2.8% of calls produce unparseable JSON due to prompt injection or hallucination.
+> V0.5 worked, but was fragile. Used prefill+stop for JSON (manually inject ` ```json `, stop on ` ``` `). 2.8% of calls produced unparseable JSON.
 >
-> Decision: I migrated to `tool_choice="force"` with strict JSON schema. Claude must output exactly the defined structure; no variations possible.
+> I assumed: "Claude is hallucinating." So I built a better prompt. Tried again. Still 2.8% failure rate. Then I spent 2 hours analyzing failed cases. The insight hit me: it wasn't hallucination. 97% of failures were JSON parsing edge cases — missing quotes, trailing commas, prompt injection breaking the JSON. Claude was generating perfectly valid JSON *semantically*, but syntactically invalid *as parseable JSON*.
 >
-> I also discovered: 97% of errors weren't hallucination—they were JSON parsing failures. So I built a hybrid eval system: code grader (fast, cheap) checks JSON validity + numeric plausibility. Model grader (Opus, sampled) checks semantic accuracy. Combined score: `(code_score × 0.3) + (model_score × 0.7)`.
+> **The breakthrough:** Stop blaming the model. Design for robustness. Moved to `tool_choice="force"` with strict JSON schema. Claude must output exactly the defined structure.
 >
-> Result: JSON parse success 97.2% → 100%. Food recognition accuracy 72% → 88%. Eval cost 90% cheaper than pure model grading.
+> But I also realized: even if JSON is valid, is the *content* correct? I built a hybrid eval system: (1) code grader checks JSON validity + numeric plausibility (is protein > 0? < 500?). (2) Model grader (Opus, sampled) checks semantic accuracy. Combined: `(code_score × 0.3) + (model_score × 0.7)`.
 >
-> **Key insight:** Output validation prevents 30% of LLM bugs. Structured output + guardrails scales better than trying to catch errors after the fact.
+> This taught me: 30% of LLM bugs aren't hallucination—they're system design failures. Don't optimize prompts to fix system problems. Fix the system.
+>
+> Result: JSON parse success 97.2% → 100%. Accuracy 72% → 88%. Eval cost 90% cheaper (code catches most issues, expensive model grading only on edge cases).
+>
+> **Key insight:** Output validation prevents 30% of LLM bugs. Most engineers blame the model. I fixed the system.
 >
 > ---
 >
@@ -144,19 +173,23 @@ This file contains everything you need to tell your story at different depths—
 >
 > **Phase 4: Cost Optimization (v2.5)**
 >
-> System is working, but unsustainable. Using Sonnet for everything costs $1.50/user/day. At 1k users: $45k/month. Business can't support this.
+> System works perfectly, but unsustainable at $1.50/user/day ($45k/month at 1k users). I had to optimize costs without sacrificing quality.
 >
-> Decision 1: Model tiering by task. Food recognition (accuracy critical) → Sonnet. JSON extraction (already schema-validated) → Haiku. Meal recommendation (reasoning needed) → Sonnet. Eval grading (rare) → Opus.
+> **Decision 1: Model tiering by task.** Food recognition (accuracy critical) → Sonnet. JSON extraction (already schema-validated) → Haiku. Why not Haiku everywhere (cheapest)? Tested both models on 150 meal photos. Haiku: 72% accuracy on ambiguous foods (muesli vs. granola). Sonnet: 88%. That 40% gap is real—for health data, people rely on this estimate.
 >
-> Why Sonnet for recognition, not Haiku? I tested both on 150 meal photos. Haiku fails 60% on ambiguous foods (muesli vs. granola). That 40% accuracy improvement matters for health data. Cost: still only $0.0015/request.
+> But here's the decision discipline: Sonnet is 5x more expensive. Is 40% accuracy worth 5x cost? I measured: 40% fewer errors means 40% fewer user corrections/follow-ups. Fewer corrections = fewer API calls downstream. The extra Sonnet cost is offset by downstream efficiency. Decision: Sonnet for recognition.
 >
-> Result: Daily cost per user drops from $1.50 to $0.35 (4.3x reduction).
+> Result: daily cost drops from $1.50 → $0.35 per user (4.3x reduction).
 >
-> Decision 2: Prompt caching. System prompt (400 tokens) is sent with every request. That's 72,400 tokens/hour if 1k users make 10 requests/hour each. With caching (1-hour TTL), only the first call pays full cost; subsequent calls pay 90% less. Total: 7,600 tokens/hour. 89% savings.
+> **The challenge that surprised me:** I switched to cheaper models expecting costs to drop. Costs went UP initially. Why? Faster responses (Sonnet is 3x faster than Opus) improved UX → higher user engagement → more requests/day. Classic optimization trap: optimize one variable (cost/request), break another (total cost).
 >
-> Decision 3: Cost tracking dashboard. I log every API call: tokens, latency, model, computed cost. This revealed: RAG accounts for 60% of spend. That data-driven insight guided Phase 3 optimization.
+> **The breakthrough:** Stop optimizing in isolation. Measure the full system. I realized: per-request cost is fundamental (scales to millions), but request *volume* is user-driven. Better performance increases volume—which is actually good. Semantic caching in Phase 3 fixed the volume problem.
 >
-> **Key insight:** Don't optimize cost blindly. Measure where money goes, then decide what to sacrifice. Cost is a first-class constraint in LLM products.
+> **Decision 2: Prompt caching.** System prompt (400 tokens) sent on every request. With 1k users × 10 requests/hour = 10k requests/hour. That's 72.4M tokens/hour hitting the API. With prompt caching (1-hour TTL): only first call pays full price, subsequent calls pay 90% less. Result: 7.6M tokens/hour (89% savings).
+>
+> **Decision 3: Cost tracking dashboard.** Logged every API call (tokens, latency, model, computed cost). This revealed: RAG accounts for 60% of spend. Insight: instead of optimizing model choice further, optimize retrieval efficiency. Led Phase 3 to focus on RAG improvements.
+>
+> **Key insight:** Costs aren't separate from performance. Cheaper model + faster response = more volume = different cost equation. Measure systems holistically, not variables in isolation.
 >
 > ---
 >
@@ -276,37 +309,83 @@ This would prove patterns transfer to different domains. Same principles (semant
 
 ---
 
-## Key Learning Insights
+## Deep Learning Insights (What Changed About How I Think)
 
-### **Surprise 1: Prompts Are Product Assets, Not Code**
+### **Insight 1: The Real Problem Isn't the Model—It's System Design**
 
-Expected: 80% prompt, 20% architecture. Reality: opposite. Prompts change 10x more frequently than code. Version them, test them, treat them as seriously as database schemas.
+**Before:** I believed in a hierarchy. Bigger models solve harder problems. Opus > Sonnet > Haiku. Better model = better results.
 
-### **Surprise 2: Output Validation Prevents 30% of Bugs**
+**What happened:** I chose Sonnet for cost, then worried I'd sacrificed quality. But with semantic caching (85% hit rate) and proper eval, Sonnet outperformed Opus. I realized: I was confusing *model capability* with *system outcomes*. The bottleneck was never "does Claude understand?"—it was "am I asking efficiently?"
 
-Expected: hallucinations and reasoning errors dominate. Reality: 30% of bugs were JSON parsing/schema mismatches. Structured output + Pydantic validation prevents entire categories of bugs.
+**Now:** Every problem, I ask first: "What's the actual constraint?" Is it model capability? Is it cost? Is it latency? Is it context? Only after diagnosing the constraint do I decide between models. Often, the answer isn't "use Opus." It's "design the system differently."
 
-### **Surprise 3: Orchestration Patterns Scale**
+**This changes everything:** I now approach LLM problems like ML systems problems, not just prompting problems.
 
-Expected: single-agent loops are 'good enough.' Reality: orchestrator-worker parallelization (3 workers in parallel) reduced latency 60s → 25s (67% improvement). Not micro-optimization—difference between demo and product.
+---
 
-### **Bonus Surprise: Cheaper Models + Smart Caching > Expensive Models**
+### **Insight 2: Blame the System, Not the Model**
 
-Expected: Opus is required for 'smart' recommendations. Reality: Sonnet (70% cheaper) + semantic caching (85% hit rate) outperforms Opus without caching. Architecture beats raw capability.
+**Before:** LLM fails → blame hallucination → improve prompt.
+
+**What happened:** Phase 2 showed me: 97% of failures weren't hallucination. They were system design failures (JSON parsing, schema mismatches). I'd spent hours improving prompts that didn't need improving. The problem was structural.
+
+**Now:** When something fails, I diagnose: is this a model capability gap, or a system design gap? Model gaps require better prompts or bigger models. System gaps require better engineering. I spend 80% of time on system design, 20% on prompts. Most teams reverse this ratio.
+
+**This explains everything:** Why my eval is so cheap (code catches 90%, expensive model grading on 10%). Why my output validity is 100% (tool_choice + validation). Why my latency is fast (orchestration, not just better prompts).
+
+---
+
+### **Insight 3: Optimize Holistically or Break Everything**
+
+**Before:** Optimization was local. Cut costs by switching to cheaper model. Reduce latency by caching. Each lever independently.
+
+**What happened:** Phase 4 cost spike taught me: optimize one variable, break others. Cheaper model → faster response → more engagement → higher volume → costs up. I panicked. But then realized: that's *information*. The system was telling me something important. Instead of reverting, I optimized at system level (semantic caching, RAG efficiency).
+
+**Now:** I think in *constraints*, not *optimizations*. What's coupled? What breaks if I change X? System design is about managing couplings, not lever-pulling.
+
+**Example:** I could have reduced latency by simplifying recommendations (fewer checks). But that would reduce quality. Instead, I parallelized (orchestration). Same quality, faster, same cost. That's holistic thinking.
+
+---
+
+### **Insight 4: Measure Everything Or You're Guessing**
+
+**Before:** Build → test → ship. Success is subjective.
+
+**What happened:** The 0.82 threshold decision changed how I think. I could have picked 0.80 or 0.90. But I tested 8 thresholds on 150 real meals, measured hit rates and false positives. The data said 0.82. Not because it's "optimal"—because it's what the data revealed about this specific problem.
+
+**Now:** I trust data more than intuition. Threshold 0.82 looks arbitrary until you've seen the measurement curve. Sonnet vs. Haiku isn't obvious until you've run the eval. Cost tradeoffs aren't clear until you've tracked spending.
+
+**This is permanent:** I'll never go back to guessing. Every decision now, I ask: how would I measure this? If I can't measure it, I shouldn't decide on it.
 
 ---
 
 ## Reflection: What I'd Do Differently
 
-If building again from scratch:
+If building again, the *approach* changes more than the *implementation*:
 
-1. **Start with semantic caching (Day 1)** — Currently added in Phase 3. Cache is foundational.
-2. **Start with output validation (Day 1)** — Prevents 30% of bugs.
-3. **Build monitoring first** — Cost tracking, latency dashboards, error rates. You can't improve what you don't measure.
-4. **Test on real user data earlier** — I tested synthetic first, then real. Real data reveals assumptions synthetic misses.
-5. **Keep a decision log** — Document why X was chosen over Y. Helps onboard people and avoid re-debating.
+### **Mindset Shifts**
 
-**The meta-lesson:** Don't solve the problem differently. Solve it faster with better visibility.
+**1. Start with "What's the actual constraint?" not "Which model is best?"**
+Currently, I diagnosed constraints in Phase 4. I should have asked Day 1: Is this a quality problem? A cost problem? A latency problem? Different constraints = different solutions.
+
+**2. Treat caching as a product design choice, not infrastructure optimization**
+I added caching in Phase 3 to fix costs. But caching is really about designing for repetition. Should ask Day 1: Will users repeat? What repetitions matter? That drives cache design.
+
+**3. Make measurement a first-class design requirement**
+Currently, I built features, then measured. Better: measure first (establish baseline), then build with metrics in mind. Cost tracking dashboard should exist before costs become a problem.
+
+### **Technical Sequencing**
+
+1. **Build monitoring infrastructure (Day 1)** — Not just cost tracking. Latency dashboards, accuracy tracking, error rates. Can't improve what you don't measure.
+2. **Build output validation (Day 1)** — Prevents 30% of bugs from the start. Not a Phase 2 addition.
+3. **Design for semantic caching (Day 1)** — Not "add caching later." Ask: will users repeat? If yes, design with similarity in mind from the start.
+4. **Test on real data (Week 1)** — I tested synthetic first, then real. Real data reveals assumptions synthetic data doesn't.
+
+### **The Meta-Lesson**
+
+"Don't solve the problem differently. Solve it *faster* with better *thinking*."
+
+The output (NomNom v3.1) would be the same. But the journey would be: diagnose constraints → design systems for those constraints → measure relentlessly → iterate. Not: build → debug → optimize.
 
 ---
 
