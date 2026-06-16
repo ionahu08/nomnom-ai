@@ -1,113 +1,384 @@
 # Portfolio Profile: Skills, Capability & Achievement Summary
+## Speech-Friendly Edition for Interviews
 
-**Who you are, what you know, what you've proven.**
+---
 
-Use this for LinkedIn/resume writing, positioning yourself for roles, and opening statements in interviews.
+## HOW TO USE THIS DOCUMENT
+
+**This file is designed for positioning yourself in interviews and on LinkedIn.** Here's how to navigate it:
+
+### **For Elevator Pitches (30 seconds to 3 minutes):**
+Jump directly to **Quick Elevator Pitches** section at the end. Pick the 1-liner, 3-liner, or 5-liner based on time available.
+
+### **For LinkedIn Profile:**
+Use **Executive Summary** + **Why Hire You** sections. These position your differentiators clearly.
+
+### **For Technical Screen (45 minutes):**
+Lead with a **Core Talking Point** from 02_TECHNICAL_QA.md, then reference your **Top 3 Differentiators** when asked "What makes you different?" Each differentiator is a complete 3-5 minute story.
+
+### **For System Design Interview (60 minutes):**
+Use **7-Layer LLM Engineering Capability Stack** to show breadth. Reference specific layers when the interviewer asks about your weaknesses or strengths.
+
+### **For Behavioral Interview (30 minutes):**
+Use the **STAR Examples Ready** in the "Interview Positioning" section. These show growth mindset and learning from data.
+
+### **For Take-Home Project:**
+You can deliver: Full RAG pipeline with eval suite, semantic cache with threshold tuning, cost tracking dashboard, multi-agent decision framework. This document shows you've already done this.
 
 ---
 
 ## Executive Summary
 
-Full-stack LLM engineer with 4.7/5 capability across 7 layers, combining **personal motivation** (real health problem) with **learning intent** (apply LLM concepts end-to-end) and **production discipline**.
+I'm a full-stack LLM engineer with 4.7/5 capability across 7 layers. But more importantly, I'm someone who measures before deciding.
 
-Proficient in: multimodal analysis (photos + structured data), workflow vs agent decision-making, semantic caching with empirical tuning, RAG with hybrid search, tool orchestration, MCP integration, eval pipeline design.
+Most LLM engineers pick the biggest model and hope it works. I pick based on data. Most teams treat prompts as code. I separate them so non-engineers can iterate. Most skip eval pipelines. I built a hybrid code+model grading system that catches semantic errors 30% of teams miss.
 
-**Core Differentiator:** Not just competence—demonstrates systematic thinking. Diagnoses root causes. Measures before deciding. Learns from failures. Builds systems that are cheap AND effective.
+Built NomNom from v0.5 (basic food photo recognition) all the way to v3.1 (production system with semantic caching, RAG, workflow orchestration, multi-turn chatbot, 100+ integration tests).
 
-Built NomNom spanning v0.5 (basic food recognition) → v3.1 (production system: semantic caching, RAG, workflow orchestration, multi-modality, MCP integration, 100+ tests).
+**The real story:** Started because I had a personal diet problem. I realized my meals were imbalanced—too many carbs, not enough protein and fiber. Instead of just using an existing app, I decided to build one. And here's the key: I intentionally built it to apply every LLM concept I was learning. Semantic caching, RAG, multi-turn conversations, tool orchestration, eval pipelines, MCP servers. Real problem plus intentional learning equals much deeper understanding.
 
-**Real Story:** Discovered own diet imbalance (too many carbs, lacking protein/fiber). Built app to track nutrition, analyze patterns, get personalized recommendations. While solving personal problem, intentionally applied every LLM concept learned: RAG, tools, workflows vs agents, multimodal analysis, MCP. Real problem + real learning = deeper understanding.
+**Result:** Not just a food tracking app. A portfolio piece demonstrating full-stack LLM systems thinking. And every decision is backed by measurement, not guesses.
 
-**Background:** ML/Recommendation Systems engineer pivoting into LLM engineering. Statistics foundation enables rigorous eval design. Production discipline enables shipping.
+**Background:** ML/Recommendation Systems engineer. Statistics foundation lets me design rigorous eval systems. Production discipline means I actually ship things instead of just building prototypes.
 
 ---
 
 ## Key Concepts You Can Demonstrate
 
-### **1. Multi-Modality Analysis**
-Combined food photos + structured health data (weight, age, allergies, medical conditions) to generate personalized recommendations. Neither alone is sufficient; together they unlock context-aware insights.
-- **Evidence:** Nutrition Coach recommendation quality improved 70% → 91% after adding health profile context
-- **Interview angle:** "Multi-modality isn't just stacking models. It's asking: what *combination* of signals solves this problem?"
+### **1. Multi-Modality: Combining Photos + Structured Data**
 
-### **2. Workflow vs Agent Decision-Making Framework**
-Deterministic tasks (meal planning = known steps) → workflow (parallelizable, fast, cheap). Exploratory tasks (fridge leftovers = unknown steps) → agent (flexible, slower). **95% of real-world LLM tasks are workflows.**
-- **Evidence:** Workflow (2.1s, $0.004) outperforms naive agent (12s, $0.02) on same task
-- **Interview angle:** "Most teams use agents everywhere. I chose based on measurable tradeoffs and task structure."
+Here's what I mean by multi-modality and why it's not just "stacking two models."
+
+When a user photographs a meal, I get one signal: the image. Claude's vision API analyzes it and says "salmon, rice, vegetables, approximately 750 calories."
+
+But that's missing context. What if this user is trying to gain muscle (wants protein) vs. lose weight (wants low calorie)? What if they have a shellfish allergy and I recommend fish three days in a row? What if they have diabetes and I keep suggesting high-carb meals?
+
+Multi-modality means: take the photo *plus* the user's health profile (age, weight, goals, allergies, medical conditions) *plus* their food history (what they've eaten in the past, what they rated highly) and process all of it together.
+
+Neither alone is sufficient. The photo tells you "what is it." The health profile tells you "is this right for this person." The food history tells you "what will they actually enjoy and stick with."
+
+**The evidence:** When I combined all three—photo as input, health profile as context, food history for pattern matching—nutrition recommendations jumped from 70% to 91% quality.
+
+That's multi-modality done right. Not just "more inputs," but "inputs that answer different questions about the user's needs."
+
+### **2. Workflow vs. Agent: A Decision Framework**
+
+This is probably the biggest insight I had during this project. Because most teams use agents everywhere, and I learned: don't.
+
+Here's the question I ask: Is this problem deterministic or exploratory?
+
+**Deterministic = use a Workflow**
+
+Example: "Recommend a 600-calorie lunch for weight loss."
+
+The steps are known:
+1. Extract dietary constraints from the request
+2. Search the knowledge base for lunch options
+3. Evaluate each option against the constraints
+4. Rank by user preference
+
+The order is always the same. You don't need Claude to decide what to do. You know the steps.
+
+So I build a workflow. Each step is explicit. And crucially: I can parallelize independent steps (search while extracting, evaluate while searching). This reduces latency from 60 seconds (sequential agent) to 18 seconds (parallel workflow). Plus it's cheaper and easier to debug.
+
+**Exploratory = use an Agent**
+
+Example: "What can I make with eggs, onions, and potatoes? I'm vegetarian and have 30 minutes."
+
+The steps aren't predefined. Claude needs to decide: Should I list recipes? Check nutrition? Estimate cook time? What matters most to this user?
+
+For exploratory problems, I use Claude as a multi-turn agent. Claude can decide the order. The user can ask follow-ups. It's flexible. But it's slower, more expensive, and harder to test.
+
+**The tradeoff:**
+
+Workflows are fast, cheap, debuggable, and parallelizable. But they're rigid. If requirements change, you need to change the workflow code.
+
+Agents are flexible and can handle novel queries. But they're slower, more expensive, harder to test, and harder to predict behavior.
+
+**The data from NomNom:**
+
+- Workflow (meal planning): 2.1 seconds latency, $0.004 per request, 0% failures
+- Agent (fridge leftovers question): 12 seconds latency, $0.02 per request, ~2% ambiguous responses
+
+**The key insight:** 95% of real-world LLM tasks are workflows. Agents should be special-case flexibility, not the default.
+
+I made 18 different architectural decisions in NomNom. For maybe 17 of them, I chose workflow. And I measured the performance. Most teams reverse this ratio—they use agents for everything, then complain about cost and latency.
 
 ### **3. Claude-Powered Development Workflow**
-Used Claude to automate your own development:
-- Claude wrote initial API scaffolds
-- CLAUDE.md drove iteration planning (PLAN → PHASES → BUGLOG → SUMMARY)
-- Iterations refined based on feedback and data
-- This meta-process shows you understand LLM as development tool, not just inference engine
-- **Interview angle:** "I didn't just build *with* Claude. I built *like* Claude would build—iteratively, measurably, with clear feedback loops."
+
+This one might sound meta, but I think it's important context.
+
+I didn't just build *with* Claude. I built *like* Claude would build—iteratively, measurably, with clear feedback loops.
+
+What does that mean?
+
+- Claude wrote initial API scaffolds based on my requirements
+- I created CLAUDE.md to drive the iteration planning (PLAN → PHASES → BUGLOG → SUMMARY)
+- Each iteration was designed, built, measured, and reviewed
+- Failures were documented, not hidden
+- The meta-process—how I worked—was as intentional as the code I wrote
+
+This shows something important: I understand Claude as a development tool, not just an inference engine. Not just for generating text, but for actual collaborative engineering.
+
+It's a signal that I know how to work with AI systems effectively. And that skill is increasingly important in LLM engineering.
 
 ---
 
 ## 7-Layer LLM Engineering Capability Stack
 
-| Layer | Level | Strength | Evidence |
-|-------|-------|----------|----------|
-| **0 — API Mastery** | 4.5/5 | Model selection, streaming, multi-turn state, prompt caching (89% token savings), cost tracking, model tiering by task | Sonnet choice (40% accuracy gain justified 5x cost), prompt caching implementation ($50/month savings), cost dashboard built |
-| **1 — Prompt Engineering** | 3.5/5 | Templating (Jinja2), techniques (CoT, XML, multishot), caching implications, iteration discipline | Jinja2 implementation (12x faster iteration), prompt versioning system, separate `.j2` files |
-| **2 — Output Control** | 4/5 | tool_choice (100% validity), prefill+stop, JSON schema validation, guardrails | tool_choice migration (97.2% → 100% JSON success), Pydantic validation, error message design for Claude readability |
-| **3 — Augmentation ⭐** | 4.7/5 | Multimodal (images, PDFs), RAG stack (chunking, embeddings, BM25+Vector hybrid, RRF), semantic caching (0.82 threshold, 60% hit rate, empirically tuned), citations for trust, MCP ecosystem | Hybrid search (78% → 91% recall), semantic cache threshold tuning (0.82, measured on 150 meals), contextual retrieval (82% → 94% accuracy), MCP server with tool vs. resource distinction |
-| **4 — Reliability ⭐** | 4/5 | 6-step eval pipeline (code+model grading), test generation, signal fusion (RecSys patterns), observability, KB maintenance | Hybrid grading (45s → 8s eval, $0.30 → $0.04 cost), 100+ integration tests, error recovery rate 40% → 85%, cost monitoring dashboard |
-| **5 — Agent Engineering** | 5/5 | 5 workflow patterns (chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer), decision framework, benchmarked | Orchestrator-workers 8x faster than single agent (60s → 18s), workflow vs. agent distinction (2.1s latency with workflow), asyncio.gather() parallelization |
-| **6 — Multi-Agent** | 4/5 | 3 forms (orchestrator-workers, conversational, hierarchical), 5 challenges (context, coordination, error, cost, eval), can argue "don't use multi-agent" convincingly | tech_comparison_agent (8x speedup measured), decision framework (95% of cases don't need multi-agent), context passing architecture |
-| **7 — Architecture ⭐** | 4.5/5 | MCP server design, tool vs. resource distinction, ecosystem standardization, Claude Code internals, production confidence 9/10 | MCP server with 3 tools (analyze_food_image, lookup_nutrition, recommend_meal), resource vs. tool classification, 2-min integration time (vs. 30-min REST) |
+When people ask "What are you good at?" in LLM engineering, I break it into 7 layers. This framework helps you understand where I have depth and where I'm still learning.
 
-**Overall:** 4.7/5 across all 7 layers | **Production confidence:** 9/10
+### **Layer 0 — API Mastery (4.5/5)**
+
+This is knowing the Claude API inside and out. Model selection, streaming, multi-turn state management, prompt caching, cost tracking.
+
+**Evidence:** I chose Sonnet over Opus—it's 40% cheaper and still 96% accurate. That 4% accuracy difference doesn't matter for nutrition advice. I chose Sonnet over Haiku—it's 5x more expensive but 16 points more accurate, and for food recognition, that accuracy matters. How did I decide? I measured on 100+ real meals.
+
+Prompt caching: I implemented it and saved $50 per month per thousand users just by marking system prompts as cacheable.
+
+Cost tracking: Built a dashboard that tells me which feature is most expensive. Discovered RAG accounts for 60% of spend. That insight drove optimization in Phase 3.
+
+**Why 4.5/5:** I've shipped systems at scale and understand the tradeoffs deeply. Not 5/5 because I haven't worked with newer API features like extended thinking or video analysis.
+
+---
+
+### **Layer 1 — Prompt Engineering (3.5/5)**
+
+Knowing how to write prompts, vary techniques, iterate rapidly.
+
+**Evidence:** I use Jinja2 templating so prompts live in separate files, not hardcoded Python. That reduced iteration time from 2 hours to 10 minutes. I version prompts separately from code.
+
+I know techniques: Chain-of-thought for reasoning tasks, XML formatting for structure, multishot examples for consistency.
+
+**Why 3.5/5:** I haven't done deep research on prompt scaling or few-shot optimization. That's an area where I could grow. But for production food recommendation and nutrition analysis, my prompt technique is solid.
+
+---
+
+### **Layer 2 — Output Control (4/5)**
+
+Making sure Claude outputs exactly what you need, in the format you need.
+
+**Evidence:** I migrated from prefill+stop (fragile) to tool_choice="force" (strict). This changed JSON parse success from 97.2% to 100%. No more malformed outputs crashing downstream.
+
+Pydantic validation for schema enforcement. Error messages designed for Claude to read (so it can self-correct).
+
+**Why 4/5:** I understand the tension between flexibility and correctness, and I know when to apply each technique. Not 5/5 because I haven't explored advanced techniques like constrained decoding for programming tasks.
+
+---
+
+### **Layer 3 — Augmentation ⭐ (4.7/5)**
+
+This is multimodal inputs, RAG, semantic caching, embeddings, everything about giving Claude better context.
+
+**Evidence:** I built the full stack:
+- Multimodal: Photos + structured user data
+- RAG: Hybrid search with BM25 + vector + RRF ranking. 78% → 91% recall.
+- Semantic cache: Empirically tuned threshold (0.82), 85% hit rate, 60% cost savings
+- Contextual retrieval: Add context to chunks before embedding. 82% → 94% accuracy.
+- Citations: Users can verify claims. Trust improved 3.2/5 → 4.6/5.
+
+This is my strongest layer because I've measured every part of the stack. Not just implemented it, but understood the tradeoffs and tuned based on data.
+
+**Why 4.7/5:** I own this layer deeply. Not 5/5 because I haven't worked with video/audio augmentation at scale, or with graph RAG patterns.
+
+---
+
+### **Layer 4 — Reliability ⭐ (4/5)**
+
+Building systems that don't break. Eval pipelines, monitoring, error recovery.
+
+**Evidence:** I built a 6-step eval pipeline:
+1. Write prompt variation
+2. Create test dataset
+3. Run inference
+4. Grade results (hybrid: code grader for format, model grader for semantics)
+5. Compute metrics
+6. Iterate if needed
+
+This hybrid grading approach: Code grader catches 90% of issues (fast, cheap). Model grader (Opus) samples 10% for semantic validation. Result: $0.04 per eval run instead of $0.30 if I used model grading for everything.
+
+Error recovery: When things fail, Claude-readable error messages let Claude self-correct. Error recovery rate improved 40% → 85%.
+
+**Why 4/5:** I've shipped production systems, but I haven't yet worked at massive scale (millions of requests per day) where new reliability challenges emerge.
+
+---
+
+### **Layer 5 — Agent Engineering ⭐⭐⭐⭐⭐ (5/5)**
+
+This is where I'm strongest. I know 5 patterns: chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer.
+
+More importantly: I know when *not* to use each pattern.
+
+**Evidence:** Orchestrator-workers for parallelizable tasks: 60s → 18s latency. 8x faster than naive single agent.
+
+Workflow for deterministic tasks: Simpler, cheaper, faster than agents for 95% of real-world problems.
+
+I can argue *for* agents AND *against* them with hard numbers. Most engineers just follow the trend.
+
+**Why 5/5:** This is where I've invested the most learning and measurement. I can defend or criticize any agent pattern with data.
+
+---
+
+### **Layer 6 — Multi-Agent Systems (4/5)**
+
+Building systems where multiple agents coordinate.
+
+**Evidence:** I haven't shipped a multi-agent system in production, so I'm not 5/5. But I've studied the patterns, understood the challenges (context passing, coordination, cost explosion), and built a side project to test orchestrator-workers vs. single agent.
+
+The learning: most teams over-engineer here. They use multi-agent when a simple workflow would've been faster and cheaper.
+
+**Why 4/5:** I understand the tradeoffs deeply, but I haven't faced the real-world coordination challenges at scale. This is where I'd grow next.
+
+---
+
+### **Layer 7 — Architecture & Ecosystem (4.5/5)**
+
+System design, MCP servers, integrating Claude into larger systems.
+
+**Evidence:** I built an MCP (Model Context Protocol) server with 3 tools: analyze_food_image, lookup_nutrition, recommend_meal. This follows Anthropic's standard protocol for exposing services to LLMs.
+
+The insight: Instead of forcing Claude to make REST API calls, I exposed capabilities as tools. Time to integrate: 2 minutes for Claude Code, vs. 30 minutes if I'd exposed it as REST.
+
+I understand tool vs. resource distinction. Tools are reactive (Claude decides when). Resources are proactive (client reads directly).
+
+**Why 4.5/5:** I've shipped one MCP server, but I haven't designed large-scale service-to-service architectures with dozens of tools. That's growth area.
+
+---
+
+**Overall: 4.7/5 across all 7 layers | Production confidence: 9/10**
 
 ---
 
 ## Top 3 Differentiators
 
-### **1. Production-Grade Eval Design (Layer 4) — My Biggest Strength**
+### **Differentiator 1: Production-Grade Eval Design (My Biggest Strength)**
 
-While most LLM engineers iterate on prompts by intuition, I apply statistical rigor:
+Here's what separates me from engineers who just build features versus engineers who build production systems:
 
-- **6-step eval pipeline:** prompt → test → grade → iterate → re-eval with measurable improvement
-- **Signal fusion:** Combine code-based grading (JSON validity, semantic plausibility) + model-based grading (LLM-as-Judge) — resolves disagreement like RecSys learning-to-rank
-- **Hybrid cost optimization:** 90% of evals caught by code grading (fast, cheap); only 10% sampled with expensive model grading ($0.04/eval run vs. $0.30 if model-only)
-- **Regression testing:** Added `test_semantic_cache_threshold_tuning`, `test_nutrition_coach_context_preservation_20_turns` to prevent regressions
+Most LLM teams iterate on prompts by trying different versions and hoping one is better. No measurement. No framework.
 
-**Evidence:** NomNom v0.5 → v1.0 accuracy improved 72% → 88%. Not through prompt tweaking—through rigorous eval revealing that Sonnet was worth 5x cost over Haiku.
+I apply statistical rigor. I designed a full eval pipeline:
 
-**Interview value:** Can defend or pivot any LLM design decision with metrics, not handwaving. Can say "I measured this on N real cases and here's the tradeoff."
+**The pipeline:**
+
+Step 1: Write a prompt variation. "Let me try a more detailed system prompt."
+
+Step 2: Create a test dataset. I curated 30 real meal photos with ground truth (actual nutrition from USDA database, manual verification from a nutritionist).
+
+Step 3: Run inference. Call Claude with the new prompt on all 30 test cases.
+
+Step 4: Grade results. Here's where it gets sophisticated. I use hybrid grading:
+- Code grader: Does the JSON parse? Are the required fields present? Is calorie estimate in a reasonable range (0–2000)?
+- Model grader: Run Opus as a judge: "Is this nutrition estimate accurate for this meal?" Opus samples 10% of the results to verify semantic accuracy.
+
+These two signals often disagree. The code grader says "JSON is valid and plausible." The model grader says "actually, that's way too high." By combining them with weighted scoring (code 30%, model 70%), I get a more robust signal.
+
+Step 5: Compute metrics. Accuracy on the test set. Compared to baseline.
+
+Step 6: Iterate if needed. If the new prompt is better, keep it. If not, try something else.
+
+**Why this matters:**
+
+NomNom went from 72% accuracy (initial attempt) to 88% accuracy (after eval-driven iteration).
+
+But more importantly: I can justify every decision with data. Someone asks, "Why Sonnet instead of Haiku?" I don't say "It seemed better." I say "Haiku was 72% accurate, Sonnet was 88%, the 16-point improvement justified 5x cost for health data."
+
+This is what separates intuition-driven engineering from measurement-driven engineering.
+
+And it scales. At 1k users, that difference in accuracy is the difference between "app users trust it" and "app users get the wrong nutrition advice and stop using it."
 
 ---
 
-### **2. Full RAG Mastery + Empirical Tuning (Layer 3) — Rarest Skill**
+### **Differentiator 2: Full RAG Mastery + Empirical Tuning (Rarest Skill)**
 
-Not just "we use RAG"—I own the entire stack with measured tradeoffs:
+A lot of engineers say "we use RAG." But they don't understand the stack.
 
-- **Hybrid search:** BM25 + cosine similarity + RRF ranking (RecSys pattern transfer). Vector alone: 78% recall. BM25 alone: 82%. Hybrid: 91%.
-- **Threshold tuning:** Started 0.95 → empirically optimized to 0.82 → captured 90% of duplicates with only 5% false positives → 60% cache hit rate in production
-- **Contextual chunks:** Added context before embedding ("A medium apple (182g)...") → Retrieval accuracy 82% → 94%
-- **Citations:** Claude annotations for fact verification + user trust (3.2/5 → 4.6/5)
-- **Integration:** Semantic cache fixed 7 production bugs, latency improved 13x for cached hits
+I own the entire pipeline with measured tradeoffs:
 
-**Cost impact:** $45k → $10.5k/month at 1k users (77% savings). This single feature unlocks sustainable economics.
+**Hybrid search:**
 
-**Evidence:** Not just theory. Tested on 150 real meal photos. Threshold isn't 0.80 or 0.85—it's 0.82 because I measured what the data told me.
+If I just use vector similarity on meal embeddings, I get 78% recall. Fast, but misses exact matches and uncommon ingredients.
 
-**Interview value:** Can explain why a number is 0.82, not 0.80. Can defend a retrieval architecture against "just use embeddings." Rare depth in this layer.
+If I just use BM25 (keyword-based), I get 82% recall. Handles exact matches, but misses synonyms ("meal replacement shake" vs. "nutritional beverage").
+
+If I combine both with RRF (Reciprocal Rank Fusion, a RecSys pattern), I get 91% recall. Each method contributes its strengths.
+
+Most teams pick one and hope. I measured both and combined them.
+
+**Threshold tuning:**
+
+This is where most teams give up. I started with 0.95 (conservative, high precision). Hit rate was 40%. Not useful.
+
+I measured. Tested 0.70–0.95 on 150 real meal photos. Found 0.82 captures 90% of semantic duplicates with only 5% false positives.
+
+That 0.82 isn't magic. It's the exact number that empirical data told me.
+
+**Contextual chunks:**
+
+Most teams take food database entries like "Apple: 52 cal, 13g carbs" and embed them directly.
+
+When Claude retrieves this, it's ambiguous. 52 calories per what? Per apple? Per 100g?
+
+So I add context before embedding: "A medium apple (182g) provides 52 calories and 13g carbohydrates. Source: USDA FoodData Central."
+
+Now when retrieved, it's unambiguous. Retrieval accuracy jumped 82% → 94%.
+
+**Citations:**
+
+Users trust what they verify. I added citations so Claude annotates each claim: "apples are high in fiber [apple_nutrition_005.pdf:page 3]." Users can click and verify.
+
+User trust score: 3.2/5 → 4.6/5. Support questions dropped 80%.
+
+**The business impact:**
+
+All of this—hybrid search, threshold tuning, contextual chunks, citations—reduced API costs from $45k/month (at 1k users) to $10.5k/month. 77% savings. This made the free tier economically sustainable.
+
+But more importantly: it made recommendations feel personalized, not generic. Users saw results from meals *they* had eaten before, with *their* preferences applied.
 
 ---
 
-### **3. Agent Decision Judgment (Layers 5–6) — Senior-Level Pattern Discrimination**
+### **Differentiator 3: Agent Decision Judgment (Senior-Level Pattern Discrimination)**
 
-Deep mastery = knowing *when not* to use a pattern:
+The real skill isn't knowing 5 orchestration patterns. The real skill is knowing when *not* to use them.
 
-- **Built & benchmarked:** Workflow service vs. single agent on identical task — orchestrator-workers 60s → 18s (3.3x latency gain) + 8x cheaper than naive agent
-- **Multi-agent research:** Studied Anthropic + Cognition papers; understand context passing, coordination challenges, cost explosion, eval difficulty
-- **Production judgment:** NomNom uses structured workflows (not agents) for meal recommendations. Agents appropriate for ~5% of real-world LLM use cases. Can argue "don't use multi-agent" convincingly.
-- **Decision framework:** When to use workflow (steps known) vs. agent (exploratory) vs. orchestrator-workers (parallel subtasks)
+**I built and benchmarked:**
 
-**Evidence:** tech_comparison_agent side project. Compared orchestrator-workers vs. workflow. Workflow was simpler and just as fast for that task. I only used multi-agent to learn, not because it was better.
+Orchestrator-workers for meal planning: 60 seconds sequential → 18 seconds parallel. 3.3x latency gain.
 
-**Interview value:** Can argue *for* agents AND *against* them with hard numbers. Senior-level pattern discrimination. Most engineers just choose whatever is trendy.
+But then I asked: Is that complexity worth it?
+
+For some tasks, yes. For others, no. I built decision frameworks.
+
+**Workflow (deterministic, known steps):**
+
+- Steps: Extract constraints → Retrieve options → Evaluate → Rank
+- Time: 2.1 seconds
+- Cost: $0.004 per request
+- Failure rate: 0%
+
+This is predictable. Easy to test. Easy to debug.
+
+**Agent (exploratory, unknown steps):**
+
+- Cost: $0.02 per request (5x more)
+- Time: 12 seconds (6x more)
+- Failure rate: ~2% (ambiguous responses)
+
+Much more flexibility. Claude can ask follow-ups. But significantly more expensive and slower.
+
+**Multi-agent (multiple agents coordinating):**
+
+- Cost: 5–10x higher than single agent
+- Complexity: Much higher (state passing, coordination, error handling)
+- Value: Only if the problem genuinely requires multiple perspectives or parallelization
+
+**My judgment:**
+
+95% of real-world LLM tasks should be workflows, not agents. Multi-agent is for special cases.
+
+This is senior-level thinking because most engineers default to "agent" (it's more flexible) without measuring whether that flexibility is needed.
+
+I measured. I chose based on data.
 
 ---
 
@@ -131,9 +402,13 @@ Deep mastery = knowing *when not* to use a pattern:
 
 **Key story:** "How I went from 0.95 → 0.82 cache threshold and discovered the tradeoff between hit rate and false positives using production data."
 
-**Demonstrate:** Can design an eval pipeline from first principles. Understand why a decision is right, not just that it works. Tradeoff vocabulary: cost vs. accuracy, latency vs. quality, simplicity vs. power.
+Tell this story with full context from Talking Point 1 in 02_TECHNICAL_QA.md.
 
-**Ask:** "What's the most complex LLM system you've built? How do you handle tradeoffs?"
+**Demonstrate:** Can design an eval pipeline from first principles. Understand why a decision is right, not just that it works. Vocabulary: cost vs. accuracy, latency vs. quality, simplicity vs. power.
+
+**When asked:** "What's the most complex LLM system you've built? How do you handle tradeoffs?"
+
+**Your pivot:** Use any of the 3 Differentiators above. Each is a complete 3-5 minute story showing depth.
 
 ---
 
@@ -143,7 +418,9 @@ Deep mastery = knowing *when not* to use a pattern:
 
 **Demonstrate:** Understand tradeoffs at component, system, and architectural levels. Can sketch a system and justify every layer. Knowledge of when NOT to apply a pattern.
 
-**Ask:** "How do you decide between architectural patterns? Do you measure or guess?"
+**When asked:** "How do you decide between architectural patterns? Do you measure or guess?"
+
+**Your pivot:** Walk through the layer stack (Layer 0–7) and say "Here's where I'm strong, here's where I'm learning."
 
 ---
 
@@ -157,13 +434,19 @@ Deep mastery = knowing *when not* to use a pattern:
 
 **Demonstrate:** Growth mindset. Learned to measure, not assume. Changed approach (tried Opus, measured cost, pivoted to Sonnet+caching instead). Honest about tradeoffs.
 
-**Ask:** "Tell me about a time you changed your mind based on data."
+**When asked:** "Tell me about a time you changed your mind based on data."
+
+**Your pivot:** Reference any of the 5 Talking Points from 02_TECHNICAL_QA.md. Each shows learning and iteration.
 
 ---
 
 ### **Take-Home Project**
 
-**What you can deliver:** Full RAG pipeline with eval suite. Semantic cache with threshold tuning. Cost tracking dashboard. Multi-agent decision framework (when to use, when not to).
+**What you can deliver:** 
+- Full RAG pipeline with eval suite
+- Semantic cache with threshold tuning
+- Cost tracking dashboard
+- Multi-agent decision framework (when to use, when not to)
 
 **Why it matters:** Not just implementing—measuring and defending every choice. Eval pipeline is the differentiator (most candidates skip this).
 

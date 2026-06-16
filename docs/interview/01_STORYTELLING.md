@@ -1,6 +1,42 @@
 # NomNom: The Storytelling Guide
+## Speech-Friendly Edition for Interviews
 
 **Three complete, conversational versions for different interview lengths.**
+
+---
+
+## HOW TO USE THIS DOCUMENT
+
+**This file contains your core narrative—the "why you, how you did it, what you learned" story.** Here's how to use it:
+
+### **For Elevator Pitches (30 seconds):**
+Use a condensed version of the 2-minute story. Open with: "I discovered my own diet was imbalanced..." and wrap up with "...every decision was data-driven."
+
+### **For Phone/Initial Screen (2 minutes):**
+Read or closely follow the **2-Minute Version**. This is your baseline story. It hits all the key points without overwhelming.
+
+### **For Technical Screen or Video Call (5 minutes):**
+Use the **5-Minute Version**. This gives you room to add details and show depth while staying focused.
+
+### **For System Design or On-Site (15 minutes):**
+Use the **15-Minute Version**. This is the full narrative with all 6 phases explained in depth. If you have extra time, you can expand individual phases with stories from 02_TECHNICAL_QA.md.
+
+### **For Casual Conversation:**
+Don't recite any version. Use these as *mental frameworks* for how to tell the story naturally. Paraphrase, add pauses, invite questions, let it flow like a conversation.
+
+### **Delivery Tips:**
+- **Pause after key numbers** (0.82, 85%, 60%, 4.3x): Let them sink in
+- **Own the struggle**: "I was confused for 2 days" is more credible than just "I fixed it"
+- **Use connector words**: "So...", "But here's the thing...", "That's when I realized..." These make it conversational
+- **Invite follow-ups**: "Does that make sense?" or "Want to dive deeper into any of those phases?" Shows you're open to questions
+- **Remember repetition is good**: You'll say "semantic caching" multiple times. That's fine. It's how people learn.
+
+### **How These Three Versions Relate:**
+- **2-min is the skeleton**: Core story, tight, no fluff
+- **5-min is the skeleton + key details**: Each phase gets a sentence or two; stories start to emerge
+- **15-min is fully fleshed out**: Each phase is a 2-3 minute subsection with concrete examples and why it mattered
+
+You're not supposed to memorize these. You're supposed to internalize the flow and tell it naturally in your own voice.
 
 ---
 
