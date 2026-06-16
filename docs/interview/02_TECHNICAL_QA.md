@@ -750,7 +750,766 @@ NomNom today: Layer 1 built. Layer 2 could be added in Phase 6. Layer 3 expensiv
 
 ---
 
-## Quick Reference: 8 Key Metrics to Remember
+## SECTION D: LLM Harnessing Process & Development Methodology (10 Q&As)
+
+**When to use:** Interviews ask "Walk me through your development process" or "How did you stay organized?" These answers differentiate you by showing not just technical depth, but systematic thinking and iteration discipline.
+
+---
+
+### **Q23: Walk me through your development process. How do you organize a big project?**
+
+Great question. I use a standardized iteration workflow that I developed specifically for AI-assisted development. It's designed to work seamlessly whether I'm writing code or having Claude help.
+
+**The structure:**
+
+Every feature or major work unit gets a dedicated folder: `docs/iterations/{number}-{slug}/`. Inside that folder, four documents:
+
+1. **PLAN.md** — Goals, success criteria, what's built vs. what we're building
+2. **PHASES.md** — Detailed implementation steps, code examples, file references
+3. **BUGLOG.md** — Known issues, blockers, decisions, updated *during* the iteration
+4. **SUMMARY.md** — Retrospective created at the end
+
+**Here's why this matters:**
+
+When you're working with AI, context gets lost between sessions. If I stop mid-way through Iteration 15, I need to remember: what was blocking me? What did I discover about the schema? What edge case did I find in testing?
+
+BUGLOG.md is the lifeline. It's not just "here's a list of bugs." It's:
+- Daily discoveries (today I realized X)
+- Decisions made (why I chose Y over Z)
+- Testing notes (edge case found: empty food list crashes parser)
+- Blockers (waiting on database migration before continuing)
+
+When I come back to the project, I read PLAN + BUGLOG and I'm immediately caught up.
+
+**Real example from my project:**
+
+Iteration 18 (Weekly Nutrition Summary) had 9 bugs. Each one is documented in BUGLOG.md with:
+- What went wrong (timezone handling bug)
+- Root cause (naive date math didn't account for DST)
+- How I fixed it (used timezone-aware datetime)
+- How I prevented recurrence (regression test added)
+
+This prevented re-discovering the same bug in Iteration 19.
+
+**Time:** 2–3 minutes | **Use when:** Asked about organization, workflow, how you stay sane on big projects
+
+---
+
+### **Q24: How do you use Claude Code in your workflow?**
+
+Claude Code is integrated directly into my iteration process. I use it for two distinct purposes: exploration and execution.
+
+**Exploration phase (Days 1-3 of iteration):**
+
+I write out the PLAN.md in plain language: "We need a semantic cache with pgvector. The constraint is: how do we avoid false positives? Here's what I know about the domain..."
+
+Then I ask Claude to help me think through the approach:
+- "What are the trade-offs between BM25 and vector search for meal embeddings?"
+- "Walk me through threshold tuning. What's the standard methodology?"
+- "Show me examples of semantic cache false positives in production systems"
+
+Claude helps me *design* the solution before I code it.
+
+**Execution phase (Days 4-10):**
+
+I work in Claude Code where I can:
+- Read code files
+- Run tests
+- Make edits with full context
+- Commit with disciplined messages
+
+The key is: I'm driving the work. I write the BUGLOG.md entries. I decide what gets tested. Claude is the intelligent pair programmer who helps me move faster.
+
+**How I stay in control:**
+
+Before every commit, I:
+1. Review `git diff` (Claude doesn't commit anything I haven't seen)
+2. Run the test suite (`pytest tests/`)
+3. Write a clear commit message (Conventional Commits style)
+
+This prevents the "AI wrote code I don't understand" problem.
+
+**Real workflow from Iteration 12 (Semantic Caching):**
+
+Day 1: Me in PLAN.md — "Goal: 85% cache hit rate with <5% false positives"
+Day 2: Claude helps me think through threshold tuning methodology
+Day 3: I build a test dataset with Claude's help (150 real meal photos + labels)
+Days 4-6: Claude helps me implement the embedding pipeline (reading pgvector docs, writing queries)
+Days 7-9: Testing phase—I run the threshold tests, Claude helps me analyze the results
+Day 10: I commit, write SUMMARY.md, move to next iteration
+
+**The skill:** Not delegating thinking to AI, but using AI to move faster on the things I've already decided to do.
+
+**Time:** 2–3 minutes | **Use when:** Asked how you work with AI tools, or if they ask about code quality/control
+
+---
+
+### **Q25: You mention "PLAN, PHASES, BUGLOG, SUMMARY"—explain this structure and why it works for AI-assisted development.**
+
+This is the core of how I stay organized with AI. Let me break down each document and its purpose.
+
+**PLAN.md (Specification)**
+
+This is the contract. It answers:
+- What problem are we solving?
+- What's already built (prerequisites)?
+- What are we building (1-5 features max)?
+- What's success? (Checkboxes: all tests pass, no regressions, X metric achieved)
+- What skills/patterns are we learning?
+
+Example from Iteration 14 (Meal Recommendation Workflow):
+```
+Goal: Replace single-agent meal planning with orchestrator-workers pattern
+Success Criteria:
+- [ ] Latency reduced from 60s → <25s
+- [ ] All meal plans return valid JSON
+- [ ] No regressions in recommendation accuracy (>90%)
+```
+
+Why this matters for AI: Claude reads this and knows exactly what "done" means. No scope creep. No "oh, maybe we should also add X feature."
+
+**PHASES.md (Implementation Breakdown)**
+
+Detailed steps. Code examples. Links to source files.
+
+Example:
+```
+Phase 1: Build the orchestrator
+- Receives planning request (user wants 7-day meal plan)
+- Spawns N parallel workers (one per day)
+- Uses asyncio.gather to wait for all workers
+
+Here's the pattern:
+  orchestrator_task = asyncio.create_task(orchestrate(planning_request))
+
+Phase 2: Implement each worker
+- Worker accepts: date + constraints
+- Returns: meal recommendation for that date
+```
+
+Why this matters for AI: It's the "how." When Claude Code reads this, it knows the pattern to implement before writing code. Prevents "write me a meal planner" → Claude writes something that doesn't fit your architecture.
+
+**BUGLOG.md (Living Document)**
+
+Updated daily/weekly during the iteration. Not just bugs—also:
+- Discoveries ("Realized pgvector doesn't have built-in pagination—need to fetch all and sort in code")
+- Decisions ("Chose Sonnet over Haiku because of accuracy gap on ambiguous foods like sushi")
+- Testing notes ("Edge case: empty food log crashes the analytics endpoint")
+- Blockers ("Waiting on database migration before I can test RAG")
+
+This is the handoff document. When I pause, the next developer (or next session of me) reads this and gets caught up in minutes, not hours.
+
+Real example from Iteration 18 (Weekly Summary):
+```
+## Testing Notes
+- Timezone bug found: naive date math breaks at DST boundary
+- Fix: Use timezone-aware datetime objects
+- Regression test added: test_analytics_handles_dst_transitions
+
+## Next Session
+- Cosmos to implement monthly analytics (similar pattern)
+- Watch out for: leap seconds? (probably not relevant, but check)
+```
+
+**SUMMARY.md (Retrospective)**
+
+Created at iteration end. Captures:
+- What was built (1-2 paragraphs)
+- Challenges (what was harder than expected?)
+- Testing results (coverage, regressions?)
+- Lessons learned (patterns that worked well)
+- Next steps (what should come next?)
+
+Example from Iteration 12:
+```
+## Lessons Learned
+1. Threshold tuning on real data beats guessing
+   - Started with 0.95 (safe), got 40% cache hit
+   - Tested 8 thresholds on 150 meals
+   - Found 0.82 = 85% hit + 5% false positives
+   - Improved cost savings by 60%
+
+2. RecSys ranking algorithm > simple similarity sorting
+   - Hybrid search (BM25 + vector) better than either alone
+   - Result: 91% recommendation accuracy vs 78% vector-only
+
+## Next Iteration
+Phase 4 should focus on cost optimization. We're now stable; time to optimize per-request cost.
+```
+
+**Why this structure works for AI-assisted development:**
+
+1. **PLAN gives Claude constraints** — It knows what "done" is. Prevents rabbit holes.
+2. **PHASES gives Claude patterns** — It understands the architecture before coding. Code quality goes up.
+3. **BUGLOG prevents re-discovery** — Next session doesn't re-debug timezone bugs. Massive time saver.
+4. **SUMMARY creates institutional memory** — Why did I choose 0.82? It's documented. Future me remembers the reasoning.
+
+**Time:** 3–4 minutes | **Use when:** Asked about process, organization, how you'd handle bigger projects
+
+---
+
+### **Q26: How do you generate test cases when working with AI? Tell me about your testing strategy.**
+
+This is where the discipline really shows. I use three layers of testing, and Claude helps at each layer.
+
+**Layer 1: Unit Tests (Behavior Tests)**
+
+I define what the function should do:
+```python
+def test_semantic_cache_threshold_0_82():
+    """Cache hit rate at 0.82 threshold should be ~85% with <1% false positives"""
+    # Setup: 150 real meal photos
+    # Threshold: 0.82
+    # Expect: 85% hit rate, minimal false positives
+```
+
+Claude helps me:
+1. Identify edge cases (what could go wrong?)
+2. Build test fixtures (realistic meal data)
+3. Assert on metrics (not just "did it crash?" but "did it achieve the target?")
+
+Real example from Iteration 12:
+```python
+def test_semantic_cache_threshold_tuning():
+    """Test that 0.82 achieves 85% hit rate on real meal data"""
+    meals = load_real_meal_dataset(150)
+    threshold_0_82 = SemantialCache(threshold=0.82)
+    
+    hit_rate = measure_hit_rate(threshold_0_82, meals)
+    false_positive_rate = measure_false_positives(threshold_0_82, meals)
+    
+    assert hit_rate > 0.80, f"Expected 85%, got {hit_rate}"
+    assert false_positive_rate < 0.05, f"Too many false positives: {false_positive_rate}"
+```
+
+**Layer 2: Integration Tests (End-to-End Tests)**
+
+Does the whole system work? Photo upload → analysis → caching → recommendation.
+
+```python
+def test_meal_recommendation_flow():
+    """Full flow: upload photo → analyze → cache → recommend"""
+    photo = upload_meal_photo(path="sushi_bowl.jpg")
+    
+    # First call: no cache hit
+    analysis_1 = analyze_food(photo)
+    assert analysis_1.calories > 0
+    
+    # Second call: cache hit (similar photo)
+    photo_similar = upload_meal_photo(path="sushi_bowl_variant.jpg")
+    analysis_2 = analyze_food(photo_similar)
+    
+    # Should be cached result (mostly identical nutrition)
+    assert analysis_1.protein_g ≈ analysis_2.protein_g
+```
+
+Claude helps me:
+- Think through the dependencies (what needs to exist first?)
+- Handle async/await properly (the code works with real async I/O)
+- Mock external services (Claude API, database, etc.)
+
+**Layer 3: Regression Tests (Prevent Re-breaking)**
+
+Whenever I discover a bug, I add a test that reproduces it, fix it, then verify the test passes.
+
+Real example from Iteration 18 (timezone bug):
+```python
+def test_analytics_handles_dst_transitions():
+    """Bug: DST transition breaks date math. Verify it's fixed."""
+    # DST transition: March 10, 2024
+    date_before_dst = datetime(2024, 3, 10, 1, 0, 0, tzinfo=UTC)
+    date_after_dst = datetime(2024, 3, 10, 4, 0, 0, tzinfo=UTC)
+    
+    analytics = calculate_weekly_summary(start_date=date_before_dst)
+    
+    # Should handle timezone-aware datetime correctly
+    assert len(analytics) == 7  # Full week, no missing days
+```
+
+**Measurement-driven testing:**
+
+When I add a feature, I define metrics upfront:
+- Cache hit rate (target: 85%)
+- Accuracy (target: >88%)
+- Latency (target: <25s)
+- Cost per request (target: <$0.10)
+
+Then I write tests that measure these metrics, not just "does it work?"
+
+**Why Claude helps here:**
+
+I describe the business constraint ("users abandon the app if latency > 30s"), and Claude helps me translate that to a test:
+```python
+def test_meal_planning_latency():
+    """Latency constraint: users abandon if response > 30s"""
+    start = time.time()
+    recommendation = get_meal_plan(user_id=1, days=7)
+    elapsed = time.time() - start
+    
+    assert elapsed < 30.0, f"Latency too high: {elapsed}s"
+```
+
+**Iteration 11 (Eval Pipeline) was my deepest testing work:**
+
+I built a systematic evaluation pipeline with 30+ test cases. Claude helped me:
+1. Define what "good" output looks like (JSON valid? semantically correct? useful?)
+2. Build a hybrid grading system (code for cheap checks, model for expensive checks)
+3. Track improvement over time (did my changes make outputs better or worse?)
+
+**Time:** 2–3 minutes | **Use when:** Asked about testing strategy, quality assurance, or how you ensure your code actually works
+
+---
+
+### **Q27: Tell me about your quality gates. How do you know when a feature is "done"?**
+
+I have five quality gates that every feature must pass before it's considered complete. This is from CLAUDE.md / dev-rules.md, and it's critical for maintaining code quality at scale.
+
+**Gate 1: Correctness**
+- Does the code do what was requested?
+- Are edge cases handled?
+- Are there any regressions?
+
+**Gate 2: Tests**
+- Are there tests for new features?
+- Do all existing tests pass?
+- Is there a regression test for any bugs I fixed?
+
+For example, when I fixed the timezone bug in Iteration 18, I added `test_analytics_handles_dst_transitions` and verified it failed before my fix, passed after.
+
+**Gate 3: Code Quality**
+- No linting errors (using ruff)
+- No TODO comments without context
+- No dead code
+- No unused imports
+
+I actually delete unused code instead of leaving it "for reference." This sounds strict, but it prevents the codebase from becoming a graveyard.
+
+**Gate 4: Security**
+- No secrets in the code
+- User input validated at system boundaries
+- Dependencies from trusted sources
+
+For iOS, this means JWT tokens go in Keychain, not UserDefaults. For the backend, it means password resets use cryptographically secure tokens.
+
+**Gate 5: Documentation**
+- Does BUGLOG.md capture what I learned?
+- Does SUMMARY.md explain decisions?
+- Is the README up-to-date?
+
+**Concrete example: Iteration 12 (Semantic Caching)**
+
+Before I marked it "done":
+- Gate 1: Cache achieves 85% hit rate (measured on 150 real meals) ✓
+- Gate 2: 100+ integration tests, all passing ✓
+- Gate 3: `ruff check src/ && ruff format src/` — clean ✓
+- Gate 4: pgvector credentials in .env, not hardcoded ✓
+- Gate 5: BUGLOG documents why 0.82 threshold, SUMMARY explains the tradeoff ✓
+
+Only then did I commit and mark the iteration complete.
+
+**Why this matters in interviews:**
+
+Most engineers say "I shipped the feature." You're saying "I shipped the feature AND verified quality across 5 dimensions." That's the difference between junior and senior thinking.
+
+**Time:** 2–3 minutes | **Use when:** Asked about quality, testing, or code standards
+
+---
+
+### **Q28: Tell me about a time you got stuck. How did you debug it with Claude?**
+
+Great question. This is where the tool actually shines. Real example: Iteration 14 (Meal Recommendation Workflow).
+
+**The problem:**
+
+I'd implemented the orchestrator-workers pattern. All three workers (analyze photo, retrieve RAG context, log cost) were supposed to run in parallel. But when I tested it, latency was only slightly better than the sequential version. Something was wrong.
+
+**Initial debug (wrong approach):**
+
+I thought maybe asyncio wasn't actually running things in parallel. So I added print statements:
+```python
+async def worker_analyze(photo):
+    print("Starting analysis")
+    # ... 2 seconds of work
+    print("Finished analysis")
+```
+
+Ran it. Saw the prints. Looked like parallelism. But still slow.
+
+**Where I got stuck:**
+
+The metrics looked wrong. If three tasks run in parallel, I should pay the cost of the longest task. But I was measuring 55 seconds for a 7-day plan (7 parallel iterations × 8 seconds each). That's sequential behavior, not parallel.
+
+**Claude's help:**
+
+I showed Claude the orchestrator code and said "This should be parallel, but it's running sequentially. Where's the bug?"
+
+Claude helped me think through:
+1. Are the tasks actually independent? (Worker 2 needs Worker 1's output? No, all independent.)
+2. Are they actually launching in parallel? (Let me trace the asyncio code... yes, using create_task.)
+3. Is there a semaphore or lock blocking them? (Check the database connection pool... ah!)
+
+**The bug:**
+
+SQLAlchemy's connection pool had `pool_size=1` by default. All three workers were waiting for a single database connection. They weren't actually parallel—they were queued on the database.
+
+**The fix:**
+
+```python
+pool = create_engine(
+    db_url,
+    poolclass=NullPool,  # <-- Changed this
+    # ... other options
+)
+```
+
+With a proper connection pool, all three workers could hit the database simultaneously. Latency dropped from 60 seconds to 18 seconds.
+
+**What I learned:**
+
+When you're stuck, think layered:
+1. Is the *logic* correct? (Yes, workers are independent)
+2. Is the *orchestration* correct? (Yes, asyncio.gather works)
+3. Is the *infrastructure* a bottleneck? (Ah! Database connection pool)
+
+Claude helped me move through these layers systematically instead of just guessing.
+
+**How I documented this:**
+
+BUGLOG.md for Iteration 14:
+```
+## Blocker: Orchestrator not actually parallelizing
+- Measured latency: still 60s (should be ~18s)
+- Diagnosis: SQLAlchemy connection pool had pool_size=1
+- Root cause: Sequential database access, not parallel
+- Fix: Created separate connection pool for async workers
+- Result: Latency 60s → 18s ✓
+- Regression test: test_orchestrator_workers_parallelize
+```
+
+**Time:** 2–3 minutes | **Use when:** Asked about debugging, problem-solving, learning from mistakes
+
+---
+
+### **Q29: How do you handle iteration when working with AI? Does your approach to prompting change between exploration and execution?**
+
+Yes, dramatically. I've learned to use different prompting strategies for different phases.
+
+**Exploration Phase Prompting (Discovery):**
+
+Here I want Claude to help me think, not write code yet. My prompts are open-ended:
+
+"I need to build semantic caching for meal embeddings. The tradeoff I'm thinking about is: should I use pgvector or a simpler in-memory solution? What are the pros and cons? What would you do, and why?"
+
+I'm not asking for code. I'm asking for reasoning. Claude helps me:
+- Think through the implications (pgvector is durable, but overhead)
+- Consider edge cases (what if the database goes down?)
+- Anticipate future constraints (will this scale to 100k users?)
+
+**Execution Phase Prompting (Building):**
+
+Now I'm specific and detailed:
+
+"I've decided to use pgvector with a 0.82 similarity threshold. Here's the design:
+1. Embed meal photos using sentence-transformers/MiniLM-L6
+2. Store embeddings in pgvector
+3. Query using cosine similarity
+4. Cache hit if similarity > 0.82
+
+Show me:
+- The SQLAlchemy model for storing embeddings
+- The query to find similar embeddings
+- Error handling if pgvector is unavailable
+
+Use this pattern: [I reference existing code from the repo]"
+
+Now Claude has a blueprint. It's not "write me a caching system." It's "implement step 1 following this exact pattern."
+
+**Testing Phase Prompting (Validation):**
+
+"I need to measure the quality of this cache at different thresholds. Can you:
+1. Generate a test function that measures hit rate and false positive rate
+2. Load real meal photo embeddings (I have 150 samples)
+3. Test thresholds 0.70, 0.75, 0.80, 0.82, 0.85, 0.90, 0.95
+4. Return a table: threshold → hit rate → false positive rate
+
+Use the pytest framework."
+
+This is directing Claude to a specific task, not asking for open-ended help.
+
+**Why this three-phase approach matters:**
+
+- **Exploration:** Claude helps you *think*, not code prematurely
+- **Execution:** Claude helps you *build faster*, not invent architecture
+- **Testing:** Claude helps you *measure*, not guess
+
+If I skip exploration and go straight to execution, Claude codes something that doesn't fit my system. If I don't test, I ship something that's broken.
+
+**Real example from Iteration 13 (Cost Optimization):**
+
+Exploration phase: "I'm paying $1.50/user/day. The major costs are: food analysis (photo → Claude vision), RAG retrieval (embedding + vector search), and logging. Which is the bottleneck? How would you optimize?"
+
+Claude analyzed all three. Helped me realize RAG was 60% of the cost, not food analysis.
+
+Execution phase: "Let's optimize RAG retrieval. Instead of full vector search, implement hybrid: BM25 for exact matches + vector for semantic similarity + RRF (reciprocal rank fusion) to combine. Here's the BM25 schema... implement the query."
+
+Testing phase: "Measure recall at each strategy: pure vector, pure BM25, hybrid. Also measure latency. Here's the data... which one wins?"
+
+Result: Hybrid search achieved 91% recall vs 78% vector-only. And it was *faster*.
+
+**How I communicate this to future me (or next developer):**
+
+PHASES.md captures the approach:
+```
+Phase 3: Cost Optimization (Exploration)
+- Identified: RAG accounts for 60% of cost (not food analysis)
+- Decision: Optimize RAG retrieval, not model selection
+
+Phase 4: Cost Optimization (Execution)
+- Implemented: Hybrid search (BM25 + vector + RRF)
+- Pattern: [link to code example]
+
+Phase 5: Cost Optimization (Validation)
+- Measured: 91% recall (vs 78% vector-only)
+- Latency: 200ms (acceptable)
+```
+
+**Time:** 2–3 minutes | **Use when:** Asked about working with AI, iteration philosophy, or how you think about building features
+
+---
+
+### **Q30: You mention "Iteration 20" and "20 phases"—how do you structure long-running projects? How do you avoid getting lost?**
+
+This is the big-picture organization. I've now shipped 20 iterations over ~4 months. Here's how I keep it coherent.
+
+**Iteration = One Feature**
+
+Each iteration is one logical unit of work. Not "month's worth of work" but "one problem solved."
+
+Examples:
+- Iteration 11: Build evaluation pipeline (so I can measure if outputs are good)
+- Iteration 12: Implement semantic caching (solve the "redundant API calls" problem)
+- Iteration 13: Cost optimization (solve the "too expensive" problem)
+- Iteration 14: Orchestrator-workers pattern (solve the "too slow" problem)
+
+Each iteration is 3-10 days of work, not weeks.
+
+**Dependencies are explicit:**
+
+Before I start Iteration 12, I check: "Do I have Iteration 11 (evaluation)? Yes—now I can measure cache quality."
+
+This prevents scope creep. I can't start Iteration 14 (orchestration) until I have Iteration 12 (caching) and Iteration 13 (cost control). Linear dependency chain.
+
+**CLAUDE.md is the north star:**
+
+Every session, I read CLAUDE.md. It tells me:
+- What iteration am I on?
+- What's completed (11-19)?
+- What's in progress (20)?
+- What's paused (21, job search agent)?
+
+Real state of the project, always up-to-date.
+
+**BUGLOG.md prevents "lost context" between sessions:**
+
+If I don't touch the project for 2 weeks, I read:
+1. CLAUDE.md (which iteration am I on?)
+2. BUGLOG.md from the current iteration (what was blocking me?)
+
+5 minutes later, I'm caught up.
+
+**Iteration folder structure prevents chaos:**
+
+```
+docs/iterations/
+  11-eval-pipeline/
+    PLAN.md
+    PHASES.md
+    BUGLOG.md
+    SUMMARY.md
+  12-semantic-cache-production/
+    PLAN.md
+    PHASES.md
+    BUGLOG.md
+    SUMMARY.md
+  13-cost-and-latency/
+    ...
+```
+
+Not a giant mess of files. Each iteration is self-contained.
+
+**Lessons learned at scale (20 iterations):**
+
+1. **Small iterations > big features** — Iteration 12 took 6 days. If I'd tried to do "all caching, all optimization, all orchestration" in one go, it would take 30 days and I'd be lost.
+
+2. **Document *during*, not after** — BUGLOG.md written daily. Not "write it at the end" (it's too late, you've forgotten the details).
+
+3. **Explicit dependencies prevent backtracking** — Before starting Iteration 14, I checked: "Does Iteration 12 (caching) work? Yes." No surprises mid-way.
+
+4. **SUMMARY.md captures "why," not just "what"** — "Why did I choose 0.82 threshold?" is in SUMMARY.md. Future me doesn't re-debate the decision.
+
+**Time:** 2–3 minutes | **Use when:** Asked about managing complexity, long-term projects, or how you'd structure something bigger
+
+---
+
+### **Q31: You completed a 10-week structured learning journey (6 phases). How did you measure learning progress? How do you know you got better?**
+
+This is my favorite question because it shows the rigor behind the project.
+
+**Measurement Framework:**
+
+I tracked progress on two axes: **knowledge** and **capability**.
+
+**Knowledge (Concepts Learned):**
+
+Phase 1: API design, prompt engineering, output control  
+Phase 2: Output validation, evaluation pipelines  
+Phase 3: RAG, semantic search, embeddings  
+Phase 4: Cost optimization, model selection  
+Phase 5: Agents, workflows, orchestration patterns  
+Phase 6: MCP servers, ecosystem integration  
+
+For each concept, I asked: "Can I explain this to someone?" If not, I didn't move on.
+
+**Capability (Production Implementation):**
+
+But knowing a concept ≠ ability to use it. So I measured: "Can I implement this in production? Does it work?"
+
+Examples:
+- Phase 2: "Can I build an evaluation pipeline that catches 90% of bad outputs?" (Measured: 98.3% caught ✓)
+- Phase 3: "Can I tune a semantic cache threshold from 40% hit rate to 85%?" (Measured: achieved 85% ✓)
+- Phase 5: "Can I parallelize meal planning from 60s to <25s?" (Measured: achieved 18s ✓)
+
+**Structured Assessment:**
+
+I created a "7-layer LLM engineering capability profile" tracking seven areas:
+
+| Layer | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Phase 5 | Phase 6 |
+|-------|---------|---------|---------|---------|---------|---------|
+| Prompt Eng | 3/5 | 4/5 | 4/5 | 4/5 | 4.5/5 | 4.5/5 |
+| Output Control | 2/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 |
+| Augmentation | 2/5 | 2/5 | 4/5 | 4.5/5 | 4.5/5 | 4.5/5 |
+| Reliability | 2/5 | 3/5 | 4/5 | 4.5/5 | 5/5 | 5/5 |
+| Agents | 1/5 | 1/5 | 2/5 | 2.5/5 | 5/5 | 4.5/5 |
+| Optimization | 1/5 | 1/5 | 1.5/5 | 4/5 | 4/5 | 4.5/5 |
+| Ecosystem | 1/5 | 1/5 | 1.5/5 | 2/5 | 3/5 | 4.5/5 |
+
+This is in `docs/learning/01_capability_profile/`. Not a guess, but *evidence-based* assessment.
+
+**End-of-Phase Retrospectives:**
+
+At the end of each phase, I wrote a retrospective:
+- What did I learn?
+- What surprised me?
+- What would I do differently?
+- What's the next bottleneck?
+
+Example from Phase 5 (Agents) retrospective:
+```
+Before: I thought agents would be the default pattern.
+After: Agents are 5% of problems. Workflows are 95%.
+Surprise: Orchestrator-workers gave 3.3x latency improvement.
+Next: Build multi-agent coordination patterns.
+```
+
+**Metrics that proved progress:**
+
+- **Phase 2:** JSON parse success 97.2% → 100%
+- **Phase 3:** Cache hit rate 40% → 85%
+- **Phase 4:** Daily cost $12 → $2 (83% savings)
+- **Phase 5:** Latency 60s → 18s (67% improvement)
+- **Phase 6:** Integration time 30min → 2min (15x faster)
+
+These are objective. Not "I learned agents" but "I can now parallelize meal planning 3.3x faster using the right pattern."
+
+**Why this matters:**
+
+Most people say "I took a course on LLM engineering." I say "I implemented RAG on production data, tuned it to 91% recall, and documented every decision." That's credible proof of learning.
+
+**Time:** 2–3 minutes | **Use when:** Asked about learning, growth, or how you assess your own skills
+
+---
+
+### **Q32: How do you use git and commit discipline in a learning context? Why does every commit have a message?**
+
+This is where the rigor really shows. Commits aren't just "save work." They're documentation.
+
+**Commit Message Format:**
+
+I follow Conventional Commits:
+```
+feat(semantic-cache): implement 0.82 threshold tuning
+
+When a user uploads similar meal photos, return cached analysis
+instead of re-analyzing. Threshold 0.82 achieves 85% cache hit
+with minimal false positives (1%).
+
+Measured on 150 real meal photos using cosine similarity search.
+Added regression test: test_semantic_cache_threshold_tuning.
+
+Closes #42
+```
+
+**Why every detail matters:**
+
+1. **Type (feat/fix/docs)** — Is this a new feature or a bug fix?
+2. **Scope (semantic-cache)** — What part of the system?
+3. **Subject (implement 0.82 threshold tuning)** — What did I do?
+4. **Body (Why this matters, how it was measured)** — Why should future me care?
+5. **Closing issue (Closes #42)** — Trace to the work item
+
+**Real benefit:**
+
+One year later, I want to know: "Why did I choose 0.82?" I can `git log --grep="0.82"` and find the commit. The message tells me:
+- I tested on 150 real meals
+- 0.82 hit 85% cache with 1% false positives
+- I added a regression test
+
+Future me knows the *reasoning*, not just the code.
+
+**What NOT to commit:**
+
+- ❌ "wip" (work in progress—incomplete)
+- ❌ "fixes" (no context)
+- ❌ Multiple unrelated changes in one commit
+- ❌ Failing tests (every commit should pass tests)
+
+**Atomic commits:**
+
+Each commit is one logical change. If I:
+1. Add semantic caching
+2. Fix a timezone bug
+3. Add monitoring
+
+Those are *three* commits, not one. This allows me to:
+- Understand one change at a time
+- Revert one change if needed (rollback the cache but keep the timezone fix)
+- Trace bugs to the specific commit that introduced them
+
+**Learning context:**
+
+Because I'm iterating rapidly, clean commits are *critical*. Otherwise:
+- Day 7: "Why does the cache not work?" I read the commit messages and understand the evolution
+- Day 10: "Let's revert the old threshold tuning and start fresh" — I can cleanly revert commits 3-5
+- Week 3: "What did I learn in Phase 3?" — I read Phase 3 commits and see the story
+
+**Real example from Iteration 12:**
+
+```
+Commit 1: feat(embedding): add MiniLM-L6 embeddings for meal photos
+Commit 2: feat(pgvector): create embedding store in PostgreSQL
+Commit 3: feat(semantic-cache): implement threshold search
+Commit 4: test(semantic-cache): measure hit rate at different thresholds
+Commit 5: fix(semantic-cache): false positives at threshold 0.95, retune to 0.82
+Commit 6: docs(iteration-12): add SUMMARY.md with findings
+```
+
+Reading these commits in order tells the *story* of how I built semantic caching. Not just the code, but the *thinking*.
+
+**Time:** 2–3 minutes | **Use when:** Asked about code discipline, collaboration, or how you keep projects maintainable
+
+---
+
+
 
 | Metric | Value | Why It Matters |
 |--------|-------|---|
