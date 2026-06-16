@@ -162,19 +162,71 @@ struct LineChart: View {
         case .week:
             return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
         case .month:
-            return stride(from: 0, to: dailyBreakdown.count, by: max(1, dailyBreakdown.count / 6))
-                .map { index in
-                    if index < dailyBreakdown.count {
-                        let dateStr = dailyBreakdown[index].date
-                        if let day = extractDay(from: dateStr) {
-                            return day
-                        }
-                    }
-                    return ""
-                }
+            return getMonthDayLabels()
         case .sixMonth:
-            return getMonthLabels()
+            return getAllMonthLabels()
         }
+    }
+
+    private func getMonthDayLabels() -> [String] {
+        guard !dailyBreakdown.isEmpty else { return [] }
+
+        // Get first and last dates from data
+        let sortedDates = dailyBreakdown.compactMap { parseDate($0.date) }.sorted()
+        guard let firstDate = sortedDates.first, let lastDate = sortedDates.last else { return [] }
+
+        // Generate dates for every ~5 days
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone(abbreviation: "UTC") ?? TimeZone.current
+        var labels: [String] = []
+        var currentDate = firstDate
+
+        while currentDate <= lastDate {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "d"
+            labels.append(formatter.string(from: currentDate))
+
+            if let nextDate = calendar.date(byAdding: .day, value: 5, to: currentDate) {
+                currentDate = nextDate
+            } else {
+                break
+            }
+        }
+
+        return labels.isEmpty ? [] : labels
+    }
+
+    private func getAllMonthLabels() -> [String] {
+        guard !dailyBreakdown.isEmpty else { return [] }
+
+        let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+        // Get first and last dates from data
+        let sortedDates = dailyBreakdown.compactMap { parseDate($0.date) }.sorted()
+        guard let firstDate = sortedDates.first, let lastDate = sortedDates.last else { return months }
+
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone(abbreviation: "UTC") ?? TimeZone.current
+
+        let firstMonth = calendar.component(.month, from: firstDate)
+        let firstYear = calendar.component(.year, from: firstDate)
+        let lastMonth = calendar.component(.month, from: lastDate)
+        let lastYear = calendar.component(.year, from: lastDate)
+
+        var labels: [String] = []
+        var currentMonth = firstMonth
+        var currentYear = firstYear
+
+        while (currentYear < lastYear) || (currentYear == lastYear && currentMonth <= lastMonth) {
+            labels.append(months[currentMonth - 1])
+            currentMonth += 1
+            if currentMonth > 12 {
+                currentMonth = 1
+                currentYear += 1
+            }
+        }
+
+        return labels.isEmpty ? months : labels
     }
 
     private func extractDay(from dateString: String) -> String? {
@@ -186,24 +238,6 @@ struct LineChart: View {
         return nil
     }
 
-    private func getMonthLabels() -> [String] {
-        let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-        guard !dailyBreakdown.isEmpty else { return [] }
-
-        var labels: [String] = []
-        var currentMonth: String? = nil
-
-        for breakdown in dailyBreakdown {
-            if let month = extractMonth(from: breakdown.date) {
-                if month != currentMonth {
-                    labels.append(month)
-                    currentMonth = month
-                }
-            }
-        }
-
-        return labels.isEmpty ? months : labels
-    }
 
     private func extractMonth(from dateString: String) -> String? {
         let components = dateString.split(separator: "-")
@@ -214,6 +248,13 @@ struct LineChart: View {
             }
         }
         return nil
+    }
+
+    private func parseDate(_ dateString: String) -> Date? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = TimeZone(abbreviation: "UTC")
+        return formatter.date(from: dateString)
     }
 
     private func getMaxValue() -> Double {
