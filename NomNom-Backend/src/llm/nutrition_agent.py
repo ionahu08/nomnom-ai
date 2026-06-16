@@ -20,7 +20,7 @@ class NutritionAgent:
     def __init__(self):
         self.client = Anthropic()
 
-    async def analyze_and_recommend(
+    def analyze_and_recommend(
         self,
         periods: dict[str, PeriodData],
         health_profile: HealthProfile,
@@ -66,6 +66,7 @@ class NutritionAgent:
             return None
         except Exception as e:
             logger.error(f"[NutritionAgent] Error during nutrition analysis: {e}")
+            logger.exception(f"[NutritionAgent] Full traceback: {e}")
             return None
 
     def _get_system_prompt(self, profile: HealthProfile) -> str:
