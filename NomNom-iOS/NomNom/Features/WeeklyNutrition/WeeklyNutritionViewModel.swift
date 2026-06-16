@@ -206,15 +206,25 @@ class WeeklyNutritionViewModel: ObservableObject {
             let path = "/api/v1/nutrition/insights"
 
             let response: NutritionInsightsResponse = try await api.get(path: path)
+            print("[InsightViewModel] API Response received: analysis=\(response.analysis != nil ? "not nil" : "nil")")
+
             nutritionInsights = response.analysis
 
-            if nutritionInsights != nil {
+            if let insights = nutritionInsights {
                 print("[InsightViewModel] ✅ Nutrition insights loaded successfully")
+                print("[InsightViewModel]   - Summary: \(insights.summary.prefix(50))...")
+                print("[InsightViewModel]   - Strengths: \(insights.strengths.count)")
+                print("[InsightViewModel]   - Gaps: \(insights.gaps.count)")
+                print("[InsightViewModel]   - Recommendations: \(insights.recommendations.count)")
             } else {
                 print("[InsightViewModel] ⚠️ Insights returned but analysis is nil")
             }
         } catch {
-            print("[InsightViewModel] ⚠️ Failed to load nutrition insights: \(error)")
+            print("[InsightViewModel] ❌ Failed to load nutrition insights: \(error)")
+            print("[InsightViewModel]    Error type: \(type(of: error))")
+            if let decodingError = error as? DecodingError {
+                print("[InsightViewModel]    Decoding error: \(decodingError)")
+            }
             // Don't set errorMessage - this is supplementary data
         }
     }

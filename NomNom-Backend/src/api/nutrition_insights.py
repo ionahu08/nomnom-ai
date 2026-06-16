@@ -114,7 +114,8 @@ async def get_nutrition_insights(
                 foods=foods,
             )
 
-        # Fetch user health profile
+        # Fetch user health profile (explicitly load async to avoid lazy-load error)
+        await db.refresh(current_user, ['profile'])
         user_profile = current_user.profile
 
         health_profile = HealthProfile(

@@ -62,39 +62,7 @@ struct WeeklyNutritionView: View {
                         .cornerRadius(8)
 
                         if let summary = viewModel.summary {
-                            // Calories Line Chart
-                            LineChart(
-                                dailyBreakdown: summary.dailyBreakdown,
-                                period: viewModel.selectedPeriod,
-                                metricType: .calories,
-                                targetValue: Double(summary.calories.target)
-                            )
-
-                            // Protein Line Chart
-                            LineChart(
-                                dailyBreakdown: summary.dailyBreakdown,
-                                period: viewModel.selectedPeriod,
-                                metricType: .protein,
-                                targetValue: Double(summary.proteinG.target)
-                            )
-
-                            // Carbs Line Chart
-                            LineChart(
-                                dailyBreakdown: summary.dailyBreakdown,
-                                period: viewModel.selectedPeriod,
-                                metricType: .carbs,
-                                targetValue: Double(summary.carbsG.target)
-                            )
-
-                            // Fat Line Chart
-                            LineChart(
-                                dailyBreakdown: summary.dailyBreakdown,
-                                period: viewModel.selectedPeriod,
-                                metricType: .fat,
-                                targetValue: Double(summary.fatG.target)
-                            )
-
-                            // AI Nutrition Insights
+                            // AI Nutrition Insights (before charts)
                             if let insights = viewModel.nutritionInsights {
                                 VStack(alignment: .leading, spacing: 16) {
                                     // Title
@@ -231,6 +199,38 @@ struct WeeklyNutritionView: View {
                                         .stroke(Color(.systemGray3).opacity(0.2), lineWidth: 1)
                                 )
                             }
+
+                            // Calories Line Chart
+                            LineChart(
+                                dailyBreakdown: summary.dailyBreakdown,
+                                period: viewModel.selectedPeriod,
+                                metricType: .calories,
+                                targetValue: Double(summary.calories.target)
+                            )
+
+                            // Protein Line Chart
+                            LineChart(
+                                dailyBreakdown: summary.dailyBreakdown,
+                                period: viewModel.selectedPeriod,
+                                metricType: .protein,
+                                targetValue: Double(summary.proteinG.target)
+                            )
+
+                            // Carbs Line Chart
+                            LineChart(
+                                dailyBreakdown: summary.dailyBreakdown,
+                                period: viewModel.selectedPeriod,
+                                metricType: .carbs,
+                                targetValue: Double(summary.carbsG.target)
+                            )
+
+                            // Fat Line Chart
+                            LineChart(
+                                dailyBreakdown: summary.dailyBreakdown,
+                                period: viewModel.selectedPeriod,
+                                metricType: .fat,
+                                targetValue: Double(summary.fatG.target)
+                            )
                         } else if viewModel.isLoading {
                             VStack(spacing: 20) {
                                 ProgressView()

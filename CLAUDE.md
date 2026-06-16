@@ -30,19 +30,35 @@ iOS App (SwiftUI) ──▶ NomNom-Backend (FastAPI) ──▶ PostgreSQL + pgve
 
 ## Current Iteration
 
-**Iteration 19: AI Nutrition Insights & Food Recommendations** — 🚀 STARTING (June 16, 2026)
-See `docs/iterations/19-nutrition-insights-agent/` for plan and progress.
+**Iteration 20: Nutrition Coach Chatbot** — 🚀 STARTING (June 15, 2026)
+See `docs/iterations/20-nutrition-coach-chatbot/` for plan and progress.
 
 **What's Being Built:**
-- Backend: New `/nutrition/insights` endpoint that analyzes past food intake (1d/1w/1m)
-- LLM Agent: Claude-powered analysis of nutrition gaps + personalized food recommendations
-- iOS: Replace static sections with interactive AI insights card
-- UX: Remove consistency bar, daily targets, top foods; add conversational feedback
-- Features: Personalized recommendations based on health profile, allergies, medical conditions, past eating habits
+- Backend: New `/nutrition/chat` endpoint for conversational nutrition advice
+- Chatbot: Claude-powered interactive coach with context from food logs and health profile
+- iOS: New "Nutrition Coach" tab with chat UI, message history, 5 quick-prompt buttons
+- Features: Persistent chat history, personalized recommendations, quick prompts for common questions
+- Integration: Access to user's food logs, health profile, nutrition data for context-aware responses
 
 ---
 
 ## Completed Iterations
+
+**Iteration 19: AI Nutrition Insights & Food Recommendations** — ✅ COMPLETE (June 15, 2026)
+See `docs/iterations/19-nutrition-insights-agent/` for plan and summary.
+
+**What Was Built:**
+- Backend: New `/nutrition/insights` endpoint analyzing past food intake (1d/1w/1m)
+- LLM Agent: Claude-powered analysis of nutrition gaps + personalized food recommendations
+- iOS: AI Nutrition Insights card (summary, strengths, gaps, recommendations)
+- UX: Replaced static sections with interactive insights; reordered to show insights before charts
+- Features: Personalized recommendations based on health profile, allergies, medical conditions, past eating habits
+
+**Key Stats:**
+- 5 commits from concept to working feature
+- Fixed async/await SQLAlchemy lazy-loading issue
+- Backend returns 200 OK with personalized nutrition analysis
+- iOS displays insights card with all data populated correctly
 
 **Iteration 18: Weekly Nutrition Summary** — ✅ COMPLETE (June 15, 2026)
 See `docs/iterations/18-weekly-nutrition-summary/` for plan, phases, and summary.
