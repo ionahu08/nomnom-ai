@@ -36,102 +36,20 @@ I solved these through **six engineering phases**, each tackling a different con
 
 ## How I Built It: Six Engineering Phases
 
-### Phase 1: Make It Recognize Food (API Mastery + Prompt Engineering)
+I solved the problems above through **six phases of deliberate architectural choices**, each measured and tested:
 
-**The Constraint:** Prompts were hardcoded in Python. Every change to phrasing required code → redeploy cycle.
+1. **Make It Recognize Food** — Separated prompts from code (12x iteration speedup)
+2. **Make NomNom Not Crash** — Fixed output validation: 97.2% → 100% JSON success (97% of bugs were system design, not hallucination)
+3. **Make NomNom Smarter** — Semantic caching + RAG: 85% cache hit, 60% cost reduction, 70% → 91% recommendation accuracy
+4. **Make NomNom Cheap and Fast** — Model tiering + prompt caching: $1.50 → $0.35/user/day (4.3x savings)
+5. **Make NomNom Handle Complex Questions** — Workflows vs agents: 60s → 18s latency with orchestrator-workers (95% of LLM tasks don't need agents)
+6. **Make NomNom Extensible** — MCP server: 30min → 2min integration time
 
-**The Decision:** Move prompts to template files, inject variables at runtime.
+**Key insight across all phases:** Architecture beats raw capability. Sonnet + semantic caching beats paying 3x for Opus. Every decision was data-driven and measured on real data.
 
-**Why:** Prompts change 10x faster than code. Coupling them forces product iteration to wait for engineering cycles.
+👉 **For the full story with details and reasoning:** See [01_STORYTELLING.md](docs/interview/01_STORYTELLING.md) — this is what I'd tell in an interview, with the complete "why" behind each decision.
 
-**Result:** Iteration time 2 hours → 10 minutes (12x speedup).
-
----
-
-### Phase 2: Make NomNom Not Crash (Output Control + Reliability)
-
-**The Constraint:** 2.8% of responses produced unparseable JSON. I assumed hallucination.
-
-**The Discovery:** Analyzed failures. 97% were JSON parsing edge cases, not hallucination.
-
-**The Decision:** Switched to `tool_choice` with strict JSON schema. Added hybrid evaluation pipeline: code grading catches 90% of issues cheaply; model grading samples edge cases.
-
-**Why:** Most LLM bugs are system design failures, not model failures. Fix the system, not the prompt.
-
-**Result:** JSON success 97.2% → 100%. Accuracy 72% → 88%. Eval costs down 90%.
-
----
-
-### Phase 3: Make NomNom Smarter (Augmentation: Semantic Caching + RAG)
-
-**The Constraint:** Every query triggered a full API call, even for meals already analyzed.
-
-**Decision 1: Semantic Caching**
-
-Traditional caching requires exact matches. Users don't eat identical meals twice. So I implemented semantic similarity: embed photos, search by cosine similarity with a learned threshold.
-
-But what threshold? I tested 0.70–0.95 on 150 real meal photos. The data showed 0.82: 85% hit rate with 1% false positives. (If I'd guessed 0.95: 40% hit rate. Measurement beat intuition.)
-
-**Why 0.82?** False positives (wrong nutrition) cost more than false negatives (extra API call). Accept more false positives to get real cache benefit.
-
-**Decision 2: RAG (Retrieval-Augmented Generation)**
-
-Instead of generic advice, retrieve user's food history + health profile before generating recommendations. Built hybrid search: keyword search for exact matches + semantic search for synonyms, merged with ranking algorithms.
-
-**Result:** Semantic caching 85% hit rate, 60% cost reduction. RAG improved recommendation accuracy 70% → 91%.
-
----
-
-### Phase 4: Make NomNom Cheap and Fast (Cost Optimization)
-
-**The Constraint:** System cost $1.50/user/day ($45k/month at 1k users). Unsustainable.
-
-**Decision 1: Model Tiering by Task**
-
-Food recognition (accuracy-critical) → Sonnet. JSON extraction (already validated) → Haiku. Why? Tested both on 150 meals. Haiku 72%, Sonnet 88%. That 40% gap matters for health data. Yes, Sonnet costs 5x more, but 40% fewer errors = fewer follow-up calls downstream. Net cost is lower.
-
-**Decision 2: Prompt Caching**
-
-System prompt is 400 tokens sent with every request. With caching, first call pays full price; next 180 calls pay 90% less. 89% savings on system prompts.
-
-**Decision 3: Cost Tracking**
-
-Log every API call: tokens, latency, model, cost. Discovery: RAG accounts for 60% of spend. Optimization focus shifted from model choice to retrieval efficiency.
-
-**The Surprise:** When I switched to Sonnet, costs went UP initially. Why? Faster response → better UX → more engagement → higher volume. Classic optimization trap: optimize one variable, break another.
-
-**The Fix:** Optimize holistically. Per-request cost scales to millions of users, but volume is user-driven. Better performance increasing volume is good. Semantic caching fixed the volume problem anyway.
-
-**Result:** Cost $1.50/user/day → $0.35/user/day. 4.3x reduction.
-
----
-
-### Phase 5: Make NomNom Handle Complex Questions (Agent Engineering + Orchestration)
-
-**The Constraint:** User asks "Plan my entire week of meals." That's 21 recommendations. A single agent loop takes 60+ seconds.
-
-**The Insight:** Not all LLM tasks are agents. Some are workflows.
-
-- **Workflows** are for deterministic tasks (known steps, fixed order). Fast, cheap, parallelizable.
-- **Agents** are for exploratory tasks (unknown steps, Claude decides). Slower, more expensive, handle novelty.
-
-For meal planning (extract constraints → retrieve options → evaluate → rank), I used a **workflow** with **orchestrator-workers**: one orchestrator decomposes "plan my week" into 7 parallel workers (one per day). Latency becomes the longest worker, not the sum.
-
-**Result:** 60 seconds (sequential agent) → 18 seconds (orchestrated workflow). 3.3x faster, same cost.
-
-**The Meta-Insight:** 95% of real-world LLM tasks are workflows, not agents. Most teams default to agents because they're simpler. Architecture thinking beats simplicity.
-
----
-
-### Phase 6: Make NomNom Extensible (Architecture + MCP)
-
-**The Constraint:** App was siloed. Only accessible via iOS or REST API. Other tools couldn't integrate.
-
-**The Decision:** Build an MCP server (Model Context Protocol—Anthropic's standard for exposing tools to LLMs).
-
-Exposed three tools: `analyze_food_image`, `lookup_nutrition`, `recommend_meal`. Plus resources for direct data access.
-
-**Result:** Integration time 30 minutes → 2 minutes. System went from standalone app to ecosystem service.
+👉 **For technical deep-dives:** See individual [iteration docs](docs/iterations/) (PLAN/PHASES/BUGLOG/SUMMARY for each phase).
 
 ---
 
