@@ -2019,7 +2019,1205 @@ Professionals use Copilot and ChatGPT all the time. The bar is: "Can you maintai
 
 ---
 
-| Metric | Value | Why It Matters |
+## SECTION F: RAG, Agents, Prompt Engineering & Tools (20 Q&As)
+
+**When to use:** LLM-focused interviews, "Tell me about your RAG system," or deep technical dives on prompting and agents.
+
+**Context from NomNom:** Your RAG achieves 91% recall. Your prompts are templated for iteration. Your agents orchestrated for speed. Your tools are discoverable via MCP. This section shows the *depth* of your LLM engineering.
+
+---
+
+### **RAG Deep Dive (6 Q&As)**
+
+### **Q39: How do you evaluate RAG quality? What metrics matter?**
+
+RAG quality has three dimensions, and you can't just measure one:
+
+**Dimension 1: Retrieval Quality**
+
+Does the RAG find the right documents? Measure with **Recall@K**:
+```
+Recall@5 = (# relevant docs in top 5) / (# total relevant docs)
+```
+
+If a user asks "How much protein should I eat?" and the relevant info is in position 7, you have 0% Recall@5.
+
+In NomNom, I measure this against a ground-truth dataset:
+- 50 user questions
+- Manual labels: "Here are the 2-3 relevant knowledge base entries for this question"
+- Run RAG retrieval
+- Measure: Did those entries appear in top-5?
+
+I track this as a metric. If Recall@5 drops below 85%, I know the retrieval is degrading.
+
+**Dimension 2: Generation Quality**
+
+Does Claude generate *good* responses using the retrieved context? This is harder to measure, but I use:
+
+**Faithfulness:** Does the response stay grounded in the retrieved context, or does it hallucinate?
+
+```python
+# Measure: Does the response cite the sources?
+# Does it contradict the retrieved docs?
+# Example:
+Retrieved: "Protein needs are 0.8g per kg of body weight"
+Response: "You need 1.2g per kg"  ← Contradiction! Faithfulness = 0%
+```
+
+**Relevance:** Is the response actually addressing the user's question?
+
+```python
+# Measure: Does a model-based evaluator think the response is relevant?
+# Prompt Claude: "User asked X. Response is Y. Is Y relevant to X?"
+# Score: 0-1
+```
+
+**Dimension 3: User Satisfaction**
+
+At scale, the gold standard: **Do users think the recommendations are good?**
+
+I track this with a simple metric:
+```
+user_feedback_score = (num positive corrections) / (num corrections)
+```
+
+If a user accepts 95% of recommendations without correction, that's good.
+
+**In practice for NomNom:**
+
+I built a dashboard tracking:
+- Recall@5: 91% (good—finding relevant docs)
+- Hallucination rate: <5% (good—Claude stays grounded)
+- User correction rate: <5% (good—recommendations are trusted)
+
+**What I do when metrics drop:**
+
+If Recall@5 drops to 80%, I investigate:
+1. Did the knowledge base change?
+2. Did the embeddings degrade? (retrain with fresher data)
+3. Did the query understanding get worse? (maybe the user asking differently)
+
+**Time:** 2–3 minutes | **Use when:** Asked "How do you know if RAG is working?" or "What metrics matter?"
+
+---
+
+### **Q40: Tell me about your hybrid search approach. Why BM25 + vector + RRF instead of pure vector search?**
+
+Pure vector search (similarity-based) is beautiful but flawed. Pure BM25 (keyword-based) is reliable but brittle. I combined them.
+
+**Pure Vector Search Problems:**
+
+```
+User query: "How much protein?"
+Vector embedding: [0.2, 0.5, ..., 0.1]  (semantic meaning)
+
+Retrieved doc: "Protein is an amino acid"
+Vector embedding: [0.2, 0.5, ..., 0.1]  (looks similar)
+
+Retrieved doc: "My protein powder tastes good"
+Vector embedding: [0.3, 0.4, ..., 0.2]  (also similar?)
+
+Problem: Semantic similarity doesn't distinguish "protein as a nutrient" 
+from "protein powder as a product."
+```
+
+**Pure BM25 Problems:**
+
+```
+User query: "How much protein?"
+BM25 matches: "protein" (exact match)
+
+Retrieved: "My protein powder tastes good"  ← Irrelevant, but has the word
+Not retrieved: "Amino acids..." (semantically relevant, but no exact match)
+```
+
+**Hybrid Search Solution:**
+
+1. **Run both searches in parallel:**
+   ```python
+   bm25_results = search_bm25("How much protein?")
+   vector_results = search_vector(embedding)
+   ```
+
+2. **Rank each result set separately:**
+   - BM25 returns: [doc5 (score=8.5), doc2 (score=7.2), doc9 (score=6.1)]
+   - Vector returns: [doc5 (score=0.89), doc12 (score=0.87), doc2 (score=0.85)]
+
+3. **Merge using Reciprocal Rank Fusion (RRF):**
+   ```python
+   rrf_score = 1/(k + rank_from_bm25) + 1/(k + rank_from_vector)
+   # k is typically 60
+   
+   # Example:
+   doc5: 1/(60+1) + 1/(60+1) = 0.0330  ← appears in both, high score
+   doc2: 1/(60+2) + 1/(60+3) = 0.0319
+   doc12: 1/(60+3) = 0.0159  ← only in vector, lower score
+   ```
+
+**Result in NomNom:**
+
+| Metric | BM25 Only | Vector Only | Hybrid (RRF) |
+|--------|-----------|-------------|--------------|
+| Recall@5 | 82% | 78% | 91% |
+| Precision@5 | 80% | 75% | 89% |
+| Time | 50ms | 200ms | 220ms |
+
+Hybrid wins on relevance (91% recall) with minimal latency penalty (+20ms).
+
+**Why RRF instead of averaging scores?**
+
+Because BM25 scores (0-100) and vector scores (0-1) are on different scales. RRF normalizes them by converting to ranks, then combining ranks. This prevents one modality from dominating the other.
+
+**Time:** 2–3 minutes | **Use when:** Asked "How do you improve RAG?" or "Vector vs BM25?"
+
+---
+
+### **Q41: Tell me about a RAG failure mode you encountered.**
+
+Real example from NomNom: **Stale Knowledge Problem**
+
+**The Failure:**
+
+Week 1: I load the knowledge base with nutrition facts:
+```
+"The daily protein target is 0.8g per kg of body weight"
+```
+
+Week 8: Nutrition science evolves. New studies suggest 1.0g per kg for active users. But the knowledge base still has the old value.
+
+User asks: "How much protein do I need?"
+Claude retrieves the stale doc and responds with outdated advice.
+
+**Root Cause:**
+
+Knowledge bases don't auto-update. You have to maintain them. I didn't.
+
+**How I Fixed It:**
+
+1. **Add a "last verified" timestamp to each doc:**
+   ```python
+   class KnowledgeDoc(Base):
+       id: int
+       content: str
+       source: str
+       created_at: datetime
+       last_verified_at: datetime  # <-- NEW
+       is_deprecated: bool = False
+   ```
+
+2. **Mark docs as deprecated, don't delete:**
+   ```python
+   # Old doc
+   doc.is_deprecated = True
+   doc.last_verified_at = None
+   
+   # New doc
+   new_doc = KnowledgeDoc(
+       content="New guidance...",
+       last_verified_at=datetime.now()
+   )
+   ```
+
+3. **During retrieval, deprioritize stale docs:**
+   ```python
+   # When retrieving, exclude docs older than 6 months
+   results = search(...).filter(
+       last_verified_at > datetime.now() - timedelta(days=180)
+   )
+   ```
+
+4. **Add a verification process:**
+   Every 3 months, I manually review top-20 knowledge docs. For each, I verify:
+   - "Is this still true?"
+   - "Is there newer information?"
+   - If yes, update `last_verified_at`
+
+**Lesson:**
+
+RAG systems need maintenance. Knowledge degrades. Plan for it.
+
+**Other RAG failures:**
+
+- **Context confusion:** Retrieved doc is relevant to the *topic* but not the *question* (e.g., retrieved "history of protein research" when user asked "how much should I eat?")
+- **Missing context:** Retrieved doc answers 80% of the question, user has to infer the other 20%
+- **Citation errors:** Response cites a doc that doesn't support the claim (hallucinated citations)
+
+**Time:** 2–3 minutes | **Use when:** Asked "How do you debug RAG?" or "What can go wrong?"
+
+---
+
+### **Q42: How do you structure knowledge base chunks for RAG? What's your chunking strategy?**
+
+Chunking is a **hidden lever** that nobody talks about, but it massively impacts RAG quality.
+
+**Problem: The Goldilocks Zone**
+
+Chunks too small (100 tokens):
+```
+Chunk 1: "Protein is an essential macronutrient"
+Chunk 2: "found in eggs, meat, fish, and legumes"
+Chunk 3: "The daily requirement is 0.8g per kg"
+
+User asks: "What should I eat for protein?"
+Retrieved: Chunk 2 (relevant, but incomplete—missing the "why" from Chunk 1)
+```
+
+Chunks too large (2000 tokens):
+```
+Chunk 1: [Entire article: history of protein, requirements, sources, 
+          cooking methods, recipes, etc.]
+
+User asks: "How much protein?"
+Retrieved: Entire article (lots of noise—cooking methods aren't relevant)
+Claude has to filter through irrelevant information.
+```
+
+**My Strategy: Semantic Chunking**
+
+Instead of arbitrary token windows, I chunk on **semantic boundaries**:
+
+```python
+# Original document
+"""
+## Protein Requirements
+
+Protein is essential for muscle growth.
+
+The daily requirement is:
+- Sedentary: 0.8g per kg
+- Active: 1.0g per kg
+- Athletes: 1.2g per kg
+
+## Sources of Protein
+
+Best sources:
+- Animal: eggs, meat, fish
+- Plant: beans, lentils, tofu
+"""
+
+# Chunked semantically:
+Chunk 1: "Protein is essential... [requirement details]"
+Chunk 2: "Best sources: [Animal/plant sources]"
+```
+
+Each chunk is one coherent idea, typically 200-500 tokens.
+
+**In code:**
+
+```python
+class DocumentChunker:
+    def chunk_by_semantic_boundaries(self, text):
+        # Split on headers (##, ###)
+        chunks = []
+        current_chunk = ""
+        
+        for line in text.split("\n"):
+            if line.startswith("##") and current_chunk:
+                chunks.append(current_chunk)
+                current_chunk = line
+            else:
+                current_chunk += "\n" + line
+        
+        return chunks
+```
+
+**Validation: Measure Quality**
+
+For each chunk, I ask: "Can Claude answer a question with just this chunk?"
+
+```python
+for chunk in chunks:
+    # Ask Claude: "What's the key question this chunk answers?"
+    key_question = claude.generate(f"Summarize the key question: {chunk}")
+    
+    # Can a typical user question be answered by this chunk alone?
+    if len(key_question) < 10:  # Too generic
+        flag_as_too_small(chunk)
+    
+    if len(chunk) > 1000:  # Probably too large
+        flag_as_too_large(chunk)
+```
+
+**Time:** 2–3 minutes | **Use when:** Asked "How do you prepare data for RAG?" or "Chunking strategy?"
+
+---
+
+### **Q43: How do you handle RAG for multi-turn conversations? Does context from turn 1 affect turn 3?**
+
+This is where RAG gets complex. In a multi-turn conversation:
+
+```
+Turn 1: User: "I'm 80kg and active"
+Turn 2: User: "How much protein?"
+Turn 3: User: "Is that enough?"
+```
+
+For turn 3, "that" refers to the protein amount from turn 2. But turn 3 doesn't explicitly say "protein." How does RAG know?
+
+**Naive Approach (Wrong):**
+
+```python
+def chat_turn_3(user_message="Is that enough?"):
+    # Search RAG for "Is that enough?"
+    # Embedding of "Is that enough?" doesn't match knowledge docs
+    # Returns nothing relevant
+    # Claude: "I don't know what you're referring to"
+```
+
+**Better Approach: Expand Query with Conversation Context**
+
+```python
+def chat_with_context(user_message, conversation_history):
+    # 1. Re-construct the full context from prior turns
+    full_context = "\n".join([
+        f"Turn {i+1}: User: {msg['content']}"
+        for i, msg in enumerate(conversation_history)
+    ])
+    
+    # 2. Expand the query with context
+    expanded_query = f"""
+    {full_context}
+    
+    Current question: {user_message}
+    """
+    
+    # 3. Search RAG with the expanded query
+    relevant_docs = rag.search(expanded_query)
+    
+    # 4. Pass both the conversation history and docs to Claude
+    response = claude.generate(
+        system="You are a nutrition coach.",
+        context_docs=relevant_docs,
+        messages=[
+            {"role": "user", "content": msg["content"]}
+            for msg in conversation_history
+        ] + [
+            {"role": "user", "content": user_message}
+        ]
+    )
+```
+
+**In NomNom Specifically:**
+
+The `/nutrition/chat` endpoint does this:
+
+```python
+@app.post("/nutrition/chat")
+async def nutrition_chat(user_id: int, message: str):
+    # 1. Fetch conversation history
+    history = db.query(NutritionChat).filter(
+        NutritionChat.user_id == user_id
+    ).order_by(NutritionChat.timestamp.desc()).limit(10)
+    
+    # 2. Build expanded query
+    prior_messages = [h.message for h in history]
+    expanded_query = "\n".join(prior_messages) + "\n" + message
+    
+    # 3. RAG retrieval
+    relevant_docs = rag_service.search(expanded_query)
+    
+    # 4. Generate response
+    response = claude_api.messages.create(
+        model="claude-3.5-sonnet",
+        system=get_system_prompt(user_profile),
+        messages=[
+            {"role": "user", "content": f"Context: {doc}\n\n{message}"}
+            for doc in relevant_docs
+        ] + conversation_messages
+    )
+    
+    # 5. Store in history
+    db.create(NutritionChat(
+        user_id=user_id,
+        message=message,
+        is_user_message=True
+    ))
+    db.create(NutritionChat(
+        user_id=user_id,
+        message=response.content,
+        is_user_message=False
+    ))
+```
+
+**Gotchas:**
+
+1. **Conversation length explosion** — Keep only last 10 messages, else token budget explodes
+2. **Stale context** — If user said "I'm 80kg" in turn 1, does it still apply in turn 5? (Probably yes, but you need to track this)
+3. **Context confusion** — If prior turns mention multiple foods, which one does "that" refer to? Claude usually figures it out, but sometimes misses.
+
+**Time:** 2–3 minutes | **Use when:** Asked "How do you handle conversations?" or "Multi-turn RAG?"
+
+---
+
+### **Q44: Walk me through your prompt A/B testing methodology. How do you measure which prompt is better?**
+
+This is the process I learned in Phase 1 and refined iteratively:
+
+**Setup: Define Success Metric**
+
+Before writing any prompt, I define what "better" means. Not subjective. Measurable.
+
+Examples:
+- **Nutrition prompt:** "How many recommended foods does the user accept without correction?"
+- **Analysis prompt:** "Does Claude identify all macronutrient gaps in the user's diet?"
+- **Chat prompt:** "Does Claude avoid recommending foods the user is allergic to?"
+
+**Test Design: 30-50 examples**
+
+I create a test set:
+```python
+test_set = [
+    {
+        "input": "I logged: eggs, rice, spinach",
+        "expected_output_contains": ["protein", "calcium"],
+        "should_not_contain": ["carbs are bad"]
+    },
+    ...
+]
+```
+
+**Variant A: Current Prompt**
+
+```
+You are a nutrition coach. Analyze the user's meal and provide:
+1. Calorie estimate
+2. Macronutrient breakdown
+3. One health recommendation
+```
+
+**Variant B: Improved Prompt**
+
+```
+You are a nutrition coach specializing in personalized health. Analyze the user's meal and provide:
+1. Calorie estimate (with confidence range)
+2. Macronutrient breakdown
+3. Key nutrients in this meal (calcium, iron, etc.)
+4. One personalized health recommendation based on the user's health profile
+```
+
+**Run Both Variants**
+
+```python
+for test_case in test_set:
+    # Variant A
+    response_a = claude.messages.create(
+        model="claude-3.5-sonnet",
+        system=PROMPT_A,
+        messages=[{"role": "user", "content": test_case["input"]}]
+    )
+    
+    # Variant B
+    response_b = claude.messages.create(
+        model="claude-3.5-sonnet",
+        system=PROMPT_B,
+        messages=[{"role": "user", "content": test_case["input"]}]
+    )
+    
+    # Score each response
+    score_a = evaluate(response_a, test_case)
+    score_b = evaluate(response_b, test_case)
+    
+    results.append({
+        "test": test_case["input"],
+        "variant_a_score": score_a,
+        "variant_b_score": score_b
+    })
+```
+
+**Scoring: Model-Based or Rule-Based**
+
+Option 1: **Rule-based** (fast, deterministic)
+```python
+def evaluate(response, test_case):
+    score = 0
+    for keyword in test_case["expected_output_contains"]:
+        if keyword in response.lower():
+            score += 1
+    for bad_keyword in test_case["should_not_contain"]:
+        if bad_keyword in response.lower():
+            score -= 1
+    return score
+```
+
+Option 2: **Model-based** (expensive, nuanced)
+```python
+def evaluate(response, test_case):
+    evaluation = claude.messages.create(
+        model="claude-3.5-sonnet",
+        system="You are an evaluation expert. Score this response 1-10.",
+        messages=[{"role": "user", "content": f"""
+        Expected: {test_case['expected_output']}
+        Actual: {response}
+        Score: [1-10]
+        """}]
+    )
+    return extract_score(evaluation.content)
+```
+
+I use rule-based for fast iteration, then model-based for final validation.
+
+**Results Summary**
+
+```
+Prompt A (current):
+  Average score: 7.2/10
+  Consistency: 68% (6 of 9 examples good)
+  Cost: $0.04 per call
+
+Prompt B (variant):
+  Average score: 8.1/10
+  Consistency: 78% (8 of 10 examples good)
+  Cost: $0.04 per call
+
+Winner: Variant B (+0.9 points, +10% consistency, same cost)
+```
+
+**Deploy**
+
+In PHASES.md or BUGLOG.md, I document:
+```
+Prompt A/B test completed:
+- Test set: 50 nutrition analysis examples
+- Metric: Expected macronutrient coverage
+- Variant A: 7.2/10 (current)
+- Variant B: 8.1/10 (new)
+- Decision: Deploy Variant B
+```
+
+**Multi-variate testing**
+
+If I'm testing multiple dimensions:
+- Temperature (0.5, 0.7, 1.0)
+- Phrasing ("Analyze", "Break down", "Evaluate")
+- Detail level (brief, medium, detailed)
+
+I don't test all combinations (3 × 3 × 3 = 27 variants). Instead, I test one variable at a time:
+1. Fix temp at 0.7, test phrasing → pick winner
+2. Fix phrasing, test detail level → pick winner
+
+**Time:** 2–3 minutes | **Use when:** Asked "How do you optimize prompts?" or "A/B testing?"
+
+---
+
+### **Q45: Tell me about few-shot vs zero-shot prompting. When do you use each?**
+
+This is a fundamental tradeoff I learned and use constantly.
+
+**Zero-Shot: No Examples**
+
+```
+System prompt: "You are a nutrition coach. Analyze this meal:"
+User: "I ate eggs and toast"
+
+Claude responds based on general knowledge.
+No examples shown, so lower prediction power but faster.
+```
+
+**Few-Shot: With Examples**
+
+```
+System prompt: "You are a nutrition coach. Analyze meals like this:
+
+Example 1:
+Meal: "Salmon with broccoli"
+Analysis: "High protein (25g), good omega-3s, low carb (8g)..."
+
+Example 2:
+Meal: "Rice and beans"
+Analysis: "Complete protein (15g), moderate carbs (45g)..."
+
+Now analyze: I ate eggs and toast"
+
+Claude sees the pattern and mimics the style.
+```
+
+**When Zero-Shot Is Better:**
+
+1. **The task is simple and unambiguous**
+   - Summarize this text
+   - Extract dates from this document
+   - Classify this food as healthy/unhealthy
+   Claude can do this without examples.
+
+2. **You want to reduce latency/cost**
+   Each example adds tokens. Few-shot costs more.
+
+3. **Examples might confuse the model**
+   If the task is "be creative," examples limit creativity.
+
+**When Few-Shot Is Better:**
+
+1. **The task needs a specific format**
+   ```
+   Zero-shot: "Analyze this meal"
+   Response: Long paragraph, inconsistent format
+   
+   Few-shot: Show 2-3 examples with exact format (JSON, bullet points)
+   Response: Consistent format, predictable
+   ```
+
+2. **The task has subtle patterns**
+   ```
+   Zero-shot: "Is this allergy-safe?"
+   Response: Might miss cross-contamination risks
+   
+   Few-shot: Show 3 examples of what counts as unsafe
+   Response: Catches subtle risks the examples covered
+   ```
+
+3. **Output quality matters more than cost**
+   If accuracy is critical (health advice), few-shot is worth the extra tokens.
+
+**In NomNom:**
+
+**Nutrition Analysis**: Few-shot
+```
+System: "Analyze meals in this exact format:
+{name}: calories, protein_g, carbs_g, fat_g, key_nutrients
+Example: Salmon with broccoli: 400, 25, 8, 20, omega-3/B12"
+
+Result: Consistent JSON-like format every time
+```
+
+**Health Profile Intake**: Zero-shot
+```
+System: "Ask the user about their age, weight, activity level"
+User: "I'm 30, weigh 75kg, and I work out 4x/week"
+Claude: Extracts correctly without examples
+```
+
+**Constraint Checking** (allergies): Few-shot
+```
+System: "Check if the recommendation is safe for this user's constraints:
+User: Shellfish allergy, vegetarian
+Example safe: Salmon with beans (no shellfish, vegetarian)
+Example unsafe: Shrimp pasta (shellfish!)
+
+Recommend: ___"
+
+Result: Never recommends shellfish
+```
+
+**Cost vs Quality Trade-off:**
+
+| Task | Zero-Shot | Few-Shot | My Choice |
+|------|-----------|----------|-----------|
+| Nutrient extraction | 92% accuracy | 97% accuracy | Few-shot |
+| Format consistency | 60% | 95% | Few-shot |
+| Creative recommendations | 85% | 80% (constrained) | Zero-shot |
+| Constraint checking | 88% | 99% | Few-shot |
+
+**Time:** 2–3 minutes | **Use when:** Asked "Zero vs few-shot?" or "When do you use examples?"
+
+---
+
+### **Q46: Tell me about chain-of-thought prompting. Do you use it? When?**
+
+Chain-of-thought (CoT) is powerful but expensive. I use it strategically.
+
+**What is CoT?**
+
+Instead of:
+```
+Q: "The user is 80kg, active. How much protein?"
+A: "100g"
+```
+
+With CoT:
+```
+Q: "The user is 80kg, active. How much protein?
+
+Let's think step by step:
+1. Active users need 1.0-1.2g per kg of body weight
+2. 80kg × 1.1g = 88g
+3. Round up for safety: 100g"
+A: "100g"
+```
+
+The model shows its reasoning. Two benefits:
+
+1. **Better accuracy** — The model reasons through the problem instead of guessing
+2. **Explainability** — User sees *why*, not just the answer
+
+**Cost Trade-off:**
+
+CoT often doubles token usage (you're asking for reasoning):
+```
+Simple: "Q: ... A: 100g" (100 tokens)
+CoT: "Q: ... Let's think... A: 100g" (200 tokens)
+
+2x tokens = 2x cost
+```
+
+**When I Use CoT:**
+
+**Use CoT:**
+- ✅ Complex reasoning (multi-step math, constraints)
+- ✅ Health/safety decisions (want justification)
+- ✅ User-facing explanations (explain the recommendation)
+- ✅ Quality matters > cost
+
+**Don't Use CoT:**
+- ❌ Simple classification (healthy/unhealthy)
+- ❌ Extracting facts (What's the calorie count?)
+- ❌ Internal batch processing (background jobs)
+- ❌ Cost sensitive (high-volume calls)
+
+**In NomNom:**
+
+**CoT Example: Recommend a meal**
+
+User asks: "I'm busy, what should I eat?"
+```
+System: "Recommend a meal with reasoning.
+
+Step 1: Check user's health profile
+- Goals: weight loss, high protein
+- Allergies: peanuts
+- Preferences: vegetarian
+
+Step 2: Find meals matching all constraints
+
+Step 3: Explain why this meal is good for the user
+
+Meal: [recommendation] because [reasoning]"
+```
+
+Result: Longer response, but user understands *why*.
+
+**No-CoT Example: Classify food**
+
+Background task: Categorize logged food
+```
+System: "Classify this food as breakfast/lunch/dinner/snack"
+Input: "eggs and toast"
+Output: "breakfast"
+```
+
+No need to show reasoning. User doesn't see this call.
+
+**Hybrid Approach:**
+
+Internal call → External call with CoT
+```
+# Step 1: Fast internal extraction (no CoT)
+nutrition = claude_api.messages.create(
+    system="Extract calories, protein, carbs, fat",
+    messages=[...],
+    temperature=0.2  # Deterministic
+)
+
+# Step 2: User-facing explanation (with CoT)
+if user_wants_explanation:
+    explanation = claude_api.messages.create(
+        system="Explain why this meal is good. Show your reasoning.",
+        messages=[...],
+        temperature=0.7  # More natural
+    )
+```
+
+**Time:** 2–3 minutes | **Use when:** Asked "Chain-of-thought?" or "Reasoning traces?"
+
+---
+
+### **Q47: How do you handle prompt versioning and rollback? What if a prompt update breaks things?**
+
+Prompts are **product assets**, not code. They change constantly. You need versioning.
+
+**Prompt Versioning Strategy:**
+
+```python
+class PromptVersion:
+    version: int
+    slug: str  # e.g., "nutrition_analysis"
+    content: str
+    active: bool = False
+    metadata: dict = {
+        "created_at": ...,
+        "author": ...,
+        "rationale": "Why this version?",
+        "test_score": 8.1  # A/B test result
+    }
+```
+
+**In Database:**
+
+```sql
+CREATE TABLE prompt_versions (
+    id INT PRIMARY KEY,
+    slug VARCHAR(100),  -- nutrition_analysis, health_profile, etc.
+    version INT,
+    content TEXT,
+    active BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP,
+    rationale TEXT,  -- Why this version was created
+    test_score FLOAT,  -- From A/B testing
+    INDEX (slug, version)
+);
+```
+
+**Deployment:**
+
+```python
+# Load the active prompt
+active_prompt = db.query(PromptVersion).filter(
+    PromptVersion.slug == "nutrition_analysis",
+    PromptVersion.active == True
+).first()
+
+response = claude_api.messages.create(
+    system=active_prompt.content,
+    messages=[...]
+)
+```
+
+**Update Process:**
+
+```python
+# 1. Test new variant
+new_variant = """You are a nutrition coach...improved instructions..."""
+test_score = run_a_b_test(new_variant, test_set=50)
+
+# 2. If score is good, create new version
+if test_score > current_score:
+    new_version = PromptVersion(
+        slug="nutrition_analysis",
+        version=current_version + 1,
+        content=new_variant,
+        active=False,  # Don't activate yet
+        rationale="Improved clarity on macro targets",
+        test_score=test_score
+    )
+    db.add(new_version)
+    db.commit()
+
+# 3. Gradual rollout (optional)
+# Deploy to 10% of users first, monitor for issues
+# If good, move to 100%
+```
+
+**Rollback (If Things Break):**
+
+```python
+# Something went wrong. Roll back to previous version.
+old_version = db.query(PromptVersion).filter(
+    PromptVersion.slug == "nutrition_analysis",
+    PromptVersion.version == current_version - 1
+).first()
+
+# Activate old version
+old_version.active = True
+current_version.active = False
+db.commit()
+
+# Log the incident
+log_rollback(
+    slug="nutrition_analysis",
+    from_version=current_version,
+    to_version=current_version - 1,
+    reason="False positive rate spiked to 15%"
+)
+```
+
+**Monitoring During Rollout:**
+
+I track metrics that would indicate a bad prompt:
+- False positive rate (recommending allergens)
+- User correction rate (user rejecting recommendations)
+- Quality score (A/B test metric)
+- Cost per call (didn't expect this to increase)
+
+```python
+# After deploying new prompt version
+# Monitor for 24 hours
+metrics_before = get_metrics(start=-24h, end=-1h)  # Pre-deployment
+metrics_after = get_metrics(start=-1h, end=now)    # Post-deployment
+
+if metrics_after["false_positive_rate"] > metrics_before["false_positive_rate"] * 1.2:
+    # 20% spike = bad. Rollback.
+    trigger_rollback()
+```
+
+**Real Example from NomNom:**
+
+Iteration 17 (Personalized Nutrition):
+- v1: Generic prompts
+- v2: Added user health profile context
+  - Test score: 8.1 (good)
+  - Deployed to 50% of users → no issues
+  - Deployed to 100% → no issues
+  - Marked as active
+- v3: Later, tried to add recommendation reasoning
+  - Test score: 7.9 (worse than v2)
+  - Never deployed
+
+**Documentation:**
+
+In BUGLOG.md:
+```
+Prompt versioning log:
+- 2026-06-10: nutrition_analysis v2 deployed (test_score 8.1)
+- 2026-06-12: nutrition_analysis v3 tested (test_score 7.9, rejected)
+- 2026-06-15: nutrition_analysis v2 stable, no rollbacks needed
+```
+
+**Time:** 2–3 minutes | **Use when:** Asked "Prompt management?" or "How do you update prompts?"
+
+---
+
+### **Q48: Tell me about the tradeoff between prompt complexity and model cost.**
+
+Simple prompts = cheaper. Complex prompts = better results. Where's the sweet spot?
+
+**Simple Prompt**
+
+```
+"You are a nutrition coach. Analyze this meal and provide protein amount."
+```
+
+Cost: ~100 tokens  
+Quality: 85% (sometimes misses nuance)  
+Latency: ~500ms  
+
+**Complex Prompt**
+
+```
+You are an expert nutrition coach specializing in personalized health recommendations.
+
+User Profile:
+- Age: 30
+- Weight: 80kg
+- Activity level: active (workout 4x/week)
+- Goals: build muscle
+- Allergies: peanuts
+- Dietary preferences: vegetarian
+- Medical conditions: none
+
+Task: Analyze this meal and provide:
+1. Calorie estimate (range, not exact)
+2. Protein in grams
+3. How this meal aligns with the user's goals
+4. One improvement suggestion
+
+Format: JSON with keys: calories_min, calories_max, protein_g, alignment_score, improvement
+
+Remember: Always check for allergen safety before recommending.
+```
+
+Cost: ~400 tokens (4x more)  
+Quality: 95% (catches nuance, safe recommendations)  
+Latency: ~600ms  
+
+**Cost-Benefit Analysis:**
+
+| Metric | Simple | Complex | Delta |
+|--------|--------|---------|-------|
+| Tokens | 100 | 400 | +300 |
+| Cost per call | $0.004 | $0.016 | +300% |
+| Daily (1000 calls) | $4 | $16 | +$12 |
+| Quality | 85% | 95% | +10% |
+| User satisfaction | 78% | 92% | +14% |
+
+**When Simple Is Enough:**
+
+- ✅ Internal batch processing (no user sees it)
+- ✅ Pre-filtering (coarse decisions)
+- ✅ Cost-sensitive (high volume, low margin)
+
+**When Complex Is Worth It:**
+
+- ✅ User-facing (impacts recommendation quality)
+- ✅ Safety-critical (allergies, medical conditions)
+- ✅ Quality drives retention (users trust the app)
+
+**My Strategy in NomNom:**
+
+**Simple Prompts (internal):**
+```
+- Categorize food (breakfast/lunch/dinner)
+- Extract calories from image
+- Check if meal contains user's allergen
+```
+
+**Complex Prompts (user-facing):**
+```
+- Generate personalized recommendations
+- Explain nutritional analysis to user
+- Suggest meal improvements
+```
+
+**Middle Ground: Hybrid Approach**
+
+```python
+# Step 1: Simple extraction (cheap)
+nutrition_facts = claude_api.messages.create(
+    system="Extract: calories, protein, carbs, fat",
+    messages=[...],
+    max_tokens=200
+)
+
+# Step 2: If user asks for explanation, run complex prompt
+if user_wants_explanation:
+    explanation = claude_api.messages.create(
+        system="Explain why this meal is good based on the user's goals",
+        messages=[...]
+    )
+```
+
+This way: fast + cheap by default, but high-quality when user cares.
+
+**Time:** 2–3 minutes | **Use when:** Asked "Prompt complexity?" or "Cost vs quality?"
+
+---
+
+### **Q49: Tell me about agent failure modes. How do you debug when an agent gets stuck?**
+
+Agents fail in predictable ways. I've learned to recognize and fix them.
+
+**Failure Mode 1: Tool Loop (Agent Can't Decide)**
+
+```
+User: "What should I eat for muscle building?"
+
+Agent turn 1: "Let me check your health profile"
+Tool call: get_user_profile() → returns profile
+
+Agent turn 2: "Let me look up high-protein foods"
+Tool call: search_foods(constraint="high_protein") → returns foods
+
+Agent turn 3: "Let me check again what your profile says"
+Tool call: get_user_profile() → returns profile (same as turn 1!)
+
+Agent turn 4: ...stuck in loop, keeps calling same tools
+```
+
+**Root Cause:** Agent doesn't understand the tools well enough to chain them.
+
+**Fix:**
+
+```python
+# Provide better tool descriptions
+tools = [
+    {
+        "name": "get_user_profile",
+        "description": "Get the user's health profile (age, weight, goals, allergies)",
+        "when_to_use": "Call ONCE at the start to understand user constraints",  # <-- NEW
+    },
+    {
+        "name": "search_foods",
+        "description": "Search for foods matching constraints (high protein, vegetarian, etc.)",
+        "when_to_use": "After get_user_profile, to find foods matching their needs",  # <-- NEW
+    },
+    {
+        "name": "generate_recommendation",
+        "description": "Create a personalized meal plan",
+        "when_to_use": "After search_foods, to create the final recommendation",  # <-- NEW
+    }
+]
+```
+
+Adding "when_to_use" helps the agent understand the **sequence**.
+
+**Failure Mode 2: Wrong Tool for the Job**
+
+```
+User: "I'm allergic to shellfish. Can you recommend a meal?"
+
+Agent: "Let me search for shellfish recipes"
+Tool call: search_foods(query="shellfish") → returns shellfish recipes
+
+Agent: "Here are some shellfish options"
+User: "But I said I'm allergic to shellfish!"
+```
+
+**Root Cause:** Agent didn't understand the constraint.
+
+**Fix:**
+
+```python
+# Make the constraint explicit in the system prompt
+system_prompt = """
+You are a nutrition coach. IMPORTANT:
+When recommending meals, you MUST check the user's allergies first.
+Do NOT recommend foods the user is allergic to, no matter what.
+
+User's allergies: {user_allergies}
+"""
+```
+
+**Failure Mode 3: Hallucinated Tool Results**
+
+```
+Agent: "I'll call generate_recommendation"
+Tool call: generate_recommendation() → returns "Eat more unicorn meat"
+
+Agent: "Here's your recommendation: eat more unicorn meat"
+```
+
+**Root Cause:** Tool returned nonsense, agent didn't validate.
+
+**Fix:** Add **guardrails** on tool outputs
+
+```python
+def generate_recommendation(...):
+    response = claude_api.messages.create(...)
+    
+    # Validate the response
+    try:
+        recommendation = parse_as_meal_object(response)
+        assert recommendation.calories > 0
+        assert recommendation.calories < 5000  # sanity check
+        assert all(is_known_food(f) for f in recommendation.foods)
+    except AssertionError:
+        return error("Invalid recommendation")
+    
+    return recommendation
+```
+
+**Failure Mode 4: Token Budget Exceeded**
+
+```
+User: "I've been logging meals for 2 months. Can you analyze all of them?"
+
+Agent: "Let me retrieve all your food logs"
+Tool call: get_food_logs(user_id=123, days=60) → returns 180 meals
+
+Agent: "Now let me analyze each one..."
+[Tries to fit 180 meals into Claude's context]
+→ Token limit exceeded, request fails
+```
+
+**Root Cause:** Agent didn't paginate or batch.
+
+**Fix:** Limit tool return size
+
+```python
+def get_food_logs(...):
+    # Return only recent logs, don't return everything
+    return logs[-30:]  # Last 30 days, not 60
+```
+
+**Debugging Strategy:**
+
+When an agent fails, I check:
+1. **Is the tool description clear?** (Mode 2)
+2. **Are tools being called in the right order?** (Mode 1)
+3. **Are tool outputs validated?** (Mode 3)
+4. **Did we exceed token budget?** (Mode 4)
+
+```python
+# Add logging to debug
+for turn in agent_steps:
+    log(f"Turn {turn['turn_num']}: Called {turn['tool_name']}")
+    log(f"  Input: {turn['tool_input']}")
+    log(f"  Output: {turn['tool_output'][:100]}...")  # First 100 chars
+```
+
+**Time:** 2–3 minutes | **Use when:** Asked "Agent failures?" or "Debugging agents?"
+
+---
+
+
 |--------|-------|---|
 | **Cache Hit Rate** | 85% | Reduces redundant API calls; fundamental to cost savings |
 | **Cost Reduction** | 83% | $12/day → $2/day (Sonnet + caching) |
