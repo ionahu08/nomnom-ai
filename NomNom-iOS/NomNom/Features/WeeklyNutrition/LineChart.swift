@@ -58,7 +58,6 @@ struct LineChart: View {
                         // Draw target reference line
                         let targetRatio = targetValue / maxValue
                         let targetY = padding + CGFloat(1 - targetRatio) * height
-                        print("[LineChart] Metric: \(metricType), Target: \(targetValue), Max: \(maxValue), targetY: \(targetY), canvasHeight: \(size.height)")
                         var targetPath = Path()
                         targetPath.move(to: CGPoint(x: padding, y: targetY))
                         targetPath.addLine(to: CGPoint(x: size.width - padding, y: targetY))
@@ -191,16 +190,25 @@ struct LineChart: View {
     }
 
     private func getMaxValue() -> Double {
+        let dataMax: Double
+        let defaultMin: Double
+
         switch metricType {
         case .calories:
-            return Double(dailyBreakdown.map { $0.calories }.max() ?? 2000)
+            dataMax = Double(dailyBreakdown.map { $0.calories }.max() ?? 0)
+            defaultMin = 2000
         case .protein:
-            return Double(dailyBreakdown.map { $0.proteinG }.max() ?? 150)
+            dataMax = Double(dailyBreakdown.map { $0.proteinG }.max() ?? 0)
+            defaultMin = 150
         case .carbs:
-            return Double(dailyBreakdown.map { $0.carbsG }.max() ?? 200)
+            dataMax = Double(dailyBreakdown.map { $0.carbsG }.max() ?? 0)
+            defaultMin = 200
         case .fat:
-            return Double(dailyBreakdown.map { $0.fatG }.max() ?? 65)
+            dataMax = Double(dailyBreakdown.map { $0.fatG }.max() ?? 0)
+            defaultMin = 65
         }
+
+        return max(dataMax, targetValue, defaultMin)
     }
 
     private func calculatePoints(width: CGFloat, height: CGFloat, maxValue: Double, padding: CGFloat) -> [CGPoint] {
