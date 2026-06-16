@@ -3217,6 +3217,1414 @@ for turn in agent_steps:
 
 ---
 
+### **Q50: How do you manage agent state and context windows? What happens to memory across turns?**
+
+Agents have limited memory (context window). In NomNom, I handle this strategically.
+
+**The Problem: Context Window Limits**
+
+Claude 3.5 Sonnet has 200k tokens, but:
+- System prompt: ~1k tokens
+- User's conversation history: grows unbounded
+- Retrieved documents (RAG): variable
+- Tools outputs: can be large
+
+```
+Turn 1: User asks question → 1k tokens used, 199k remaining
+Turn 2: User asks follow-up → 2k used, 198k remaining
+Turn 3: ...
+Turn 10: 10k used, 190k remaining ← Still fine
+Turn 50: 50k used, 150k remaining ← Still ok
+Turn 100: 100k used, 100k remaining ← Getting tight
+Turn 150: 150k used, 50k remaining ← Dangerously low
+```
+
+**Solution 1: Conversation Pruning**
+
+Keep only recent messages:
+```python
+def manage_conversation_history(conversation, max_messages=20):
+    # Keep only the last 20 messages
+    # Oldest messages are dropped
+    if len(conversation) > max_messages:
+        conversation = conversation[-max_messages:]
+    
+    return conversation
+```
+
+In NomNom's `/nutrition/chat`:
+```python
+# Fetch conversation history
+history = db.query(NutritionChat).filter(
+    NutritionChat.user_id == user_id
+).order_by(NutritionChat.timestamp.desc()).limit(20)  # Only last 20
+
+# Use for context
+messages = [
+    {"role": "user" if m.is_user_message else "assistant", "content": m.message}
+    for m in reversed(history)
+]
+```
+
+**Solution 2: Conversation Summarization**
+
+Instead of dropping old messages, summarize them:
+```python
+def summarize_old_conversation(old_messages, max_to_keep=5):
+    # Keep recent messages as-is
+    recent = old_messages[-max_to_keep:]
+    
+    # Summarize older messages into one
+    if len(old_messages) > max_to_keep:
+        old_text = "\n".join([m["content"] for m in old_messages[:-max_to_keep]])
+        summary = claude_api.messages.create(
+            model="claude-3.5-sonnet",
+            system="Summarize this conversation in 2-3 sentences",
+            messages=[{"role": "user", "content": old_text}]
+        )
+        
+        return [
+            {"role": "user", "content": f"[Summary of earlier conversation]\n{summary.content}"},
+            *recent
+        ]
+    
+    return old_messages
+```
+
+**Solution 3: Agent State (Separate from Context)**
+
+Context is what Claude sees. State is what the backend tracks:
+
+```python
+class ConversationState:
+    user_id: int
+    health_profile: UserProfile  # ← Not in context, accessed via tool
+    allergies: List[str]         # ← Not in context, accessed via tool
+    medical_conditions: List[str] # ← Not in context, accessed via tool
+    conversation_topics: Set[str] # ← What has the user asked about?
+    last_recommendation: str      # ← What did we recommend last time?
+```
+
+When the agent needs user info, it calls a tool:
+```python
+@tool
+def get_user_health_profile(user_id: int):
+    """Get the user's stored health data (age, weight, goals, allergies)"""
+    return db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+```
+
+Claude doesn't store this in its context. It asks for it.
+
+**Monitoring Context Usage:**
+
+```python
+def create_message_with_monitoring(system, messages):
+    # Count tokens before
+    tokens_before = count_tokens(system + str(messages))
+    
+    response = claude_api.messages.create(
+        model="claude-3.5-sonnet",
+        system=system,
+        messages=messages
+    )
+    
+    # Log for monitoring
+    tokens_after = count_tokens(system + str(messages) + response.content)
+    
+    if tokens_after > 150_000:  # Getting full
+        log_warning(f"High token usage: {tokens_after}/200k")
+        trigger_conversation_pruning()
+    
+    return response
+```
+
+**Time:** 2–3 minutes | **Use when:** Asked "How do you handle long conversations?" or "Context windows?"
+
+---
+
+### **Q51: How do you design tools so Claude picks the right one? Tool selection strategy?**
+
+When Claude has 10 tools, how do you ensure it calls the right one?
+
+**Problem: Tool Confusion**
+
+```python
+tools = [
+    {name: "get_user_profile"},
+    {name: "get_food_logs"},
+    {name: "get_nutrition_targets"},
+    {name: "search_foods"},
+    {name: "generate_recommendation"},
+    {name: "get_user_allergies"},
+    {name: "get_meal_history"},
+    {name: "calculate_macro_split"},
+    {name: "check_allergen_safety"},
+    {name: "get_health_conditions"},
+]
+
+User: "What should I eat?"
+Claude: Calls get_food_logs (retrieves data, not recommendations)
+        Then generate_recommendation (works, but inefficient)
+```
+
+**Better approach: Clear tool descriptions**
+
+```python
+tools = [
+    {
+        "name": "get_user_profile",
+        "description": "Retrieve the user's complete health profile (age, weight, goals, etc)",
+        "when_to_call": "FIRST, when you need to understand the user's constraints and preferences",
+        "returns": {"age": 30, "weight_kg": 80, "goals": "muscle building", ...}
+    },
+    {
+        "name": "get_food_logs",
+        "description": "Get the user's past food logs (what they've eaten)",
+        "when_to_call": "When analyzing eating patterns or dietary history",
+        "returns": [{"food": "salmon", "date": "2026-06-15", ...}]
+    },
+    {
+        "name": "search_foods",
+        "description": "Search the knowledge base for foods matching constraints (high protein, vegetarian, etc)",
+        "when_to_call": "When you need to find specific foods that match criteria",
+        "example": "search_foods(constraints=['high_protein', 'vegetarian'])"
+    },
+    {
+        "name": "generate_recommendation",
+        "description": "Create a personalized meal recommendation based on user profile and preferences",
+        "when_to_call": "LAST, after you understand the user's needs. Pass the user profile and constraints",
+        "returns": {"meal": "grilled chicken with rice", "reasoning": "high protein for your goals"}
+    }
+]
+```
+
+**Tool Ordering Matters:**
+
+```python
+# GOOD: Tools ordered by logical sequence
+tools = [
+    get_user_profile,      # ← Call first to understand constraints
+    get_food_logs,         # ← Optional: understand history
+    search_foods,          # ← Use criteria to find options
+    generate_recommendation # ← Synthesize into recommendation
+]
+
+# BAD: Random order
+tools = [
+    generate_recommendation,  # ← Claude calls this first, guesses at user profile
+    search_foods,
+    get_user_profile,       # ← Too late, already generated wrong recommendation
+    get_food_logs
+]
+```
+
+**Tool Descriptions: Be Specific**
+
+```python
+# GOOD
+{
+    "name": "check_allergen_safety",
+    "description": "Check if a specific food is safe for the user (checks against their allergies and medical conditions)",
+    "parameters": {
+        "food_name": "string"
+    },
+    "return_value": {
+        "is_safe": true,
+        "allergens": ["shellfish"],
+        "medical_concerns": []
+    }
+}
+
+# BAD
+{
+    "name": "check_food",
+    "description": "Check a food"
+}
+```
+
+**Tool Batching: Avoid Tool Explosion**
+
+Instead of 10 separate tools:
+```python
+tools = [
+    get_user_profile,
+    get_user_constraints,
+    get_user_allergies,
+    get_user_goals,
+    get_user_medical_conditions,
+]
+```
+
+Combine into one:
+```python
+tools = [
+    get_user_full_profile,  # Returns {profile, constraints, allergies, goals, medical}
+]
+```
+
+Fewer tools = clearer decision for Claude.
+
+**Tool Success Rate Tracking:**
+
+```python
+# Log which tools Claude calls and whether they were useful
+for turn in agent_steps:
+    if turn["tool_called"]:
+        log({
+            "tool": turn["tool_name"],
+            "success": turn["achieved_goal"],
+            "turns_to_goal": turn["turns_needed"]
+        })
+
+# If check_allergen_safety has low success rate, improve the description
+if success_rate("check_allergen_safety") < 0.8:
+    improve_tool_description("check_allergen_safety")
+```
+
+**Time:** 2–3 minutes | **Use when:** Asked "How do you guide agent behavior?" or "Tool design?"
+
+---
+
+### **Q52: Tell me about multi-agent coordination. How do multiple agents work together?**
+
+In NomNom, I have different agents for different tasks. They need to work together.
+
+**Example: Recommend a Meal (Multi-Agent)**
+
+User: "I want to build muscle. What should I eat?"
+
+**Agent 1: Health Analyzer**
+```
+Purpose: Understand the user's constraints
+Tool: get_user_profile()
+Output: "User goals: muscle building, allergies: peanuts"
+```
+
+**Agent 2: Food Searcher**
+```
+Purpose: Find foods matching constraints
+Input: "muscle building, no peanuts"
+Tool: search_foods(constraint="high_protein")
+Output: "salmon (25g protein), chicken (30g), eggs (6g)"
+```
+
+**Agent 3: Recommendation Generator**
+```
+Purpose: Create the final meal plan
+Input: User profile + candidate foods
+Tool: generate_recommendation()
+Output: "Grilled chicken with rice and broccoli"
+```
+
+**Sequential Coordination (Waterfall)**
+
+```
+Agent 1 finishes → Pass output to Agent 2
+Agent 2 finishes → Pass output to Agent 3
+Agent 3 finishes → Return final recommendation
+```
+
+**In Code:**
+
+```python
+async def coordinate_meal_recommendation(user_id: int):
+    # Agent 1: Get user constraints
+    profile = await agent_1_health_analyzer(user_id)
+    
+    # Agent 2: Find foods
+    foods = await agent_2_food_searcher(profile.constraints)
+    
+    # Agent 3: Generate recommendation
+    recommendation = await agent_3_recommendation_generator(profile, foods)
+    
+    return recommendation
+```
+
+**Parallel Coordination (Where Possible)**
+
+Some agents don't depend on each other:
+
+```python
+async def get_user_context(user_id: int):
+    # These can run in parallel (no dependencies)
+    profile_task = agent_get_profile(user_id)
+    history_task = agent_get_history(user_id)
+    allergies_task = agent_get_allergies(user_id)
+    
+    # Wait for all to finish
+    profile, history, allergies = await asyncio.gather(
+        profile_task, history_task, allergies_task
+    )
+    
+    return {profile, history, allergies}
+```
+
+**Inter-Agent Disagreement (Voting)**
+
+When agents disagree, use voting:
+
+```python
+async def recommend_with_consensus(user_id: int):
+    # 3 agents independently generate recommendations
+    rec1 = await agent_recommendation_style_A(user_id)
+    rec2 = await agent_recommendation_style_B(user_id)
+    rec3 = await agent_recommendation_style_C(user_id)
+    
+    # Score each
+    scores = [
+        evaluate_recommendation(rec1),
+        evaluate_recommendation(rec2),
+        evaluate_recommendation(rec3),
+    ]
+    
+    # Return the best one
+    best_index = scores.index(max(scores))
+    return [rec1, rec2, rec3][best_index]
+```
+
+**Communication Protocol: Structured Handoffs**
+
+Agents pass data as structured objects, not free-text:
+
+```python
+class AgentHandoff:
+    agent_name: str
+    task: str
+    output: dict
+    confidence: float
+    next_agent_hints: List[str]  # Suggestions for next agent
+
+# Agent 1 output:
+AgentHandoff(
+    agent_name="health_analyzer",
+    task="understand user constraints",
+    output={
+        "age": 30,
+        "goal": "muscle building",
+        "allergies": ["peanuts"],
+        "activity_level": "active"
+    },
+    confidence=0.95,
+    next_agent_hints=["search for high-protein foods", "avoid peanuts"]
+)
+
+# Agent 2 reads this and knows exactly what to do
+```
+
+**Time:** 2–3 minutes | **Use when:** Asked "Multiple agents?" or "How do agents coordinate?"
+
+---
+
+### **Q53: How do you debug what an agent is thinking? Reasoning traces?**
+
+When an agent makes a bad decision, how do you understand why?
+
+**Capture Reasoning:**
+
+```python
+def call_agent_with_reasoning(system, tools, messages):
+    # Request Claude to show its thinking
+    response = claude_api.messages.create(
+        model="claude-3.5-sonnet",
+        system=system,
+        tools=tools,
+        messages=messages,
+        # Budget tokens for thinking
+        thinking={
+            "type": "enabled",
+            "budget_tokens": 10000  # Give Claude thinking space
+        }
+    )
+    
+    # Capture the reasoning
+    reasoning = response.thinking  # Claude's internal reasoning
+    tool_calls = response.tool_calls
+    final_output = response.text
+    
+    return {
+        "reasoning": reasoning,
+        "tool_calls": tool_calls,
+        "output": final_output
+    }
+```
+
+**Log Tool Call Sequences:**
+
+```python
+def debug_agent_trace(agent_result):
+    print("=== AGENT TRACE ===")
+    print(f"Reasoning: {agent_result['reasoning']}")
+    print()
+    
+    print("Tool calls in order:")
+    for i, call in enumerate(agent_result['tool_calls']):
+        print(f"  {i+1}. {call.name}({call.arguments})")
+        print(f"     Result: {call.result[:100]}...")
+    
+    print()
+    print(f"Final output: {agent_result['output']}")
+```
+
+**Example Trace (Good Decision):**
+
+```
+=== AGENT TRACE ===
+Reasoning: "User wants muscle building recommendation. I need to understand their constraints first."
+
+Tool calls in order:
+  1. get_user_profile(user_id=123)
+     Result: age=30, weight=80kg, goal=muscle building, allergies=peanuts
+  
+  2. search_foods(constraint=['high_protein'], exclude=['peanuts'])
+     Result: salmon (25g), chicken (30g), eggs (6g)
+  
+  3. generate_recommendation(profile={...}, foods=[...])
+     Result: "Grilled chicken with rice"
+
+Final output: "For muscle building, I recommend grilled chicken with rice and broccoli. It has 30g protein..."
+```
+
+**Example Trace (Bad Decision):**
+
+```
+=== AGENT TRACE ===
+Reasoning: "User wants a meal. Let me recommend something."
+
+Tool calls in order:
+  1. search_foods(query="meal")  ← WRONG: didn't get user profile first!
+     Result: pizza, pasta, burger, tacos
+  
+  2. generate_recommendation(foods=[...])  ← WRONG: using foods without knowing user is allergic to gluten!
+     Result: "I recommend pasta"
+
+Final output: "Pasta is a great meal choice."
+```
+
+**Root Cause:** Agent didn't call `get_user_profile` first.
+
+**Fix:** Improve system prompt:
+```python
+system_prompt = """
+You are a nutrition coach.
+
+IMPORTANT: ALWAYS start by understanding the user's health profile.
+1. Call get_user_profile first
+2. Then search for foods matching their constraints
+3. Finally, generate a personalized recommendation
+
+Do not skip step 1.
+"""
+```
+
+**Post-Mortem:**
+
+When an agent fails:
+```python
+if agent_result['output'] is_bad:
+    print("Debugging bad decision:")
+    print(f"1. Trace: {agent_result['reasoning']}")
+    print(f"2. Missing tools: Which tools should have been called?")
+    print(f"3. Wrong order: Were tools called in wrong order?")
+    print(f"4. Bad input: Were tool parameters correct?")
+```
+
+**Time:** 2–3 minutes | **Use when:** Asked "How do you debug agents?" or "Agent reasoning?"
+
+---
+
+### **Q54: Agent vs Workflow—how do you decide which to use?**
+
+This is the most important decision for LLM orchestration.
+
+**Key Difference:**
+
+```
+Agent:
+  - Decides what to do (agentic reasoning)
+  - Flexible, handles unknown steps
+  - Slower, more expensive, less predictable
+
+Workflow:
+  - Predefined steps, known sequence
+  - Fast, cheap, predictable
+  - Can't handle surprises
+```
+
+**Decision Framework:**
+
+**Use WORKFLOW if:**
+- ✅ Steps are known upfront
+- ✅ Order is fixed
+- ✅ All paths lead to the same result
+- ✅ Speed/cost matters
+
+Example: "Analyze a meal photo"
+```
+Step 1: Extract nutrition facts from photo
+Step 2: Store in database
+Step 3: Fetch user profile
+Step 4: Compare to targets
+Step 5: Return analysis
+```
+
+The steps are always the same. Workflow is perfect.
+
+**Use AGENT if:**
+- ✅ User can ask unpredictable questions
+- ✅ Different paths lead to different results
+- ✅ Requires reasoning about which tools to call
+- ✅ Flexibility is more important than cost
+
+Example: "I'm busy, what should I eat?"
+```
+User might follow up with:
+  - "What about allergies?" (agent should ask profile)
+  - "Can you make it vegetarian?" (agent should refine search)
+  - "How many calories?" (agent should adjust)
+  
+The agent figures out what to do next, not the developer.
+```
+
+**In NomNom:**
+
+**Workflow: Meal Analysis**
+```
+Deterministic steps:
+1. Extract nutrition from photo
+2. Store to database
+3. Retrieve user profile
+4. Calculate vs targets
+5. Return analysis
+
+→ Use Workflow (predictable, fast)
+```
+
+**Agent: Nutrition Coaching**
+```
+Unpredictable user questions:
+- "What should I eat?"
+- "I'm allergic to shellfish, can you adjust?"
+- "Make it high-protein"
+- "Can I meal prep this?"
+
+Agent decides which tools to call.
+→ Use Agent (flexible)
+```
+
+**Hybrid: Start with Workflow, finish with Agent**
+
+```python
+async def recommend_meal(user_id, user_request):
+    # Workflow: Extract constraints (known steps)
+    profile = await workflow_get_profile(user_id)
+    history = await workflow_get_history(user_id)
+    constraints = extract_constraints(user_request)
+    
+    # Agent: Reason about recommendation (unpredictable)
+    recommendation = await agent_recommend(
+        profile=profile,
+        history=history,
+        constraints=constraints,
+        user_question=user_request
+    )
+    
+    return recommendation
+```
+
+**Time:** 2–3 minutes | **Use when:** Asked "Agents vs workflows?" or "When to use which?"
+
+---
+
+### **Q55: How do you design tools so they're discoverable? Tool naming and descriptions?**
+
+Claude needs to understand what each tool does and when to use it.
+
+**Bad Tool Design:**
+
+```python
+tools = [
+    {"name": "f1", "description": "Get data"},
+    {"name": "f2", "description": "Search"},
+    {"name": "f3", "description": "Generate"},
+]
+
+Problem: Claude doesn't know what "f1" does or when to call it.
+```
+
+**Good Tool Design:**
+
+```python
+tools = [
+    {
+        "name": "get_user_health_profile",  # ← Exact, descriptive name
+        "description": "Retrieve the user's health profile including age, weight, goals, allergies, medical conditions, and dietary preferences",
+        "when_to_call": "Call this FIRST when you need to understand the user's constraints",
+        "parameters": {
+            "user_id": {
+                "type": "integer",
+                "description": "The user's ID"
+            }
+        },
+        "example_call": {
+            "user_id": 123,
+            "example_result": {
+                "age": 30,
+                "weight_kg": 80,
+                "goals": ["muscle building"],
+                "allergies": ["peanuts"],
+                "medical_conditions": []
+            }
+        }
+    },
+    {
+        "name": "search_foods_by_constraints",  # ← Specific, not just "search"
+        "description": "Search for foods matching specific nutritional and dietary constraints (e.g., high protein, vegetarian, low-carb)",
+        "when_to_call": "After understanding the user's profile, use this to find specific foods",
+        "parameters": {
+            "constraints": {
+                "type": "array of strings",
+                "description": "Constraints like 'high_protein', 'vegetarian', 'gluten_free', 'exclude:shellfish'",
+                "example": ["high_protein", "vegetarian"]
+            }
+        },
+        "example_call": {
+            "constraints": ["high_protein", "vegetarian"],
+            "example_result": ["chickpeas (15g protein)", "tofu (8g protein)", "lentils (9g protein)"]
+        }
+    }
+]
+```
+
+**Naming Convention:**
+
+```
+BAD:              GOOD:
+f1         →      get_user_health_profile
+search     →      search_foods_by_constraints
+generate   →      generate_personalized_meal_recommendation
+check      →      check_allergen_safety_for_food
+```
+
+**Description Structure:**
+
+```
+{
+    "description": "[1-2 sentence overview of what this does]",
+    "when_to_call": "[When should Claude call this? Triggers? Prerequisites?]",
+    "example_call": "[Concrete example of input and output]"
+}
+```
+
+**Avoid:**
+
+```python
+{
+    "name": "foo",
+    "description": "Does something"  # ← Too vague!
+}
+```
+
+**In NomNom's MCP Server:**
+
+```python
+TOOLS = [
+    MCP_Tool(
+        name="analyze_food_image",
+        description="Analyze a food photograph and extract nutritional information",
+        input_schema={
+            "type": "object",
+            "properties": {
+                "image_url": {
+                    "type": "string",
+                    "description": "URL of the food image to analyze"
+                }
+            }
+        },
+        when_to_call="When a user uploads a food photo"
+    ),
+    MCP_Tool(
+        name="get_user_nutrition_summary",
+        description="Get the user's nutrition summary for a date range (daily, weekly, monthly)",
+        input_schema={
+            "type": "object",
+            "properties": {
+                "user_id": {"type": "integer"},
+                "period": {"type": "string", "enum": ["daily", "weekly", "monthly"]}
+            }
+        },
+        when_to_call="After user asks about their nutrition data"
+    )
+]
+```
+
+**Time:** 2–3 minutes | **Use when:** Asked "Tool design?" or "How do you make Claude use the right tool?"
+
+---
+
+### **Q56: Tell me about MCP (Model Context Protocol). When do you use it vs REST API?**
+
+MCP is Anthropic's standard for exposing tools to Claude. When do you use it vs REST?
+
+**REST API Approach:**
+
+```
+iOS App → FastAPI backend → Claude API
+
+Problem: Claude doesn't directly call the backend.
+Claude generates text like "call GET /nutrition/analyze"
+The iOS app has to parse that and make the call.
+Fragile, error-prone.
+```
+
+**MCP Approach:**
+
+```
+Claude ← Direct tool calls via MCP ← NomNom MCP Server
+
+Claude calls tools directly:
+  - analyze_food_image
+  - get_user_profile
+  - recommend_meal
+
+The app doesn't have to parse Claude's output.
+Claude handles the orchestration.
+Cleaner, more reliable.
+```
+
+**Decision Matrix:**
+
+| Factor | REST API | MCP | Winner |
+|--------|----------|-----|--------|
+| Simple CRUD endpoints | Good | Overkill | REST |
+| Claude needs to call tools | Messy | Perfect | MCP |
+| Human-readable output | Good | Harder | REST |
+| Agentic orchestration | Messy | Built-in | MCP |
+| Mobile client needs the data | Good | Need HTTP anyway | REST |
+
+**In NomNom:**
+
+**REST API Used For:**
+- iOS → Backend communication (authentication, data retrieval)
+- Example: `GET /nutrition/analytics?period=weekly`
+
+**MCP Used For:**
+- Claude → Tool calling (agent orchestration)
+- Example: Claude calls `get_user_nutrition_summary` internally
+
+**Real Example: Recommendation Flow**
+
+**Approach 1: REST (Old)**
+```
+iOS: "Generate a meal recommendation"
+Backend: (routes to Claude)
+Claude: "I'll call get_user_profile and search_foods"
+Claude output: "TOOL_CALL: get_user_profile(user_id=123)"
+iOS: Parse output, call API, return result to Claude
+[Back and forth, fragile]
+```
+
+**Approach 2: MCP (New)**
+```
+iOS: "Generate a meal recommendation"
+Backend: (sets up MCP server with tools)
+Backend → Claude via MCP API:
+  Available tools: [get_user_profile, search_foods, generate_recommendation]
+Claude: Directly calls get_user_profile()
+Claude: Directly calls search_foods()
+Claude: Directly calls generate_recommendation()
+Claude: Returns final recommendation
+Backend: Returns to iOS
+[Clean, direct, no parsing]
+```
+
+**When to Build MCP:**
+
+✅ Do build MCP if:
+- Claude needs to decide which tools to call
+- You want agentic behavior (agents decide the flow)
+- You're building Claude-first applications
+
+❌ Don't build MCP if:
+- Simple CRUD endpoints (REST is fine)
+- Humans always drive the flow (not Claude)
+- You need quick iteration (REST is faster to prototype)
+
+**Time:** 2–3 minutes | **Use when:** Asked "MCP vs REST?" or "When do you use MCP?"
+
+---
+
+### **Q57: How do you handle tool versioning? What if you need to change a tool's behavior?**
+
+Tools change. How do you avoid breaking Claude's tool calls?
+
+**Tool Versioning Strategy:**
+
+```python
+class MCP_Tool:
+    name: str
+    version: str  # ← NEW
+    deprecated: bool = False
+    replacement: Optional[str] = None
+```
+
+**Version 1 (Original):**
+```python
+{
+    "name": "analyze_food_image",
+    "version": "v1",
+    "parameters": {
+        "image_url": "string"
+    }
+}
+```
+
+**Version 2 (Enhanced, Backward Compatible):**
+```python
+{
+    "name": "analyze_food_image",
+    "version": "v2",
+    "parameters": {
+        "image_url": "string",
+        "detailed_analysis": "boolean (optional)"  # ← NEW, optional
+    }
+}
+```
+
+Both v1 and v2 exist. Claude can call either. Old calls still work.
+
+**Version 3 (Breaking Change):**
+```python
+{
+    "name": "analyze_food_image",
+    "version": "v3",
+    "parameters": {
+        "image_base64": "string"  # ← CHANGED from image_url!
+    }
+}
+```
+
+**Deprecation Plan:**
+1. v3 exists alongside v2
+2. Claude prefers v3 (newer)
+3. After 2 weeks, v2 marked deprecated
+4. After 4 weeks, v2 removed
+
+**Implementation:**
+
+```python
+TOOLS = {
+    "analyze_food_image": {
+        "v1": {
+            "deprecated": True,
+            "replacement": "analyze_food_image:v2"
+        },
+        "v2": {
+            "deprecated": False,
+            "current": True
+        }
+    }
+}
+
+def get_tool(name: str, prefer_version: Optional[str] = None):
+    tool_versions = TOOLS[name]
+    
+    if prefer_version and tool_versions[prefer_version]["current"]:
+        return tool_versions[prefer_version]
+    
+    # Return non-deprecated version
+    for version, spec in tool_versions.items():
+        if not spec["deprecated"]:
+            return spec
+```
+
+**Time:** 2–3 minutes | **Use when:** Asked "Tool versioning?" or "Evolving tools?"
+
+---
+
+### **Q58: How do you structure workflows? Sequential vs parallel vs hybrid?**
+
+Workflows can run steps in different orders. Which pattern for which problem?
+
+**Sequential Workflow (Default):**
+
+```
+Step 1 → Step 2 → Step 3 → Done
+
+Example: Meal Analysis
+  1. Extract nutrition from photo
+  2. Fetch user profile
+  3. Compare to targets
+  4. Return analysis
+
+Reason: Step 2 depends on Step 1's photo.
+Step 3 depends on Steps 1 and 2.
+Must be sequential.
+
+Latency: 1 + 2 + 3 = 6 seconds
+```
+
+**Parallel Workflow:**
+
+```
+Step 1 ─┐
+        ├─→ Combine → Done
+Step 2 ─┤
+Step 3 ─┘
+
+Example: Gather User Context
+  1. Fetch user profile (async)
+  2. Fetch food history (async)
+  3. Fetch allergies (async)
+
+Steps are independent.
+Run them all at once.
+
+Latency: max(1, 2, 3) = 2 seconds (if each takes 2s)
+vs sequential: 6 seconds
+```
+
+**Hybrid Workflow (Best):**
+
+```
+Phase 1: Parallel
+  ├─ Get user profile (async)
+  ├─ Get food history (async)
+  ├─ Get allergies (async)
+
+Phase 2: Combine Results
+  └─ Synthesize into recommendation
+
+Latency: parallel(2s each) + synthesis(1s) = 3 seconds
+```
+
+**In Code:**
+
+```python
+async def recommend_meal_hybrid(user_id):
+    # Phase 1: Parallel (can run together)
+    profile, history, allergies = await asyncio.gather(
+        get_user_profile(user_id),
+        get_food_history(user_id),
+        get_user_allergies(user_id)
+    )
+    
+    # Phase 2: Synthesis (depends on phase 1)
+    recommendation = await generate_recommendation(
+        profile=profile,
+        history=history,
+        allergies=allergies
+    )
+    
+    return recommendation
+```
+
+**Decision Matrix:**
+
+| Workflow Type | When | Example |
+|---|---|---|
+| Sequential | Steps depend on previous step | Photo → Extract → Analyze → Return |
+| Parallel | Steps are independent | Fetch profile, history, allergies all at once |
+| Hybrid | Some parallel, then synthesis | Fetch multiple things, then combine |
+
+**Time:** 2–3 minutes | **Use when:** Asked "Workflow structure?" or "Sequential vs parallel?"
+
+---
+
+### **Q59: How do you handle errors in workflows? What if a step fails?**
+
+Workflows are deterministic. But things still fail (API down, timeout, bad data).
+
+**Error Modes:**
+
+1. **Transient error** (API temporarily down)
+   → Retry with backoff
+
+2. **Permanent error** (invalid input)
+   → Fail the workflow, report to user
+
+3. **Partial error** (one of 3 parallel steps fails)
+   → Decide: retry just that step, or fail whole workflow?
+
+**Strategy 1: Retry**
+
+```python
+async def step_with_retry(func, max_retries=3):
+    for attempt in range(max_retries):
+        try:
+            return await func()
+        except TransientError as e:
+            if attempt == max_retries - 1:
+                raise
+            await asyncio.sleep(2 ** attempt)  # exponential backoff
+```
+
+**Strategy 2: Fallback**
+
+```python
+async def get_user_profile_with_fallback(user_id):
+    try:
+        return await get_user_profile(user_id)
+    except PermanentError:
+        # Return minimal default profile
+        return {
+            "age": None,
+            "weight": None,
+            "goals": ["general health"]
+        }
+```
+
+**Strategy 3: Partial Failure (Parallel Steps)**
+
+```python
+async def recommend_with_partial_failure(user_id):
+    profile = await get_user_profile(user_id)
+    
+    # These can fail independently
+    history_task = asyncio.create_task(get_food_history(user_id))
+    allergies_task = asyncio.create_task(get_user_allergies(user_id))
+    
+    history = await history_task  # Might fail
+    allergies = await allergies_task  # Might fail
+    
+    # If one failed, use empty default
+    history = history or []
+    allergies = allergies or []
+    
+    recommendation = await generate_recommendation(
+        profile=profile,
+        history=history,
+        allergies=allergies
+    )
+    return recommendation
+```
+
+**Error Response to User:**
+
+```python
+try:
+    recommendation = await recommend_meal(user_id)
+    return {"success": True, "recommendation": recommendation}
+except CriticalError as e:
+    log_error(e)
+    return {
+        "success": False,
+        "error": "Unable to generate recommendation. Please try again."
+    }
+except PartialError as e:
+    log_warning(e)
+    return {
+        "success": True,
+        "recommendation": recommendation,
+        "warning": "Generated without access to your food history"
+    }
+```
+
+**Time:** 2–3 minutes | **Use when:** Asked "Error handling in workflows?" or "What if a step fails?"
+
+---
+
+### **Q60: How do you choose between conditional branching and orchestrating with agents?**
+
+Sometimes workflows split into different paths (if-then-else). When do you keep it in the workflow vs delegate to an agent?
+
+**Example: User Asks for Recommendation**
+
+**Option 1: Conditional Workflow**
+
+```python
+async def recommend_meal(user_id, user_request):
+    profile = await get_user_profile(user_id)
+    
+    if "vegetarian" in user_request.lower():
+        foods = await search_foods(constraint="vegetarian")
+    elif "high protein" in user_request.lower():
+        foods = await search_foods(constraint="high_protein")
+    else:
+        foods = await search_foods(constraint="balanced")
+    
+    recommendation = await generate_recommendation(profile, foods)
+    return recommendation
+```
+
+Pros: Fast, predictable
+Cons: Hard-coded logic, doesn't scale to new constraint types
+
+**Option 2: Agent**
+
+```python
+async def recommend_meal_agentic(user_id, user_request):
+    profile = await get_user_profile(user_id)
+    
+    recommendation = await agent_recommend(
+        profile=profile,
+        user_request=user_request,
+        tools=[
+            search_foods_vegetarian,
+            search_foods_high_protein,
+            search_foods_low_carb,
+            search_foods_any,
+            generate_recommendation
+        ]
+    )
+    return recommendation
+```
+
+Pros: Agent decides which tools to call, flexible
+Cons: Slower, less predictable
+
+**Decision Framework:**
+
+Use **Conditional Workflow** if:
+✅ Choices are small and known (2-3 options)
+✅ Logic is stable (rarely changes)
+✅ Speed matters
+Example: "User is vegetarian or not?" → 2 branches
+
+Use **Agent** if:
+✅ Choices are many or unknown (>3 options)
+✅ Logic changes frequently (users ask new things)
+✅ Flexibility matters
+Example: "User might ask for vegetarian, high-protein, low-carb, dairy-free, ..." → Agent handles it
+
+**Hybrid:**
+
+```python
+async def recommend_meal_hybrid(user_id, user_request):
+    profile = await get_user_profile(user_id)
+    
+    # Simple logic: extract top-level constraint
+    constraint = extract_primary_constraint(user_request)
+    
+    if constraint == "unknown":
+        # Agent handles complex/multi-faceted requests
+        return await agent_recommend(profile, user_request)
+    else:
+        # Workflow handles simple cases
+        foods = await search_foods(constraint=constraint)
+        return await generate_recommendation(profile, foods)
+```
+
+**Time:** 2–3 minutes | **Use when:** Asked "Branching logic?" or "Conditional workflows?"
+
+---
+
+### **Q61: How do you monitor and debug workflows? Observability?**
+
+When a workflow fails or behaves unexpectedly, how do you understand what happened?
+
+**Trace Logging:**
+
+```python
+class WorkflowTrace:
+    workflow_id: str
+    user_id: int
+    steps: List[StepTrace]
+
+class StepTrace:
+    step_name: str
+    status: "success" | "failed" | "skipped"
+    input: dict
+    output: dict
+    latency_ms: int
+    error: Optional[str]
+```
+
+**Example Trace:**
+
+```json
+{
+  "workflow_id": "rec_meal_123",
+  "user_id": 456,
+  "steps": [
+    {
+      "step_name": "get_user_profile",
+      "status": "success",
+      "input": {"user_id": 456},
+      "output": {"age": 30, "goals": ["muscle building"]},
+      "latency_ms": 45
+    },
+    {
+      "step_name": "search_foods",
+      "status": "success",
+      "input": {"constraints": ["high_protein", "vegetarian"]},
+      "output": ["chickpeas", "tofu", "lentils"],
+      "latency_ms": 120
+    },
+    {
+      "step_name": "generate_recommendation",
+      "status": "failed",
+      "input": {"profile": {...}, "foods": [...]},
+      "output": null,
+      "error": "Claude API timeout",
+      "latency_ms": 30000
+    }
+  ]
+}
+```
+
+**Implementation:**
+
+```python
+async def recommend_meal_traced(user_id):
+    trace = WorkflowTrace(workflow_id=uuid(), user_id=user_id, steps=[])
+    
+    try:
+        start = time.time()
+        profile = await get_user_profile(user_id)
+        trace.steps.append(StepTrace(
+            step_name="get_user_profile",
+            status="success",
+            input={"user_id": user_id},
+            output=profile,
+            latency_ms=int((time.time() - start) * 1000)
+        ))
+    except Exception as e:
+        trace.steps.append(StepTrace(
+            step_name="get_user_profile",
+            status="failed",
+            error=str(e)
+        ))
+        raise
+    
+    # Log the trace
+    log_trace(trace)
+    
+    return recommendation
+```
+
+**Metrics to Track:**
+
+```python
+metrics = {
+    "total_latency": 165,  # ms
+    "step_count": 3,
+    "failure_rate": 0.33,  # 1 of 3 steps failed
+    "critical_path": ["get_user_profile", "search_foods"],  # Which steps are slowest?
+    "bottleneck": "search_foods" (120ms)
+}
+```
+
+**Time:** 2–3 minutes | **Use when:** Asked "Workflow debugging?" or "Observability?"
+
+---
+
+### **Q62: What's the most common workflow anti-pattern you've encountered?**
+
+Common mistakes when designing workflows.
+
+**Anti-Pattern 1: Sequential When Could Be Parallel**
+
+```python
+# WRONG: Sequential
+profile = await get_user_profile(user_id)  # 100ms
+history = await get_food_history(user_id)  # 100ms
+allergies = await get_user_allergies(user_id)  # 100ms
+# Total: 300ms
+```
+
+```python
+# RIGHT: Parallel
+profile, history, allergies = await asyncio.gather(
+    get_user_profile(user_id),
+    get_food_history(user_id),
+    get_user_allergies(user_id)
+)
+# Total: 100ms
+```
+
+**Anti-Pattern 2: Hardcoded Branching**
+
+```python
+# WRONG: If-else for every constraint type
+if "vegetarian" in request:
+    constraint = "vegetarian"
+elif "high protein" in request:
+    constraint = "high_protein"
+elif "low carb" in request:
+    constraint = "low_carb"
+elif "keto" in request:
+    constraint = "keto"
+elif "paleo" in request:
+    constraint = "paleo"
+# Now user asks for "dairy-free" and workflow breaks
+```
+
+```python
+# RIGHT: Let agent decide
+recommendation = await agent.call(
+    tools=[search_foods, generate_recommendation],
+    user_request=user_request
+)
+# Agent handles any constraint type
+```
+
+**Anti-Pattern 3: Not Handling Partial Failures**
+
+```python
+# WRONG: If any step fails, entire workflow fails
+profile, history, allergies = await asyncio.gather(
+    get_user_profile(user_id),
+    get_food_history(user_id),
+    get_user_allergies(user_id)
+)
+# If allergies_task fails, entire thing fails
+
+recommendation = await generate_recommendation(profile, history, allergies)
+```
+
+```python
+# RIGHT: Handle partial failures gracefully
+try:
+    profile = await get_user_profile(user_id)
+except:
+    profile = default_profile
+    
+try:
+    history = await get_food_history(user_id)
+except:
+    history = []
+    
+try:
+    allergies = await get_user_allergies(user_id)
+except:
+    allergies = []
+
+recommendation = await generate_recommendation(profile, history, allergies)
+```
+
+**Anti-Pattern 4: No Observability**
+
+```python
+# WRONG: Black box
+async def recommend():
+    ...
+    return recommendation
+
+# If it fails, no way to debug
+```
+
+```python
+# RIGHT: Traceable
+async def recommend():
+    trace = WorkflowTrace()
+    
+    for step in steps:
+        try:
+            result = await step()
+            trace.log_success(step.name, result)
+        except Exception as e:
+            trace.log_failure(step.name, e)
+            raise
+    
+    log_trace(trace)
+    return recommendation
+
+# Failures are debuggable
+```
+
+**Time:** 2–3 minutes | **Use when:** Asked "Workflow patterns?" or "Common mistakes?"
+
+---
 
 |--------|-------|---|
 | **Cache Hit Rate** | 85% | Reduces redundant API calls; fundamental to cost savings |
