@@ -26,6 +26,155 @@ Use **SECTION C: 22 Technical Q&As** — These are quick pivots when someone ask
 
 ---
 
+## 🗺️ MASTER FILE GUIDE — Navigate This 4,700-Line Document
+
+**This file is HUGE (4,727 lines, 62 Q&As).** Use this guide so you don't get lost.
+
+### **File Structure Summary**
+
+```
+📄 02_TECHNICAL_QA.md (4,727 lines total)
+│
+├─ 📖 SECTION A: 5 Core Talking Points (Narrative stories, 2-3 min each)
+│  └─ Talking Point 1-5 (semantic caching, costs, optimization, latency, paradigm shift)
+│
+├─ 📋 SECTION B: 18 Technical Decision Stories (Condensed, 30 sec each)
+│  └─ Decision 1-18 (caching, costs, orchestration, model tiering)
+│
+├─ ❓ SECTION C: 22 Core Q&As (Q1-Q22, 1-2 min each)
+│  └─ Q1-Q22 (fundamentals, RAG, orchestration, evaluation, scaling)
+│
+├─ 🔨 SECTION D: 10 Q&As on LLM Harnessing Process (Q23-Q32, 2-3 min each)
+│  └─ Development workflow, Claude Code, testing, quality gates, git discipline
+│
+├─ 📱 SECTION E: 6 Q&As on Frontend & Database (Q33-Q38, 2-3 min each)
+│  └─ iOS architecture, database schema, auth, mobile challenges, data sync
+│
+└─ 🤖 SECTION F: 20 Q&As on RAG/Agents/Tools (Q39-Q62, 2-3 min each)
+   └─ RAG evaluation, prompt engineering, agents, workflows, MCP, tools
+```
+
+---
+
+### **What Each Section Is For**
+
+| Section | Focus | When to Use | Time | Count |
+|---------|-------|-----------|------|-------|
+| **A: Talking Points** | 5 complete narrative stories | **Opening your interview.** Set the tone with a strong first answer. | 2-3 min each | 5 |
+| **B: Decision Stories** | 18 condensed technical decisions | **Quick proof points.** Show you measured and decided. | 30 sec each | 18 |
+| **C: Core Q&As** | 22 essential technical topics | **Mid-conversation follow-ups.** When asked specific questions. | 1-2 min each | 22 |
+| **D: LLM Harnessing** | Development process & methodology | **"How do you work?" questions.** Process > coding skill. | 2-3 min each | 10 |
+| **E: Frontend & Database** | Full-stack + security + mobile | **Full-stack interviews.** Backend + frontend + data modeling. | 2-3 min each | 6 |
+| **F: RAG/Agents/Tools** | Advanced LLM patterns | **Deep technical dives.** Agents, workflows, RAG, MCP. | 2-3 min each | 20 |
+
+---
+
+### **Quick Start — Which Section to Read?**
+
+**⏱️ Have 10 minutes?**
+- Read: **SECTION A** (pick 2-3 talking points)
+- Skim: Headers in this guide
+
+**⏱️ Have 30 minutes?**
+- Read: **SECTION A** (all 5 talking points, 12 min)
+- Skim: **SECTION B** (18 decision stories, 9 min)
+- Read: **SECTION C: Q1-Q13** (core questions)
+
+**⏱️ Have 1 hour?**
+- Read: **SECTION A** (all 5, 12 min)
+- Skim: **SECTION B** (all 18, 9 min)
+- Read: **SECTION C + D** (Q1-Q32, ~30 min) — Focus on 🔴 CRITICAL
+
+**⏱️ Have 2+ hours?**
+- Read: All sections in order
+- Focus: 🔴 CRITICAL first, 🟡 IMPORTANT second, 🟢 SPECIALIST third
+
+---
+
+### **Find Answers by Interview Type**
+
+**System Design / Architecture?**
+→ **SECTION A** (Talking Point 2) + **SECTION B** (Decisions 5-12) + **SECTION C** (Q13-17)
+
+**LLM Engineering / Prompting?**
+→ **SECTION A** (Talking Point 1) + **SECTION C** (Q1-11) + **SECTION F** (Q39-49)
+
+**Full-Stack / Product?**
+→ **SECTION A** (All) + **SECTION D** (Q23-32) + **SECTION E** (Q33-38)
+
+**Agents / LLM Orchestration?**
+→ **SECTION C** (Q13-17) + **SECTION F** (Q50-62)
+
+---
+
+### **SECTION Details**
+
+**SECTION A: 5 Talking Points** (Lines 113-371, ~12 min)
+- Talking Point 1: "Why 0.82?" (semantic cache threshold, empirical validation)
+- Talking Point 2: "Why did costs spike?" (model tiering, business constraints)
+- Talking Point 3: "Why this tradeoff?" (precision vs false positives)
+- Talking Point 4: "Orchestrator-workers" (60s → 18s latency)
+- Talking Point 5: "What surprised you?" (paradigm shift: system design > model size)
+- **Use for:** Opening your interview with a compelling story
+
+**SECTION B: 18 Decision Stories** (Lines 372-594, ~9 min to skim)
+- Decisions 1-4: Caching & evaluation
+- Decisions 5-8: Cost optimization
+- Decisions 9-12: Orchestration & parallelization
+- **Use for:** Quick proof points ("I measured X, chose Y, got Z result")
+
+**SECTION C: 22 Core Q&As** (Lines 595-836, ~30 min)
+- Q1-Q8: Fundamentals (errors, costs, caching, prompts, thresholds)
+- Q9-Q17: RAG & orchestration (search, evaluation, workflows, agents)
+- Q18-Q22: Reflection (tradeoffs, iteration, scaling, personalization)
+- **Use for:** Technical follow-ups mid-conversation
+
+**SECTION D: 10 LLM Harnessing Q&As** (Lines 837-987, ~25 min)
+- Q23-Q32: Development process, testing, quality, iteration
+- **Use for:** "How do you stay organized?" or "How do you work with AI?"
+
+**SECTION E: 6 Frontend/Database Q&As** (Lines 1596-2105, ~15 min)
+- Q33-Q38: iOS, database, auth, mobile, data sync, LLM-assisted dev
+- **Use for:** Full-stack or security questions
+
+**SECTION F: 20 RAG/Agents Q&As** (Lines 2106-4727, ~45 min)
+- Q39-Q49: RAG (evaluation, search, chunking, prompting, A/B testing)
+- Q50-Q54: Advanced agents (context, tools, coordination, reasoning)
+- Q55-Q57: Tools & MCP (design, versioning)
+- Q58-Q62: Workflows (structure, errors, logic, monitoring, anti-patterns)
+- **Use for:** Deep technical dives on LLM patterns
+
+---
+
+### **Interview Prep Schedule**
+
+**Week 1: Foundations (20 min/day)**
+- Mon-Tue: SECTION A (all 5 talking points)
+- Wed-Thu: SECTION C (Q1-Q13 core questions)
+- Fri: Review + practice delivering out loud
+
+**Week 2: Depth (30 min/day)**
+- Mon-Tue: SECTION D (development process, Q23-Q32)
+- Wed-Thu: SECTION E (full-stack, Q33-Q38)
+- Fri-Sat: Practice mock interviews
+
+**Week 3: Advanced (30 min/day)**
+- Mon-Tue: SECTION F Part 1 (Q39-Q49, RAG & prompting)
+- Wed-Thu: SECTION F Part 2 (Q50-Q62, agents & workflows)
+- Fri-Sat: Full run-throughs
+
+---
+
+### **Pro Tips**
+
+1. **Don't memorize — understand the thinking.** Use these as guides, not scripts.
+2. **Lead with SECTION A, use others for follow-ups.** Talking Points set the tone; Q&As answer specifics.
+3. **Focus 70% of prep on 🔴 CRITICAL, 20% on 🟡 IMPORTANT, 10% on 🟢 SPECIALIST.**
+4. **Tailor to the role:** Backend → add F. Full-stack → add E. Product → add D.
+5. **In the interview:** "Here's my example..." then tell YOUR version of the Q&A, not the file.
+
+---
+
 ## IMPORTANCE LEVELS
 
 Each Q&A is marked with one of three importance levels:
