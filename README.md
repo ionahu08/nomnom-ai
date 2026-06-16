@@ -1,4 +1,4 @@
-# NomNom — AI-Powered Food Tracking with Semantic Caching & RAG
+# NomNom — Food Analysis & Health Tracking App with Multimodal AI Agents
 
 **An intelligent food tracking application that solves my diet imbalance while demonstrating production LLM engineering: 85% cache hit rate, 4.3x cost reduction, 67% latency improvement.**
 
