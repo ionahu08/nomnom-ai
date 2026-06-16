@@ -44,8 +44,7 @@ class NutritionChatService:
         db: AsyncSession, user: User
     ) -> dict:
         """Gather user context for the nutrition coach prompt."""
-        # Fetch user's health profile
-        await db.refresh(user, ["profile"])
+        # Fetch user's health profile (already loaded by dependency, avoid extra refresh)
         user_profile = user.profile
 
         # Get nutrition data for the past week

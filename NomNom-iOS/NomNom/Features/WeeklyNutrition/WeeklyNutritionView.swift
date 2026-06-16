@@ -63,7 +63,18 @@ struct WeeklyNutritionView: View {
 
                         if let summary = viewModel.summary {
                             // AI Nutrition Insights (before charts)
-                            if let insights = viewModel.nutritionInsights {
+                            if viewModel.isLoadingInsights {
+                                VStack(spacing: 12) {
+                                    ProgressView()
+                                    Text("Loading your personalized nutrition insights...")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color(.systemGray6))
+                                .cornerRadius(12)
+                            } else if let insights = viewModel.nutritionInsights {
                                 VStack(alignment: .leading, spacing: 16) {
                                     // Title
                                     HStack {

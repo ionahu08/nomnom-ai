@@ -19,15 +19,20 @@ struct NutritionCoachView: View {
                                         ChatMessageView(message: message)
                                             .id(message.id)
                                     }
-                                }
-                            }
-                            .onChange(of: viewModel.chatMessages.count) { _, newCount in
-                                if let lastMessage = viewModel.chatMessages.last {
-                                    scrollProxy.scrollTo(lastMessage.id, anchor: .bottom)
+                                    // Spacer to push messages up and auto-scroll to bottom
+                                    Spacer()
+                                        .id("bottom")
                                 }
                             }
                         }
                         .frame(maxHeight: .infinity)
+                        .onReceive(viewModel.$chatMessages) { messages in
+                            if !messages.isEmpty {
+                                withAnimation {
+                                    scrollProxy.scrollTo("bottom", anchor: .bottom)
+                                }
+                            }
+                        }
                     }
 
                     Divider()

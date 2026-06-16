@@ -30,6 +30,10 @@
 		A03704AC0EC19A07830F1410 /* PhotoCaptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67B214C6A5B1BF471C587B98 /* PhotoCaptureService.swift */; };
 		A3C8EA04D70D69F46B194FDE /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70DF926E485D806B7973C883 /* UserProfile.swift */; };
 		A42EB38598DF847CBF724EB5 /* WeeklySummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922C77489EEC281CBD654641 /* WeeklySummary.swift */; };
+		A52275652FE1162E00912DB3 /* NutritionCoachView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A52275612FE1162E00912DB3 /* NutritionCoachView.swift */; };
+		A52275662FE1162E00912DB3 /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A52275622FE1162E00912DB3 /* ChatMessage.swift */; };
+		A52275672FE1162E00912DB3 /* NutritionCoachViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A52275632FE1162E00912DB3 /* NutritionCoachViewModel.swift */; };
+		A52275682FE1162E00912DB3 /* ChatMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A52275642FE1162E00912DB3 /* ChatMessageView.swift */; };
 		B445B4E8FBB2C1C814866CDA /* RoastBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E3DC3BCFAF5DEB6151365F /* RoastBubble.swift */; };
 		B8CA06BD3F8A7EF793146A19 /* NomNomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D26F5B9F96D66F9A2AFEEDE /* NomNomTests.swift */; };
 		C403DA8214CB0F35117552BC /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DFBE6B80A5D1E964B4C28A /* SettingsViewModel.swift */; };
@@ -80,6 +84,10 @@
 		70DF926E485D806B7973C883 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		922C77489EEC281CBD654641 /* WeeklySummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklySummary.swift; sourceTree = "<group>"; };
 		9BCEEBF8D63B932F4B168638 /* FoodLogCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodLogCard.swift; sourceTree = "<group>"; };
+		A52275612FE1162E00912DB3 /* NutritionCoachView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NutritionCoachView.swift; path = NomNom/Features/NutritionCoach/NutritionCoachView.swift; sourceTree = "<group>"; };
+		A52275622FE1162E00912DB3 /* ChatMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ChatMessage.swift; path = NomNom/Features/NutritionCoach/ChatMessage.swift; sourceTree = "<group>"; };
+		A52275632FE1162E00912DB3 /* NutritionCoachViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NutritionCoachViewModel.swift; path = NomNom/Features/NutritionCoach/NutritionCoachViewModel.swift; sourceTree = "<group>"; };
+		A52275642FE1162E00912DB3 /* ChatMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ChatMessageView.swift; path = NomNom/Features/NutritionCoach/ChatMessageView.swift; sourceTree = "<group>"; };
 		ADEB777D4674C91E3BE0B25D /* WeeklyNutritionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyNutritionViewModel.swift; sourceTree = "<group>"; };
 		B248A228CFDFB4F0FB9209CD /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
 		C8ADD11C9DF904DB40134E18 /* InsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsView.swift; sourceTree = "<group>"; };
@@ -208,6 +216,10 @@
 		D17CDC29259E849E5FFA71CF = {
 			isa = PBXGroup;
 			children = (
+				A52275622FE1162E00912DB3 /* ChatMessage.swift */,
+				A52275642FE1162E00912DB3 /* ChatMessageView.swift */,
+				A52275612FE1162E00912DB3 /* NutritionCoachView.swift */,
+				A52275632FE1162E00912DB3 /* NutritionCoachViewModel.swift */,
 				09CD9F187BE3F8A02E379BDF /* NomNom */,
 				E22C7CAD01DC6A3DEC95171D /* NomNomTests */,
 				8F52EC90EF66436DD6490ED4 /* Products */,
@@ -361,6 +373,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A52275652FE1162E00912DB3 /* NutritionCoachView.swift in Sources */,
+				A52275662FE1162E00912DB3 /* ChatMessage.swift in Sources */,
+				A52275672FE1162E00912DB3 /* NutritionCoachViewModel.swift in Sources */,
+				A52275682FE1162E00912DB3 /* ChatMessageView.swift in Sources */,
 				60AE8A81261325AD853B9669 /* APIClient.swift in Sources */,
 				116E569CF12A8D765269E47D /* Auth.swift in Sources */,
 				4F52FC88CFEE5C6A2CD1B9C8 /* AuthService.swift in Sources */,

@@ -27,6 +27,7 @@ class WeeklyNutritionViewModel: ObservableObject {
     @Published var summary: WeeklySummaryResponse?
     @Published var nutritionInsights: NutritionInsights?
     @Published var isLoading = false
+    @Published var isLoadingInsights = false
     @Published var errorMessage: String?
     @Published var selectedDate = Date()
     @Published var selectedPeriod: PeriodType = .week
@@ -201,6 +202,9 @@ class WeeklyNutritionViewModel: ObservableObject {
     }
 
     func loadNutritionInsights() async {
+        isLoadingInsights = true
+        defer { isLoadingInsights = false }
+
         do {
             print("[InsightViewModel] Loading nutrition insights...")
             let path = "/api/v1/nutrition/insights"

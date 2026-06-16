@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_serializer
 from datetime import datetime
 
 
@@ -11,6 +11,13 @@ class ChatMessageResponse(BaseModel):
     role: str
     content: str
     timestamp: datetime
+
+    @field_serializer('timestamp')
+    def serialize_timestamp(self, value: datetime) -> str:
+        """Ensure timestamp is ISO8601 formatted with Z suffix for UTC."""
+        if value.tzinfo is None:
+            return value.isoformat() + "Z"
+        return value.isoformat()
 
 
 class ChatHistoryResponse(BaseModel):
