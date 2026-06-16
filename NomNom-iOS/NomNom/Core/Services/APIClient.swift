@@ -193,6 +193,12 @@ class APIClient {
                 decoder.dateDecodingStrategy = .iso8601
                 return try decoder.decode(T.self, from: data)
             } catch {
+                // Log the raw response for debugging
+                if let jsonString = String(data: data, encoding: .utf8) {
+                    print("[APIClient] ❌ JSON Decoding failed for type \(T.self)")
+                    print("[APIClient] Raw response: \(jsonString)")
+                }
+                print("[APIClient] ❌ Decoding error: \(error)")
                 throw APIError.decodingError
             }
         case 401, 403:
