@@ -58,6 +58,7 @@ struct LineChart: View {
                         // Draw target reference line
                         let targetRatio = targetValue / maxValue
                         let targetY = padding + CGFloat(1 - targetRatio) * height
+                        print("[LineChart] Metric: \(metricType), Target: \(targetValue), Max: \(maxValue), targetY: \(targetY), canvasHeight: \(size.height)")
                         var targetPath = Path()
                         targetPath.move(to: CGPoint(x: padding, y: targetY))
                         targetPath.addLine(to: CGPoint(x: size.width - padding, y: targetY))
