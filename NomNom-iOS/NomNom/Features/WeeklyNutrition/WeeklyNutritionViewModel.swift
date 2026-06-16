@@ -39,6 +39,7 @@ class WeeklyNutritionViewModel: ObservableObject {
 
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = TimeZone(abbreviation: "UTC")  // Always use UTC for consistency
         let dateString = formatter.string(from: endDate)
 
         let apiPeriod = period.rawValue
@@ -132,7 +133,12 @@ class WeeklyNutritionViewModel: ObservableObject {
         guard let summary = summary else { return nil }
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.date(from: summary.endDate)
+        formatter.timeZone = TimeZone(abbreviation: "UTC")  // Always use UTC for consistency
+        let parsedDate = formatter.date(from: summary.endDate)
+        if parsedDate == nil {
+            print("[InsightViewModel] ⚠️ Failed to parse endDate: \(summary.endDate)")
+        }
+        return parsedDate
     }
 
     func getWeekLabel() -> String {
@@ -173,6 +179,7 @@ class WeeklyNutritionViewModel: ObservableObject {
     private func parseDate(_ dateString: String) -> Date? {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = TimeZone(abbreviation: "UTC")  // Always use UTC for consistency
         return formatter.date(from: dateString)
     }
 }
