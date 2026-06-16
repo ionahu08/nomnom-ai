@@ -30,8 +30,15 @@ iOS App (SwiftUI) ──▶ NomNom-Backend (FastAPI) ──▶ PostgreSQL + pgve
 
 ## Current Iteration
 
-**Iteration 19:** TBD (Next iteration)
-See `docs/iterations/19-*/` for plan and progress.
+**Iteration 19: AI Nutrition Insights & Food Recommendations** — 🚀 STARTING (June 16, 2026)
+See `docs/iterations/19-nutrition-insights-agent/` for plan and progress.
+
+**What's Being Built:**
+- Backend: New `/nutrition/insights` endpoint that analyzes past food intake (1d/1w/1m)
+- LLM Agent: Claude-powered analysis of nutrition gaps + personalized food recommendations
+- iOS: Replace static sections with interactive AI insights card
+- UX: Remove consistency bar, daily targets, top foods; add conversational feedback
+- Features: Personalized recommendations based on health profile, allergies, medical conditions, past eating habits
 
 ---
 
