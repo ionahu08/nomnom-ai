@@ -131,7 +131,7 @@ You're not supposed to memorize these. You're supposed to internalize the flow a
 
 > "So, I discovered something about myself—my diet is pretty imbalanced. I eat way too many carbs: noodles, rice, ramen. And I'm lacking protein and dietary fiber. Over time, that became a real health problem.
 >
-> I needed an app to track my nutrition, see my patterns, and get recommendations tailored to me—not generic advice. But here's the thing: I'd just learned about LLM engineering, and I wanted to actually apply it, not just read about it. So I intentionally built this system to use every major technique I'd learned.
+> I needed an app to track my nutrition, see my patterns, and get recommendations tailored to me—not generic advice. The app had five main tabs: a Camera tab for photo analysis, a Diary tab for logged meals, an Insights tab for nutrition patterns, a Coach tab for AI conversations, and a Settings tab for health profile. But here's the thing: I'd just learned about LLM engineering, and I wanted to actually apply it, not just read about it. So I intentionally built this system to use every major technique I'd learned.
 >
 > I broke the project into six phases. **Phase 1** was getting the basics right—I realized prompts were locked in code, which meant every change needed a code deploy. So I separated them into prompt templates instead. That one change cut my iteration time from two hours down to ten minutes.
 >
@@ -155,7 +155,7 @@ You're not supposed to memorize these. You're supposed to internalize the flow a
 
 > "Let me tell you about NomNom. So, I discovered that my own diet is pretty imbalanced. I eat way too many carbs—noodles, rice, ramen—and I'm missing protein and dietary fiber. That's a real, personal health problem that I live with every day.
 >
-> I wanted to build an app to fix this: track my nutrition, see my patterns, and get recommendations tailored to *me*—not generic advice, but based on my weight, my allergies, my actual preferences.
+> I wanted to build an app to fix this: track my nutrition, see my patterns, and get recommendations tailored to *me*—not generic advice, but based on my weight, my allergies, my actual preferences. The final app had five tabs—Camera for meal analysis, Diary for food logs, Insights for nutrition patterns, Coach for AI conversations, and Settings for health data—but the core was making it *work reliably and cheaply*.
 >
 > But here's the thing—I'd just finished learning about LLM engineering, and I wanted to actually apply it. Not just read about it. So I intentionally designed this project to use every major technique: prompt engineering and templating, output control with guardrails, semantic caching for performance, RAG for personalization, knowing when to use workflows versus agents, and MCP for ecosystem integration. It was a real problem plus a real learning challenge.
 >
@@ -188,6 +188,8 @@ You're not supposed to memorize these. You're supposed to internalize the flow a
 > **The Problem**
 >
 > I discovered that my diet is pretty imbalanced. I eat way too many carbs—noodles, rice, ramen, all the delicious stuff—and I'm consistently lacking protein and dietary fiber. That's not just a theoretical problem for me; it's something I live with every day. So I wanted to build an app to fix this: track my nutrition, see my patterns, and get recommendations tailored to me—not generic advice, but based on my actual weight, height, allergies, medical conditions.
+>
+> The final app had five main tabs: a Camera tab where users photograph meals, a Diary tab showing all logged foods, an Insights tab with nutrition analysis, a Coach tab for AI-powered advice conversations, and a Settings tab for health profile data. But here's the thing—just building these features wasn't the challenge. The real challenge was making the backend *work reliably and cost-effectively*.
 >
 > **The Motivation**
 >
