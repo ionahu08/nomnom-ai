@@ -87,17 +87,104 @@
 
 ---
 
-## Phase 2: LLM Nutrition Agent (Days 2-3) 🚧 PENDING
+## Phase 2: LLM Nutrition Agent (Days 2-3) ✅ COMPLETE
 
 **Goal:** Create Claude-powered agent that analyzes nutrition data and generates personalized recommendations.
 
-**Placeholder:** Will be filled in during Phase 2
+**Status:** COMPLETE
+
+### Files Created
+
+1. **`src/llm/nutrition_agent.py`** (NEW)
+   - `NutritionAgent` class with Claude API integration
+   - `analyze_and_recommend()` method that:
+     - Takes multi-period nutrition data + health profile
+     - Calls Claude API with customized system prompt
+     - Parses JSON response into structured analysis
+     - Returns NutritionAnalysis object
+   - Helper methods:
+     - `_get_system_prompt()` — Build personalized system prompt based on user's goal and constraints
+     - `_build_context()` — Format nutrition data for Claude
+     - `_parse_response()` — Parse Claude's JSON response
+     - `_get_goal_context()` — Convert goal codes to human-readable text
+
+2. **`src/api/nutrition_insights.py`** (MODIFIED)
+   - Added import: `from src.llm.nutrition_agent import get_nutrition_agent`
+   - Updated endpoint to call agent: `analysis = await agent.analyze_and_recommend(periods, health_profile)`
+   - Now returns populated `analysis` field instead of `null`
+   - Added error handling if agent fails (returns None)
+
+### Implementation Details
+
+**Agent Prompt Design:**
+- System prompt is customized per user based on their goal (lean_out, gain_muscle, maintain, lose_weight)
+- Instructs Claude to:
+  - Analyze past 1d/1w/1m eating patterns
+  - Identify what they're doing well (strengths)
+  - Identify nutrient gaps
+  - Recommend 3-5 specific foods for improvement
+  - NEVER recommend foods matching allergies or medical conflicts
+  - Base recommendations on foods they've already logged
+  - Connect recommendations to their specific goal
+
+**Response Format (JSON):**
+```json
+{
+  "summary": "One or two sentences about their overall nutrition status",
+  "strengths": [
+    "Thing they're doing well #1",
+    "Thing they're doing well #2"
+  ],
+  "gaps": [
+    "Nutrient gap #1",
+    "Nutrient gap #2"
+  ],
+  "recommendations": [
+    {
+      "nutrient": "Iron-rich foods",
+      "foods": ["Spinach", "Lean beef", "Fortified cereals"],
+      "reasoning": "Why this matters for their goal"
+    }
+  ]
+}
+```
+
+**Key Features:**
+- Uses Claude Opus 4.7 for best reasoning quality (nutrition analysis is complex)
+- Limits output to 1024 tokens (~350-400 words)
+- Handles JSON parsing robustness (extracts from markdown if needed)
+- Logs errors and returns None gracefully if LLM call fails
+- Singleton agent pattern for efficient reuse
+
+### Testing Notes
+
+- Endpoint now takes ~1-2s longer (LLM call time)
+- If Claude fails, endpoint still returns data (with analysis=None)
+- All user constraints (allergies, conditions) properly passed to prompt
+- Response is deterministic JSON (not streaming)
+- Respects ANTHROPIC_API_KEY environment variable
+
+### Cost Estimate
+
+- Per call: ~200-300 input tokens, ~100-150 output tokens
+- Claude Opus pricing: ~$3/MTok input, ~$15/MTok output
+- Estimated cost per call: ~$0.001-$0.002 (roughly $0.0015 average)
 
 ---
 
 ## Phase 3: iOS Insight Tab Redesign (Days 3-4) 🚧 PENDING
 
 **Goal:** Update iOS Insight tab to display new AI insights card instead of static sections.
+
+**Tasks:**
+- [ ] Remove: Logging consistency progress bar
+- [ ] Remove: Daily Targets section (Protein/Carbs/Fat)
+- [ ] Remove: Top Foods section
+- [ ] Create: NutritionInsightsCard.swift component
+- [ ] Update: WeeklyNutritionView to include new card
+- [ ] Update: WeeklyNutritionViewModel to fetch insights
+- [ ] Test: Load and display insights for day/week/month periods
+- [ ] Polish: Loading states, error handling, animations
 
 **Placeholder:** Will be filled in during Phase 3
 
@@ -135,5 +222,6 @@ iOS NutritionInsightsCard renders data
 
 | Hash | Message |
 |------|---------|
-| TBD | Phase 1: Create nutrition insights endpoint and schemas |
+| c197491 | feat(iter19-phase1): Create nutrition insights endpoint and schemas |
+| TBD | feat(iter19-phase2): Add LLM nutrition agent with Claude analysis |
 

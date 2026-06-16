@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timedelta, timezone
 from typing import Annotated, Optional
 
@@ -6,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.deps import get_current_user
 from src.database import get_db
+from src.llm.nutrition_agent import get_nutrition_agent
 from src.models.user import User
 from src.repositories.analytics_repository import AnalyticsRepository
 from src.schemas.nutrition_insights import (
@@ -14,6 +16,8 @@ from src.schemas.nutrition_insights import (
     NutrientData,
     HealthProfile,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/nutrition", tags=["nutrition"])
 
@@ -132,8 +136,15 @@ async def get_nutrition_insights(
         ),
     )
 
+    # Generate AI analysis and recommendations
+    agent = get_nutrition_agent()
+    analysis = await agent.analyze_and_recommend(periods, health_profile)
+
+    if analysis is None:
+        logger.warning(f"[NutritionInsights] Failed to generate analysis for user {current_user.id}")
+
     return NutritionInsightsResponse(
         periods=periods,
         health_profile=health_profile,
-        analysis=None,  # Will be populated in Phase 2
+        analysis=analysis,
     )
