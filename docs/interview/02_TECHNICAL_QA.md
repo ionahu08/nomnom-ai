@@ -1509,7 +1509,515 @@ Reading these commits in order tells the *story* of how I built semantic caching
 
 ---
 
+## SECTION E: Frontend, Database & iOS Architecture (6 Q&As)
 
+**When to use:** Full-stack interviews, "Tell me about your iOS app" questions, or when asked about architecture decisions beyond just the LLM backend.
+
+**Note on framing "LLM-assisted iOS":** Your iOS implementation was done with Claude's help. Don't hide this—own it. Frame it as: "I accelerated iOS development using AI pair programming, which let me focus on architecture and UX rather than boilerplate. The result is clean, well-structured code that follows iOS best practices."
+
+---
+
+### **Q33: Walk me through your iOS architecture. Why MVVM? How does it handle the backend integration?**
+
+I use MVVM (Model-View-ViewModel) with SwiftUI and dependency injection. Here's the structure:
+
+**Layer 1: Models (M)**
+```
+Core/Models/
+  - FoodLog.swift (Codable structs matching backend schemas)
+  - UserProfile.swift
+  - Auth.swift
+```
+
+These are lightweight, just Codable structs that mirror the API responses. No business logic here.
+
+**Layer 2: Services (where the real work happens)**
+```
+Core/Services/
+  - APIClient.swift (HTTP communication, error handling, token management)
+  - AuthService.swift (@StateObject, manages login state and Keychain storage)
+  - PhotoCaptureService.swift (iOS camera + photo library integration)
+  - ProfileService.swift (CRUD for user profile)
+  - RecommendationService.swift (Calls /recommendations endpoint)
+```
+
+Each service is a single responsibility. AuthService doesn't know how to take photos. PhotoCaptureService doesn't handle API calls.
+
+**Layer 3: ViewModels (V-M)**
+```
+Features/Insights/
+  - InsightsViewModel.swift (@MainActor ObservableObject with @Published properties)
+  - InsightsView.swift (SwiftUI, observes the ViewModel)
+```
+
+The ViewModel is the "glue":
+- Calls services (e.g., `RecommendationService.getRecommendations()`)
+- Publishes state (@Published) that the View observes
+- Handles async work (async/await)
+- Format data for display (e.g., "12.5g" from 12.54g)
+
+**Real example:**
+
+```swift
+@MainActor
+class InsightsViewModel: ObservableObject {
+    @Published var isLoading = false
+    @Published var insights: InsightsResponse?
+    @Published var errorMessage: String?
+    
+    private let api = APIClient.shared
+    
+    func loadInsights() async {
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            insights = try await api.request("GET", path: "/nutrition/insights")
+            isLoading = false
+        } catch let error as APIError {
+            errorMessage = error.errorDescription
+            isLoading = false
+        }
+    }
+}
+```
+
+When `loadInsights()` is called, the View automatically updates because `@Published` changes trigger re-render.
+
+**Why MVVM?**
+
+1. **Separation of concerns** — View logic ≠ business logic ≠ networking logic
+2. **Testability** — Can test ViewModels without a UI
+3. **Reusability** — Two views can share the same ViewModel
+4. **SwiftUI native** — ObservableObject + @Published is designed for MVVM
+
+**Dependency Injection:**
+
+At app launch:
+```swift
+@main
+struct NomNomApp: App {
+    @StateObject private var authService = AuthService()
+    
+    var body: some Scene {
+        WindowGroup {
+            if authService.isAuthenticated {
+                ContentView()
+                    .environmentObject(authService)  // <-- injected into view hierarchy
+            } else {
+                LoginView()
+                    .environmentObject(authService)
+            }
+        }
+    }
+}
+```
+
+Every view in the app can access `@EnvironmentObject var authService: AuthService` without passing it explicitly.
+
+**Backend Integration:**
+
+All network calls go through APIClient:
+```swift
+class APIClient {
+    static let shared = APIClient()
+    var token: String?  // JWT token from Keychain
+    
+    func request<T: Decodable>(...) async throws -> T {
+        // Add Authorization header with token
+        // Encode request body
+        // Decode response
+        // Handle errors (401 → onUnauthorized callback)
+    }
+}
+```
+
+When the user logs in:
+1. AuthService calls `APIClient.request("POST", path: "/auth/login", body: credentials)`
+2. Backend returns JWT token
+3. AuthService stores token in Keychain
+4. AuthService sets `APIClient.setToken(token)`
+5. All subsequent requests include `Authorization: Bearer {token}`
+
+**Time:** 2–3 minutes | **Use when:** Asked about iOS architecture, or how you structured a full-stack app
+
+---
+
+### **Q34: Walk me through your database schema. Why did you design it this way?**
+
+The schema is designed to support three core features: food tracking, personalization, and LLM caching.
+
+**Core Tables:**
+
+**Users table**
+```sql
+id (PK)
+email (unique, indexed)
+hashed_password
+created_at
+```
+
+Simple, minimal. Email is the natural key for login.
+
+**UserProfile table**
+```sql
+id (PK)
+user_id (FK to users, unique) ← one-to-one relationship
+age, gender, height_cm, weight_kg
+activity_level, goal
+allergies (JSON), dietary_restrictions (JSON), medical_conditions (JSON)
+calorie_target, protein_target, carb_target, fat_target
+notification_enabled
+created_at, updated_at
+```
+
+**Why separate from Users?**
+
+Users table is for authentication (email, password). UserProfile is for health data. Clear separation. Also, a user *might* not have filled out their profile yet (nullable), so separating makes that explicit.
+
+**Why JSON for allergies/restrictions?**
+
+Because they're flexible lists. A user might have 0 allergies or 10. SQL arrays are one option, but JSON is more portable (easier to serialize to API responses). I chose JSON.
+
+**FoodLog table** (the core of the app)
+```sql
+id (PK)
+user_id (FK to users, indexed)
+photo_path (string)
+food_name, calories, protein_g, carbs_g, fat_g
+food_category, cuisine_origin, meal_type
+cat_roast (the AI's witty comment)
+ai_raw_response (JSON, for debugging)
+embedding (pgvector, for semantic cache)
+is_user_corrected (boolean, for evaluating AI accuracy)
+logged_at (when user ate it, timezone-aware)
+created_at
+```
+
+**Key decisions:**
+
+1. **embedding column (pgvector)** — This is how semantic caching works. When a new photo comes in, I embed it, search for similar embeddings in this column, and return cached results. Crucial for the 85% cache hit rate.
+
+2. **ai_raw_response (JSON)** — I store the raw Claude response for debugging. If recommendation accuracy drops, I can inspect what Claude actually returned.
+
+3. **is_user_corrected** — I track corrections because that's my evaluation signal. If Claude said "200 calories" but the user corrected it to "350 calories," that's valuable data for measuring accuracy.
+
+4. **logged_at (timezone-aware)** — This was a critical bug in Iteration 18. If I use naive datetimes, DST transitions break date arithmetic. Now it's timezone-aware, so "what did I eat today?" works correctly even across DST boundaries.
+
+**NutritionChat table** (for multi-turn conversations)
+```sql
+id (PK)
+user_id (FK to users, indexed)
+message (text, could be user or AI)
+is_user_message (boolean)
+timestamp
+```
+
+Simple thread. Users can have multiple conversations, each conversation has multiple messages.
+
+**Indexes:**
+
+```sql
+CREATE INDEX idx_food_logs_user_id ON food_logs(user_id);
+CREATE INDEX idx_food_logs_logged_at ON food_logs(logged_at);
+CREATE INDEX idx_users_email ON users(email);
+```
+
+Why these? Queries are typically:
+- "Get all food logs for user X" (indexed by user_id)
+- "Get food logs from the last 7 days" (indexed by logged_at)
+- "Find user by email at login" (indexed by email)
+
+**Why pgvector for embeddings?**
+
+pgvector is a PostgreSQL extension that natively supports vector operations (cosine similarity, L2 distance). Alternatives:
+- Redis (fast but ephemeral, not durable)
+- Elasticsearch (powerful but overkill for this use case)
+- pgvector (native to Postgres, ACID guarantees, indexed fast enough for our scale)
+
+**Scalability notes:**
+
+At 100k users × 3 meals/day = 300k food logs/day. Indexes keep queries fast. Embedding vectors are 384-dimensional (MiniLM-L6 model), stored as `vector(384)` in pgvector.
+
+**Time:** 2–3 minutes | **Use when:** Asked about database design, schema decisions, or how you handle large datasets
+
+---
+
+### **Q35: Tell me about authentication. How do you store the JWT token securely on iOS?**
+
+Short answer: JWT tokens go in **iOS Keychain**, not UserDefaults or local files.
+
+**Why not UserDefaults?**
+
+UserDefaults is plaintext on disk. If a phone is stolen or an attacker gains file system access, they can read the token. That's a security violation.
+
+**How Keychain works:**
+
+iOS Keychain is an encrypted key-value store. The OS encrypts the data at rest. Only your app can decrypt it (the app is tied to a code-signing identity).
+
+**Implementation:**
+
+```swift
+class KeychainService {
+    static let shared = KeychainService()
+    
+    func saveToken(_ token: String) throws {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: "nomnom_token",
+            kSecValueData as String: token.data(using: .utf8)!
+        ]
+        
+        SecItemDelete(query as CFDictionary)
+        let status = SecItemAdd(query as CFDictionary, nil)
+        guard status == errSecSuccess else {
+            throw KeychainError.saveFailed
+        }
+    }
+    
+    func getToken() throws -> String? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: "nomnom_token",
+            kSecReturnData as String: true
+        ]
+        
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        
+        guard status == errSecSuccess else {
+            if status == errSecItemNotFound { return nil }
+            throw KeychainError.retrieveFailed
+        }
+        
+        guard let data = result as? Data,
+              let token = String(data: data, encoding: .utf8) else {
+            throw KeychainError.decodingFailed
+        }
+        
+        return token
+    }
+}
+```
+
+**AuthService integration:**
+
+```swift
+@MainActor
+class AuthService: ObservableObject {
+    @Published var isAuthenticated = false
+    private let keychain = KeychainService.shared
+    
+    func login(email: String, password: String) async throws {
+        let response: LoginResponse = try await APIClient.shared.request(
+            "POST", path: "/auth/login",
+            body: LoginRequest(email: email, password: password)
+        )
+        
+        try keychain.saveToken(response.token)
+        APIClient.shared.setToken(response.token)
+        self.isAuthenticated = true
+    }
+    
+    func restoreSession() {
+        if let token = try? keychain.getToken() {
+            APIClient.shared.setToken(token)
+            self.isAuthenticated = true
+        }
+    }
+}
+```
+
+**Token expiry:**
+
+When a 401 response comes back:
+```swift
+case 401:
+    self.onUnauthorized?()  // Notify app to go to login
+    throw APIError.unauthorized
+```
+
+**Security best practices:**
+
+✅ Token in Keychain (encrypted)  
+✅ HTTPS only (no HTTP)  
+✅ Token in Authorization header (not in body)  
+✅ Clear token on logout  
+✅ Handle 401 gracefully (re-auth)  
+
+**Time:** 2–3 minutes | **Use when:** Asked about security, authentication, or sensitive data on mobile
+
+---
+
+### **Q36: Tell me about a mobile-specific challenge you solved.**
+
+Real example: **Photo upload with retry logic and progress tracking.**
+
+**The Problem:**
+
+Users on bad networks were losing photos. Uploads would fail and get stuck.
+
+**Root causes:**
+
+1. **Network unreliability** — 4G → WiFi handoff interrupted uploads
+2. **Large payloads** — Photos are 2-3MB, slow networks take 10-30s
+3. **No retry** — One failure = total loss
+
+**Solution: Exponential backoff retry**
+
+```swift
+func uploadPhoto(_ imageData: Data) async throws {
+    let maxRetries = 3
+    var delayMillis = 100
+    var lastError: Error?
+    
+    for attempt in 1...maxRetries {
+        do {
+            return try await APIClient.shared.upload(
+                path: "/food/analyze", imageData: imageData
+            )
+        } catch let error as URLError where error.isNetworkError {
+            lastError = error
+            if attempt < maxRetries {
+                let delaySeconds = Double(delayMillis) / 1000.0
+                try await Task.sleep(seconds: delaySeconds)
+                delayMillis *= 2
+            }
+        }
+    }
+    
+    throw lastError ?? APIError.networkError(...)
+}
+```
+
+Delays: 0 → 100ms → 200ms (gives server time to recover, not hammering)
+
+**Progress tracking:**
+
+```swift
+@Published var uploadProgress: Double = 0.0
+
+func captureAndAnalyze(_ image: UIImage) async {
+    uploadProgress = 0.5  // 50% while uploading
+    let response = try await uploadPhoto(imageData)
+    uploadProgress = 1.0
+}
+```
+
+**Other challenges:**
+
+1. **Memory on large galleries** — Lazy loading + thumbnails
+2. **Background interrupted work** — Save state, restore on reopen
+3. **Keyboard stickiness** — `UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), ...)`
+
+**Time:** 2–3 minutes | **Use when:** Asked about debugging, resilience, or mobile-specific problems
+
+---
+
+### **Q37: How do you keep iOS and backend data in sync?**
+
+Short answer: **Remote Source of Truth (backend) with Local Caching**
+
+Backend is always the source of truth. iOS caches for offline access, but backend wins on conflicts.
+
+**Pattern: Request → Cache → Display**
+
+```swift
+func loadFoodLogs() async {
+    do {
+        // 1. Request from backend (source of truth)
+        foodLogs = try await APIClient.shared.request("GET", path: "/food/logs?limit=30")
+        
+        // 2. Cache locally (for offline access)
+        CoreDataManager.shared.save(foodLogs)
+        
+    } catch {
+        // 3. If request fails, load from local cache
+        foodLogs = CoreDataManager.shared.fetchFoodLogs()
+    }
+}
+```
+
+**Local caching options:**
+
+- **UserDefaults** — Simple, but limited for large datasets
+- **Core Data** — Full database, relationships, indexing, predicates
+- **SQLite** — Lightweight, fast, ACID guarantees
+
+I chose **Core Data** because I need relationships and indexing.
+
+**Conflict resolution: Backend wins**
+
+```swift
+func syncFoodLogs() async {
+    let remoteLogs = try await APIClient.shared.request(...)
+    CoreDataManager.shared.deleteAll()
+    CoreDataManager.shared.save(remoteLogs)
+}
+```
+
+Or merge strategically:
+
+```swift
+let merged = remoteLogs.map { remote in
+    local.first { $0.id == remote.id } ?? remote
+}
+// Prefer remote version if newer, else keep local
+```
+
+**Offline behavior:**
+
+- User logs meal → Save locally immediately (user sees it)
+- Sync to backend → If offline, retry when network returns
+- Mark synced when successful
+
+**Time:** 2–3 minutes | **Use when:** Asked about data persistence, offline support, or syncing
+
+---
+
+### **Q38: You built the iOS app with LLM assistance (Claude Code). How do you communicate that in interviews?**
+
+**The straightforward answer:**
+
+"I used Claude Code as an intelligent pair programmer. The architecture, design decisions, and quality standards came from me. Claude helped me accelerate implementation—handling boilerplate, suggesting patterns, debugging—so I could focus on architecture and UX.
+
+The result is clean, well-structured code that follows iOS best practices. I understand the codebase entirely."
+
+**Why this is a strength:**
+
+1. **Productivity** — Shipped 5 iOS features in 4 weeks (faster than solo developer)
+2. **Code quality** — Claude suggested patterns I might have missed
+3. **Practical skill** — Using AI tools effectively is increasingly valuable
+4. **No black box** — I can explain every decision
+
+**How to demonstrate understanding:**
+
+- Explain *why* you chose MVVM (Q33)
+- Walk through Keychain implementation (Q35)
+- Discuss trade-offs ("Core Data vs. SQLite because...")
+- Debug a hypothetical iOS bug
+
+If you can do all that, interviewers will be confident you own the work.
+
+**Red flags (what NOT to say):**
+
+❌ "I don't understand the iOS code"  
+❌ "Claude wrote the frontend, I just did backend"  
+❌ "I copied code without understanding it"  
+
+**What TO say:**
+
+✅ "I architected with MVVM. Claude helped me implement faster."  
+✅ "I debugged the photo upload retry logic."  
+✅ "I understand the full iOS stack: SwiftUI, async/await, Keychain, URLSession, Core Data."  
+
+**Context:**
+
+Professionals use Copilot and ChatGPT all the time. The bar is: "Can you maintain, debug, extend this code?" If yes, it doesn't matter how it was initially written.
+
+**Time:** 1–2 minutes | **Use when:** Asked "How did you build the iOS app?" or if there's any skepticism about understanding/quality
+
+---
 
 | Metric | Value | Why It Matters |
 |--------|-------|---|
