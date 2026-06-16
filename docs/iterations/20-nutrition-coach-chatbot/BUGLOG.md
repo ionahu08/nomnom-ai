@@ -7,7 +7,74 @@
 
 ## Known Issues
 
-*None yet — iteration just started*
+### Issue 1: Coach Tab Returns 500 Error (CRITICAL) ❌
+
+**Description:**
+- Coach tab fails to send messages with "Failed to send message" error
+- Backend returns HTTP 500 Internal Server Error
+- Cascades to slow photo saving and slow diary loading
+
+**Root Cause:**
+- `NutritionChatService.gather_context()` tries to access `user.profile` (lazy-loaded relationship)
+- In async context, SQLAlchemy can't lazy-load without `await`
+- Error: `sqlalchemy.exc.MissingGreenlet: greenlet_spawn has not been called`
+
+**Solution:**
+- ✅ Fixed: Added `await db.refresh(current_user, ["profile"])` before accessing `.profile`
+- Location: `src/services/nutrition_chat_service.py` line 117-118
+
+**Verification:**
+- Test Coach tab message sending
+- Should return 200 OK with assistant response
+
+---
+
+### Issue 2: Photo Saving Takes >1 Minute ⏱️
+
+**Description:**
+- Taking a photo and saving takes over 1 minute
+- User sees no progress/loading indicator
+- Likely caused by cascading 500 errors from Issue #1
+
+**Root Cause:**
+- Backend endpoints returning 500 errors due to SQLAlchemy async issue (Issue #1)
+- iOS app waits for response, timeout retry delays occur
+- No loading indicator shows what's happening
+
+**Solution:**
+- ✅ Fixed Issue #1 (Coach backend errors) - should resolve this
+- ✅ Added loading indicator for nutrition insights (similar feedback needed for photo save)
+- Consider adding progress indicator for photo upload in future iteration
+
+**Verification:**
+- After fixing Issue #1, test photo saving time
+- Should be <10 seconds (image upload + processing)
+
+---
+
+### Issue 3: Food Diary Slow to Load Pictures 📸
+
+**Description:**
+- After saving a photo, Food Diary tab takes too long to display the image
+- Appears to be network/API latency issue
+- Related to backend performance issues
+
+**Root Cause:**
+- Backend endpoints returning 500 errors (Issue #1) cause cascading failures
+- iOS app retries with exponential backoff, adding delays
+- No loading indicator while fetching image data
+
+**Solution:**
+- ✅ Fixed Issue #1 (backend errors) - should resolve this
+- Consider caching thumbnail images on iOS
+- Add loading spinner in Food Diary while images load
+
+**Verification:**
+- After fixing Issue #1, test Food Diary image loading
+- Should load within 2-3 seconds
+- Check if issue persists after backend fix
+
+---
 
 ---
 
