@@ -30,43 +30,32 @@ iOS App (SwiftUI) ──▶ NomNom-Backend (FastAPI) ──▶ PostgreSQL + pgve
 
 ## Current Iteration
 
-**Iteration 18: Weekly Nutrition Summary** — 🚀 STARTING (June 15, 2026)
+**Iteration 19:** TBD (Next iteration)
+See `docs/iterations/19-*/` for plan and progress.
+
+---
+
+## Completed Iterations
+
+**Iteration 18: Weekly Nutrition Summary** — ✅ COMPLETE (June 15, 2026)
 See `docs/iterations/18-weekly-nutrition-summary/` for plan, phases, and summary.
 
-**Goal:** Add new "Weekly Summary" screen (📊 tab) between Food Diary and Settings that displays:
-- Weekly calorie intake (total, average, vs. target)
-- Nutrient composition breakdown (Protein/Carbs/Fat)
-- Daily consistency metrics & top foods
-- Visual charts (bar chart for daily calories, macro breakdown)
+**What Was Built:**
+- Backend: Analytics API with multi-period support (week/month/6-month)
+- iOS: Insight tab with period selector, line charts for calories & macros
+- UI: Period-aware x-axis labels (days/dates/months), Y-axis with values
+- Features: Date navigation, consistency tracking, top foods ranking
 
-**Phases:**
-- Phase 1 (Day 1): Backend analytics API (`GET /api/v1/analytics/summary`)
-- Phase 2 (Days 2-3): iOS WeeklyNutritionView & ViewModel
-- Phase 3 (Days 3-4): Visualization components (charts)
-- Phase 4 (Day 5): Integration, testing, polish
+**Key Stats:**
+- 9 critical bugs found and fixed
+- 14 commits across backend/iOS/documentation
+- Bugs: period mapping, timezone handling, schema mismatches (all resolved)
+- Tests: 25+ test cases verified, all passing
 
-**Next Step:** Phase 1 — Build backend analytics repository and API endpoint
-
-**⚠️ Critical Notes for Iteration 18 Development:**
-
-**Phase 1 - Import Errors:**
-- Critical import error in analytics.py caused all API requests to timeout
-- Before committing new API files, read `NomNom-Backend/BACKEND_IMPORT_GUIDE.md`
-- Always verify backend starts and responds to test requests
-
-**Phase 3 - Two Critical Bugs Found & Fixed:**
-1. **AsyncSession + Synchronous SQLAlchemy** (500 error)
-   - Never use `.query()` / `.first()` with AsyncSession
-   - Use `select()` + `await db.execute()` instead
-   - Mark repository methods as `async`
-
-2. **iOS-Backend Type Mismatches** (JSON decoding errors)
-   - Test actual API responses before building iOS models
-   - Match types exactly: backend Double → iOS Double (not Int)
-   - Optional fields: backend null → iOS Double? (not Double)
-   - Use `if let` for optional fields in UI
-
-**See:** `docs/iterations/18-weekly-nutrition-summary/BUGLOG.md` for full prevention strategies
+**See BUGLOG.md for:**
+- Complete list of 9 bugs with root causes
+- Prevention strategies for each bug type
+- Detailed explanations of timezone, schema, and date calculation issues
 
 ---
 
