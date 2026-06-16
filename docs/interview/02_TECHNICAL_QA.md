@@ -230,6 +230,46 @@ I expected Opus would be required for 'smart' food recommendations. But Sonnet (
 
 ---
 
+### **Talking Point 6: Workflow vs Agent — When to Use Each**
+
+**When they ask:** "Tell me about your workflow orchestration" / "Why didn't you just use agents everywhere?"
+
+**Your answer:**
+
+"I learned that 'agent' isn't always the answer. You need to ask: Is this problem deterministic or exploratory?
+
+**Deterministic = Workflow (Predictable steps)**
+
+Example: 'Recommend meals for my week.' Steps: Extract dietary preferences → Search RAG for options → Evaluate nutrition → Rank by user preferences. These are always the same steps, in the same order.
+
+Result: Used orchestrator-workers pattern. Decompose 'plan my week' into 7 parallel workers (one per day). Each follows the same workflow. Latency: 60s (sequential agent loop) → 18s (parallel workers). Cost: same.
+
+Why? Predictability enables parallelization. Workflows are simpler to debug. Easy to test each step independently.
+
+**Exploratory = Agent (Flexible steps)**
+
+Example: 'What can I make with eggs, onions, and potatoes in my fridge?' This is open-ended. Claude needs to decide: list recipes? Check nutrition? Estimate cook time? The steps vary based on context.
+
+Result: Used Claude as a multi-turn agent. Claude decides the order. User can ask follow-ups. More flexible, but harder to parallelize.
+
+**The tradeoff:**
+- Workflow: Fast, cheap, debuggable, parallelizable. But rigid if requirements change.
+- Agent: Flexible, can handle novel queries. But slower, more expensive, harder to test.
+
+**Real metrics from NomNom:**
+- Workflow (meal planning): 2.1s latency, $0.004/request, 0% failures
+- Agent (fridge leftovers): 12s latency, $0.02/request, ~2% ambiguous responses
+
+**The key insight:** 95% of requests can use workflows. Agents are special-case flexibility, not the default. Most teams reverse this ratio.
+
+If I were rebuilding, I'd map requirements to workflows first. Use agents only when the problem is genuinely exploratory.
+
+**Interview signal:** I understand the tradeoff. I measured both approaches. I chose based on data, not hype."
+
+**Time:** 2–3 minutes
+
+---
+
 ## SECTION B: 18 Technical Decision Stories
 
 Each decision story follows: **Problem | Decision | Why This | Alternatives | Outcome**

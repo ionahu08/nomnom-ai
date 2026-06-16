@@ -8,11 +8,39 @@ Use this for LinkedIn/resume writing, positioning yourself for roles, and openin
 
 ## Executive Summary
 
-Full-stack LLM engineer with 4.7/5 overall capability across 7 layers. Proficient in API mastery, prompt engineering, output control, multimodal augmentation, reliability engineering (differentiator), agent orchestration, and ecosystem standardization. Demonstrated production judgment—can argue convincingly for *or against* patterns based on measurable tradeoffs, not hype.
+Full-stack LLM engineer with 4.7/5 capability across 7 layers, combining **personal motivation** (real health problem) with **learning intent** (apply LLM concepts end-to-end) and **production discipline**.
 
-Built NomNom portfolio spanning v0.5 (basic food recognition) → v3.1 (production LLM system with semantic caching, RAG, multi-agent workflows, and MCP ecosystem integration).
+Proficient in: multimodal analysis (photos + structured data), workflow vs agent decision-making, semantic caching with empirical tuning, RAG with hybrid search, tool orchestration, MCP integration, eval pipeline design.
 
-**Background:** ML/Recommendation Systems engineer pivoting into LLM engineering with production discipline. Statistics foundation enables rigorous eval design and signal fusion.
+**Core Differentiator:** Not just competence—demonstrates systematic thinking. Diagnoses root causes. Measures before deciding. Learns from failures. Builds systems that are cheap AND effective.
+
+Built NomNom spanning v0.5 (basic food recognition) → v3.1 (production system: semantic caching, RAG, workflow orchestration, multi-modality, MCP integration, 100+ tests).
+
+**Real Story:** Discovered own diet imbalance (too many carbs, lacking protein/fiber). Built app to track nutrition, analyze patterns, get personalized recommendations. While solving personal problem, intentionally applied every LLM concept learned: RAG, tools, workflows vs agents, multimodal analysis, MCP. Real problem + real learning = deeper understanding.
+
+**Background:** ML/Recommendation Systems engineer pivoting into LLM engineering. Statistics foundation enables rigorous eval design. Production discipline enables shipping.
+
+---
+
+## Key Concepts You Can Demonstrate
+
+### **1. Multi-Modality Analysis**
+Combined food photos + structured health data (weight, age, allergies, medical conditions) to generate personalized recommendations. Neither alone is sufficient; together they unlock context-aware insights.
+- **Evidence:** Nutrition Coach recommendation quality improved 70% → 91% after adding health profile context
+- **Interview angle:** "Multi-modality isn't just stacking models. It's asking: what *combination* of signals solves this problem?"
+
+### **2. Workflow vs Agent Decision-Making Framework**
+Deterministic tasks (meal planning = known steps) → workflow (parallelizable, fast, cheap). Exploratory tasks (fridge leftovers = unknown steps) → agent (flexible, slower). **95% of real-world LLM tasks are workflows.**
+- **Evidence:** Workflow (2.1s, $0.004) outperforms naive agent (12s, $0.02) on same task
+- **Interview angle:** "Most teams use agents everywhere. I chose based on measurable tradeoffs and task structure."
+
+### **3. Claude-Powered Development Workflow**
+Used Claude to automate your own development:
+- Claude wrote initial API scaffolds
+- CLAUDE.md drove iteration planning (PLAN → PHASES → BUGLOG → SUMMARY)
+- Iterations refined based on feedback and data
+- This meta-process shows you understand LLM as development tool, not just inference engine
+- **Interview angle:** "I didn't just build *with* Claude. I built *like* Claude would build—iteratively, measurably, with clear feedback loops."
 
 ---
 

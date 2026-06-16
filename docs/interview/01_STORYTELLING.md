@@ -6,20 +6,49 @@ This file contains everything you need to tell your story at different depths—
 
 ---
 
-## Your Hypothesis & Why You Built This
+## Your Real Story: Why You Built NomNom
 
-**Who you are:** ML engineer with recommendation systems background, pivoting into LLM engineering with production discipline.
+**Personal Motivation (The Honest Start)**
 
-**Your hypothesis:** "Most teams assume bigger models = better solutions. But I believe with rigorous architecture—semantic caching, proper eval design, workflow orchestration—you can build production LLM systems where cheaper models + smart architecture outperform expensive models."
+You discovered something about yourself: your diet is imbalanced. Too many carbs (noodles, rice, ramen), lacking protein and dietary fiber. Long-term, this is a real health problem. You needed:
+- Daily tracking of nutrition intake
+- Weekly/monthly habit analysis (what patterns am I repeating?)
+- Personalized insights based on YOUR constraints (height, weight, age, allergies, medical conditions)
+- Smart recommendations ("You're eating too many carbs, try these protein-rich alternatives")
+- Honest feedback ("Your diet this week scores 5/10 on balance")
 
-**Why NomNom:** Food tracking is a real problem with measurable health impact. But more importantly, it's a domain where you can test every hypothesis:
-- Can semantic caching beat exact-match caching? (Food items repeat, but not identically)
-- Can Sonnet outperform Opus with proper caching? (Measurable quality + cost tradeoff)
-- Can orchestration beat single agents? (Meal planning is parallelizable)
+**This is a real problem, not a theoretical one.** You're the user. You feel it.
 
-**The bet:** Build a production LLM system end-to-end, measure *every* decision, and prove that architecture + measurement beats raw capability.
+---
 
-This wasn't just "build a nutrition app"—it was "validate my hypothesis about production LLM engineering."
+**Learning Motivation (The Strategic Growth)**
+
+While building the app, you wanted to:
+1. **Actually apply LLM concepts**, not just read about them
+   - RAG (retrieve your food history for personalized recommendations)
+   - Multi-modality (analyze photos of food + structured health data)
+   - Workflow vs Agent (when to use predictable workflows vs flexible agents)
+   - Tool use (Claude as orchestrator, calling your nutrition tools)
+   - MCP (expose app to Claude Code ecosystem)
+   - Eval & prompt engineering (rigorous quality control)
+
+2. **Understand production engineering discipline**
+   - How to measure every decision (not guess)
+   - How to use AI to automate your own workflow (Claude.md → CLAUDE.md → PLAN.md → iterations)
+   - How to combine tools, agents, and systems into something real
+
+**This isn't "let me learn LLM concepts in a vacuum."** It's "I have a real problem, and I want to solve it using LLM engineering properly."
+
+---
+
+**Architecture Philosophy (The Third Dimension)**
+
+As you built, you discovered something important about LLM systems:
+- **Multi-modality matters.** Food photo + health profile + past history = better recommendations than any single data type
+- **Workflow vs Agent is a real tradeoff.** Meal planning? Use workflow (parallelizable, predictable). Fridge leftovers? Use agent (exploratory)
+- **Cheaper models + smart architecture beat expensive models.** Sonnet + semantic caching > Opus without caching
+
+This philosophy emerged from building something real, not from theory.
 
 ---
 
@@ -27,21 +56,25 @@ This wasn't just "build a nutrition app"—it was "validate my hypothesis about 
 
 ### **1-Minute Version**
 
-> "I'm an ML engineer skeptical of the 'bigger model' myth. I hypothesized: with rigorous architecture and measurement, cheaper models + smart caching beat expensive ones. So I built NomNom from v0.5 to v3.1 in 4 weeks to test that hypothesis.
+> "I built NomNom because I discovered my own diet is imbalanced—too many carbs, lacking protein. Tracking nutrition manually is tedious, so I built an app.
 >
-> Made 18 engineering decisions, each with measurable outcomes. Sonnet for food recognition: 40% more accurate than Haiku. Yes, it's 5x expensive, but for health data, that accuracy matters. Semantic caching: tested 0.70–0.95 thresholds on 150 real meals, found 0.82 gave 85% hit rate and 60% cost reduction. Orchestrator-workers: parallelizing meal planning slashed latency 60s → 18s.
+> But building a real app meant actually learning LLM engineering: RAG for personalized recommendations, multi-modality analysis (photos + health data), workflow vs agent tradeoffs, tool orchestration. Not just theory—production-grade implementations.
 >
-> Result: a production LLM system that's accurate, affordable, and extensible. But more importantly: proven that architecture beats raw capability."
+> Key decisions I made: Sonnet for food recognition (40% more accurate than Haiku, worth 5x cost for health data). Semantic caching with 0.82 threshold (tested 0.70–0.95 on 150 real meals, achieved 85% hit rate, 60% cost reduction). Orchestrator-workers for meal planning (parallelized from 60s → 18s).
+>
+> The deeper learning: architecture beats raw model capability. Cheaper model + smart system design outperforms expensive model alone. This changes how I approach every LLM problem."
 
-**Time:** 60 seconds | **Tone:** Confident, metrics-driven, hypothesis-driven
+**Time:** 60 seconds | **Tone:** Personal problem → Learning intent → Architecture insight
 
 ---
 
 ### **2-Minute Version**
 
-> "I'm an ML engineer with a hypothesis: cheaper models + smart architecture beat expensive models. I built NomNom as a learning project to test that in production.
+> "I discovered something about myself: I eat too many carbs (noodles, rice, ramen), lack protein and fiber. I needed an app to track this, analyze patterns, and get personalized recommendations based on my health profile.
 >
-> It went through 6 phases, each testing one key assumption:
+> While building this real app, I wanted to actually apply what I learned about LLM engineering—not just read about it. So I incorporated every key concept: RAG, multi-modality, tool use, workflow vs agent patterns, MCP, eval pipelines. Real problem + real learning.
+>
+> The app went through 6 phases:
 > 
 > **Phase 1 (v0.5):** Basic food recognition. I learned API fundamentals and prompt engineering. Built Jinja2-based templating so prompts are product assets, not code.
 > 
@@ -83,7 +116,11 @@ This wasn't just "build a nutrition app"—it was "validate my hypothesis about 
 
 ### **5-Minute Technical Screen Version**
 
-> "I'm an ML engineer with a question: can cheaper models + smart architecture beat expensive models in production? I built NomNom to test that hypothesis end-to-end. Here's what happened:
+> "I discovered my diet is imbalanced and wanted to build an app to track it, analyze patterns, and get personalized nutrition recommendations. But I also wanted to learn production LLM engineering, not just read about it.
+>
+> So I incorporated every major concept: RAG (retrieve food history for context), multi-modality (combine food photos + structured health data for richer recommendations), workflow orchestration (meal planning is parallelizable), tool use (Claude as orchestrator), eval pipelines (rigorous quality), MCP (integrate with Claude Code).
+>
+> This taught me something important: **architecture beats raw model capability.** Here's how:
 >
 > **The Problem:** Food tracking apps are tedious (manual logging), give generic advice (ignore history), and use expensive APIs (re-analyzing similar meals).
 >
