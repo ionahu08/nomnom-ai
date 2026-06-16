@@ -52,21 +52,23 @@ You're not supposed to memorize these. You're supposed to internalize the flow a
 
 ## 2-Minute Version
 
-> "So, I discovered something about myself—my diet is pretty imbalanced. I eat way too many carbs: noodles, rice, ramen. And I'm lacking protein and dietary fiber. Over time, that's a real health problem.
+> "So, I discovered something about myself—my diet is pretty imbalanced. I eat way too many carbs: noodles, rice, ramen. And I'm lacking protein and dietary fiber. Over time, that became a real health problem.
 >
-> I needed an app to track my nutrition, analyze my eating patterns, and get personalized recommendations based on my actual health profile. But I didn't just want to build any food app—I wanted to actually apply everything I'd learned about LLM engineering while solving this real problem.
+> I needed an app to track my nutrition, see my patterns, and get recommendations tailored to me—not generic advice. But here's the thing: I'd just learned about LLM engineering, and I wanted to actually apply it, not just read about it. So I intentionally built this system to use every major technique I'd learned.
 >
-> So I incorporated every major concept: RAG for personalized recommendations, multi-modality combining photos with health data, understanding when to use workflows versus agents, tool orchestration, eval pipelines, and MCP integration for ecosystem reach.
+> I broke the project into six phases. **Phase 1** was getting the basics right—I realized prompts were locked in code, which meant every change needed a code deploy. So I separated them into template files instead. That one change cut my iteration time from two hours down to ten minutes.
 >
-> I built it through six phases. First, API fundamentals—I separated prompts from code using Jinja2 templating, which sped up iteration from two hours to ten minutes. Then, output control—I discovered that 97% of my errors weren't hallucination, they were JSON parsing issues. So I switched to tool_choice with hybrid evaluation, which got me from 72% to 88% accuracy.
+> **Phase 2** was about reliability. I thought my system was crashing because Claude was hallucinating. But when I actually looked at the failures, 97% of them were JSON parsing issues, not hallucination. So I fixed the system design instead of tweaking prompts. That got me from 72% accuracy to 88%.
 >
-> Third was RAG with semantic caching. I tested different thresholds and found that 0.82 gave me an 85% cache hit rate while reducing costs by 60%. Then I added cost optimization through model tiering and prompt caching, which brought my cost down 4.3 times.
+> **Phase 3** is where it got interesting—I built semantic caching. Instead of analyzing the same meal twice, I tested different thresholds and found that 0.82 was perfect: 85% cache hit rate with just 1% false positives. I also added smarter retrieval so recommendations were personalized, not generic. Accuracy jumped from 70% to 91%.
 >
-> Fifth, I built workflows and orchestration. I learned that deterministic tasks should use workflows—they're parallelizable and cheap—while exploratory tasks need agents. Using an orchestrator-workers pattern cut my latency from 60 seconds down to 18 seconds.
+> **Phase 4** was about making it sustainable. The system worked great but cost too much. So I used cheaper models for simple tasks and saved expensive models for what really mattered. I also added prompt caching so I wasn't resending the same 400 tokens every single time. This brought costs down 4.3 times.
 >
-> Finally, I built an MCP server so the whole system could integrate with Claude Code and other tools in the broader ecosystem.
+> **Phase 5** taught me something important: not everything needs to be an agent. For meal planning with known steps, I used a workflow pattern that parallelizes the work. That cut latency from 60 seconds down to 18 seconds.
 >
-> Throughout all of this, the pattern was consistent: every decision was data-driven. The 0.82 caching threshold, the choice of Sonnet over Haiku, the hybrid search approach—all of it was measured, not guessed."
+> **Phase 6** was about making it extensible. I built an MCP server so the system could integrate with other tools like Claude Code in seconds, not minutes.
+>
+> Throughout all of this, the pattern was simple: every decision was backed by data. The 0.82 threshold came from testing, not guessing. The choice of Sonnet over Haiku came from measuring accuracy on real meals. That's the real skill—not just building, but measuring before deciding."
 
 **Time:** ~2 minutes | **Flow:** Problem → Real learning → 6 phases → Key insight
 
@@ -112,93 +114,123 @@ You're not supposed to memorize these. You're supposed to internalize the flow a
 
 > "Alright, so let me tell you about NomNom. I'm going to walk you through how I built it from concept to a production system, and what that taught me about production LLM engineering.
 >
-> First, the personal motivation. I discovered that my diet is pretty imbalanced. I eat way too many carbs—we're talking noodles, rice, ramen, all the delicious stuff—and I'm consistently lacking protein and dietary fiber. That's not just a theoretical problem for me; it's something I live with every day. So I wanted to build an app to solve this: track my nutrition intake, analyze my eating patterns, and get personalized recommendations based on my actual health profile—weight, height, age, allergies, medical conditions.
+> **The Problem**
 >
-> But here's the thing that really motivated me: I'd just finished learning LLM engineering, and I wanted to actually *apply* it. Not just read about RAG or workflows or tool orchestration—but build something real and put those concepts into practice. So I intentionally designed the system to use every major concept: RAG for personalized recommendations, multi-modality combining photos with structured health data, understanding when to use workflows versus agents, tool orchestration, eval pipelines, and MCP for ecosystem integration.
+> I discovered that my diet is pretty imbalanced. I eat way too many carbs—noodles, rice, ramen, all the delicious stuff—and I'm consistently lacking protein and dietary fiber. That's not just a theoretical problem for me; it's something I live with every day. So I wanted to build an app to fix this: track my nutrition, see my patterns, and get recommendations tailored to me—not generic advice, but based on my actual weight, height, allergies, medical conditions.
+>
+> **The Motivation**
+>
+> But here's the thing that really motivated me: I'd just finished learning LLM engineering, and I wanted to actually *apply* it. Not just read about concepts like semantic caching or workflows or RAG—but build something real and put them into practice. So I intentionally designed this system to use every major technique: semantic caching for performance, smart retrieval for personalization, understanding when to use workflows versus agents. It was the perfect testbed: a real problem I cared about, plus real learning.
 >
 > I built this over six phases, roughly four weeks total. Each phase tackled a different dimension of production LLM engineering. Let me walk you through each one.
 >
-> **Phase 1: API Fundamentals**
+> ---
 >
-> The core task was simple: user takes a photo of food, Claude analyzes it and returns nutrition facts. But pretty quickly I hit a friction point. Prompts were hardcoded in Python files. Every time I wanted to test a different phrasing—say, slightly different wording in the system prompt—I had to edit the Python, redeploy, and retest. Product iteration was blocked by engineering cycles.
+> **Phase 1: Make It Recognize Food**
 >
-> So I implemented Jinja2 templating. Prompts now live in `.j2` template files, and variables get injected at runtime. This might sound like a small change, but it was huge: iteration time dropped from two hours to ten minutes. That's a 12x speedup just from separating concerns. The insight here is that prompts are product assets, not infrastructure code. They change at a completely different rate than your backend code. If you embed them in Python, you're coupling two things that shouldn't be coupled.
+> The core task was simple: user takes a photo, Claude analyzes it, returns nutrition. But I hit a friction point pretty quickly. Prompts were hardcoded in Python files. Every time I wanted to test different wording—say, slightly different phrasing in the system prompt—I had to edit Python, commit, redeploy, and retest. Product iteration was blocked by engineering cycles.
 >
-> **Phase 2: Output Control**
+> So here's what I did. I moved prompts into separate template files. Variables get injected at runtime instead of being hardcoded. This might sound like a small change, but it was huge. Iteration time dropped from two hours down to ten minutes. That's a 12x speedup from just separating concerns.
 >
-> By phase two, the system was working, but it was fragile. I was using prefill-stop for JSON output: manually inject ` ```json `, stop when you see ` ``` `. It worked most of the time, but about 2.8% of calls produced unparseable JSON.
+> The insight here is fundamental: prompts are product assets, not infrastructure code. They change at a completely different rate than your backend. If you embed prompts in Python, you're coupling two things that shouldn't be coupled. They evolve at different speeds, so keep them separate.
 >
-> Now, when something fails in an LLM system, the obvious assumption is hallucination. So I spent time building better prompts, better system instructions. Still 2.8% failure. That's when I actually sat down and analyzed failed cases—really looked at what was going wrong.
+> ---
 >
-> Here's what surprised me: 97% of the failures had nothing to do with hallucination. They were JSON parsing edge cases. Missing quotes, trailing commas, prompt injection breaking the JSON syntax. Claude was generating semantically valid JSON, but syntactically invalid JSON that my parser couldn't handle.
+> **Phase 2: Make NomNom Not Crash**
 >
-> So instead of optimizing prompts, I fixed the system. I switched to tool_choice with strict JSON schema. Claude now must output exactly the defined structure—no variations. But I also realized that even valid JSON might have semantically wrong content. Is the protein value actually positive? Less than 500 grams? So I built a hybrid evaluation system: code grading catches 90% of issues cheaply, checking JSON validity and numeric plausibility. Model grading, which is expensive, only evaluates the edge cases.
+> By phase two, the system was working, but it was fragile. I was using a simple approach: manually inject a JSON marker, tell Claude to stop at the closing marker. It worked most of the time, but about 2.8% of calls produced unparseable JSON.
 >
-> The result: JSON parse success went from 97.2% to 100%. Accuracy improved from 72% to 88%. And eval costs dropped 90%. The lesson here is profound: most LLM bugs aren't hallucination. They're system design failures. And you fix them by designing better systems, not by tweaking prompts.
+> And here's what I thought: the problem must be hallucination. Claude is making up information. So I spent time building better prompts, more detailed instructions, better examples. Still 2.8% failure.
 >
-> **Phase 3: Semantic Caching and RAG**
+> That's when I actually sat down and analyzed the failed cases. Really looked at what was going wrong. And here's what I discovered: 97% of the failures had nothing to do with hallucination. They were JSON parsing edge cases. Missing quotes, trailing commas, weird formatting that my parser couldn't handle.
 >
-> By phase three, the system is stable. But now I'm hitting a different problem: cost. Every user query triggers a full Claude API call, even if the meal is almost identical to one they've already analyzed. "What did I eat yesterday?" costs the same as analyzing a completely new meal. That doesn't scale.
+> So instead of optimizing prompts, I fixed the system. I switched to a strict schema where Claude must output exactly the defined structure—no variations. But I also realized that even valid JSON might have semantically wrong content. Is the protein value positive? Is it less than 500 grams? So I built a hybrid grading system: code grading catches 90% of issues cheaply—just checking JSON validity and numeric plausibility. Model grading, which is expensive, only evaluates the hard edge cases.
 >
-> Two decisions here. First: semantic caching. Traditional caching requires exact matches. 'Salmon bowl' and 'salmon with rice' are different keys, so you cache miss. But they're nutritionally similar—same protein source, similar carbs. An exact-match cache is useless.
+> The result: JSON parse success went from 97.2% to 100%. Accuracy improved from 72% to 88%. And eval costs dropped 90%.
 >
-> So I implemented semantic similarity with pgvector. Embed the meal photo, store it, and when a new photo comes in, search for similar embeddings using cosine similarity. But what threshold do you use? If it's too high (0.95), you miss most meals and the cache doesn't help. If it's too low (0.70), you get false positives—caching the wrong meal.
+> Here's the lesson: most LLM bugs aren't hallucination. They're system design failures. You fix them by designing better systems, not by tweaking prompts. This completely changed how I think about LLM problems.
 >
-> Here's where measurement matters. I took 150 real meal photos, tested eight different thresholds from 0.70 to 0.95, and measured both hit rate and false positives. The data showed that 0.82 was the sweet spot: 85% hit rate with only 1% false positives. This single decision saved 60% on API costs.
+> ---
 >
-> Second decision in this phase: RAG for personalization. Instead of generic advice, I retrieve the user's food history, health profile, and past preferences. Claude generates recommendations grounded in *their* actual data. I used hybrid search—BM25 for keyword matches combined with vector semantic search, merged using reciprocal rank fusion. That's a pattern I learned from recommendation systems.
+> **Phase 3: Make NomNom Smarter**
+>
+> By phase three, the system is stable and reliable. But now I'm hitting a different constraint: cost. Every user query triggers a full Claude API call, even if they're asking about a meal they've already logged. "What did I eat yesterday?" costs the same as analyzing a completely new meal. That doesn't scale.
+>
+> So I made two decisions here.
+>
+> **First: Semantic caching.** Traditional caching requires exact matches. You cache "salmon bowl," and later when someone photographs "salmon with rice," that's a different string, so you cache miss. But they're nutritionally similar—same protein, similar carbs.
+>
+> So I implemented semantic similarity. Embed the meal photo, store the embedding, and when a new photo comes in, search for similar embeddings. But here's the question: what similarity threshold do you use? If it's too high like 0.95, you miss most meals and the cache doesn't help. If it's too low like 0.70, you get false positives—caching the wrong meal, giving wrong nutrition advice.
+>
+> Here's where measurement matters. I took 150 real meal photos, tested eight different thresholds from 0.70 to 0.95, and measured both hit rate and false positives. The data showed that 0.82 was the sweet spot: 85% hit rate with only 1% false positives.
+>
+> If I'd just guessed at 0.95, I'd have 40% cache hits. With measurement, I got 85%. That single number saves 60% on API costs. And it came from data, not intuition.
+>
+> **Second: Smart retrieval.** Instead of giving generic advice, I retrieve the user's food history and health profile. Claude generates recommendations grounded in *their* actual data. I combined two search techniques—keyword search for exact matches, semantic search for similarity—and merged them using a ranking pattern I learned from recommendation systems.
 >
 > Result: recommendation accuracy improved from 70% to 91%. I also added citations so users can verify every claim. For health data, trust is critical.
 >
-> **Phase 4: Cost Optimization**
+> ---
 >
-> Phase four tackles sustainability. The system works perfectly but costs $1.50 per user per day. At 1,000 users, that's $45,000 a month. That's not sustainable for a learning project.
+> **Phase 4: Make NomNom Cheap and Fast**
 >
-> Three decisions here. First: model tiering by task. Food recognition—accuracy-critical—uses Sonnet. JSON extraction—already schema-validated—uses Haiku. Why not Haiku everywhere? I tested both on 150 real meals, focusing on ambiguous ones like muesli versus granola. Haiku got 72% right. Sonnet got 88%. That 40% gap is real.
+> Phase four tackles sustainability. The system works perfectly, but it costs $1.50 per user per day. At 1,000 users, that's $45,000 per month. That's not sustainable for a learning project.
 >
-> Now, Sonnet costs 5 times more than Haiku. Is that accuracy improvement worth it? I measured the downstream impact: 40% fewer recognition errors means 40% fewer user corrections, which means fewer API calls downstream. The extra Sonnet cost is actually offset by downstream efficiency. So yes, Sonnet is worth it.
+> So I made three decisions.
 >
-> Second: prompt caching. My system prompt is 400 tokens sent with every request. At 1k users × 10 requests/hour, that's 72.4 million tokens per hour hitting the API. With prompt caching—only the first call pays full price, subsequent calls pay 90% less. That's 89% token savings.
+> **First: Model tiering by task.** Food recognition—that's accuracy-critical—I use Sonnet. JSON extraction—that's already schema-validated—I use Haiku, which is much cheaper. Why not just use Haiku everywhere? Because I tested both on 150 real meals, especially ambiguous ones like muesli versus granola. Haiku got 72% right. Sonnet got 88%. That 40% accuracy gap is real.
 >
-> Third: cost tracking dashboard. I log every API call: tokens, latency, model, computed cost. This revealed that RAG accounts for 60% of my total spend. That insight guided phase three optimization—focus on retrieval efficiency, not model choice.
+> Now, Sonnet costs 5 times more than Haiku. Is that improvement worth it? I measured the downstream impact: 40% fewer recognition errors means fewer user corrections, which means fewer API calls downstream. The extra Sonnet cost is actually offset by downstream efficiency.
 >
-> But here's something interesting that happened: when I switched to Sonnet, I expected costs to drop. Instead, they went UP initially. Why? Faster response time improved user experience, which drove more engagement, which meant more requests per day. Classic optimization trap: optimize one variable, break another.
+> **Second: Prompt caching.** My system prompt is 400 tokens sent with every request. At 1k users × 10 requests per hour, that's 72 million tokens per hour. With caching, only the first call pays full price. Subsequent calls pay 90% less. That's 89% token savings on system prompts alone.
 >
-> The breakthrough was realizing I should optimize the system holistically, not individual levers. Per-request cost is what scales to millions of users, but request volume is user-driven. Better performance increasing volume is actually good. And semantic caching fixed the volume problem. So the costs came back down.
+> **Third: Cost tracking.** I log every API call: tokens, latency, model, computed cost. This revealed something important: RAG accounts for 60% of my total spend. That insight guided the optimization—focus on retrieval efficiency, not on model choice.
 >
-> Final result: daily cost per user went from $1.50 down to $0.35. That's a 4.3x reduction.
+> But here's something interesting that happened. When I switched to Sonnet, I expected costs to drop. Instead, they went UP initially. Why? Faster response time improved user experience. Better UX drove more engagement. More engagement meant more requests per day. Classic optimization trap: optimize one variable, break another.
 >
-> **Phase 5: Workflows and Orchestration**
+> The breakthrough was realizing: I should optimize the system holistically, not individual levers. Per-request cost is what scales to millions of users, but request volume is user-driven. If better performance increases volume, that's actually good—users are engaging more. And semantic caching fixed the volume problem anyway.
 >
-> Phase five is where I learned a really important distinction. Complex requests like "plan my entire week of meals"—that's 21 individual recommendations. A single agent loop would take 60-plus seconds and cost way too much.
+> Final result: daily cost per user went from $1.50 down to $0.35. That's a 4.3x reduction. And the lesson: systems thinking. Cost, latency, quality are coupled. Change one, everything shifts.
 >
-> Here's the key insight: not all LLM tasks are agents. Some are workflows. Deterministic tasks with known steps upfront should be workflows: they're fast, cheap, parallelizable. Exploratory tasks with unknown steps need agents.
+> ---
 >
-> For meal planning—the steps are known. Extract constraints, retrieve options from RAG, evaluate, rank. Using a workflow: 2.1 seconds, four cents, fully debuggable.
+> **Phase 5: Make NomNom Handle Complex Questions**
 >
-> For exploratory questions like "what can I make with eggs, onions, and potatoes?"—the steps are unknown. Maybe list recipes, check nutrition, estimate cook time. That needs an agent. Takes longer, costs more, but handles novelty.
+> Phase five is where I learned something really important. When a user asks "Plan my entire week of meals," that's 21 individual recommendations. A single agent loop—give Claude a tool, let it loop—would take 60-plus seconds. Too slow.
 >
-> For meal planning specifically, I used an orchestrator-workers pattern. One orchestrator decomposes "plan my week" into seven parallel workers, one per day. All seven workers run at the same time, so latency is just the longest worker. Result: 60 seconds with a sequential agent down to 18 seconds with orchestration. Same cost, 3.3 times faster.
+> Here's the key insight: not all LLM tasks are agents. Some are workflows.
 >
-> And the meta-insight here: 95% of real-world LLM tasks are workflows, not agents. Most teams build agents everywhere because they're conceptually simpler. But architecture thinking beats that. Workflows are faster, cheaper, easier to debug, and they scale better.
+> **Workflows** are for deterministic tasks with known steps upfront. For meal planning, the steps are always: extract constraints, retrieve options, evaluate, rank. The sequence is fixed. Workflows are fast, cheap, parallelizable.
 >
-> **Phase 6: MCP and Ecosystem**
+> **Agents** are for exploratory tasks with unknown steps. If someone asks "What can I make with eggs, onions, and potatoes?"—the steps are unknown. Maybe list recipes, maybe check nutrition, maybe estimate cook time. Claude needs flexibility. Agents are slower, more expensive, but handle novelty.
 >
-> Final phase is about extensibility. The app is feature-complete, but it's siloed. Only accessible via iOS or REST API. Other tools like Claude Code can't easily integrate with it.
+> For meal planning specifically, I used an orchestrator-workers pattern. One orchestrator takes "plan my week" and decomposes it into seven parallel workers—one per day. All seven run at the same time. Latency is just the longest worker, not the sum. Result: 60 seconds with a sequential agent down to 18 seconds with orchestration. Same cost, 3.3 times faster.
 >
-> Solution: build an MCP server—Model Context Protocol is Anthropic's standard for exposing tools. I exposed three tools: analyze_food_image, lookup_nutrition, recommend_meal. Plus resources for direct data access.
+> And here's the meta-insight: 95% of real-world LLM tasks are workflows, not agents. Most teams build agents everywhere because they're conceptually simpler. But architecture thinking beats that. Workflows are faster, cheaper, easier to debug, easier to test. They scale better.
 >
-> Integration time dropped from 30 minutes down to 2 minutes. The system went from a standalone app to a service in the broader ecosystem.
+> ---
 >
-> **Synthesis**
+> **Phase 6: Make NomNom Extensible**
 >
-> So let me tie this together. Throughout all six phases, the pattern was consistent: every decision involved tradeoffs, and I didn't choose winners based on intuition or hype. I measured.
+> Final phase is about ecosystem. The app is feature-complete, but it's siloed. Only accessible via iOS or REST API. Other tools like Claude Code can't easily integrate.
+>
+> Solution: build an MCP server. MCP is Anthropic's standard protocol for exposing tools to LLMs. I exposed three tools: analyze_food_image, lookup_nutrition, recommend_meal. Plus resources for direct data access.
+>
+> Integration time dropped from 30 minutes down to 2 minutes. The system went from a standalone app to a service that other tools can use.
+>
+> The lesson: standards matter. Open systems integrate better.
+>
+> ---
+>
+> **Synthesis: What This Taught Me**
+>
+> So let me tie all of this together. Throughout all six phases, there was one consistent pattern: every decision involved tradeoffs, and I didn't choose winners based on intuition or hype. I measured.
 >
 > The 0.82 caching threshold came from testing eight options on 150 real meals. The Sonnet choice came from evaluating Haiku versus Sonnet on real food photos. The orchestrator-workers pattern—I benchmarked it against single-agent loops.
 >
-> And here's the big insight: architecture beats raw model capability. Sonnet plus semantic caching outperforms Opus by itself. Cheaper model, smarter system design, better results. That's systems thinking. That's how production LLM engineering differs from prompt engineering.
+> And here's the big insight: **architecture beats raw model capability.** Sonnet plus semantic caching outperforms Opus without caching. Cheaper model, smarter system design, better results. That's systems thinking. That's the difference between prompt engineering and production LLM engineering.
 >
-> Cost 83% lower. Latency 67% faster. Accuracy improved. Test coverage: 100+ tests. All of it came from architectural decisions, not model capability.
+> Cost 83% lower. Latency 67% faster. Accuracy improved 72% to 88%. Test coverage: 100+ tests. Zero critical production issues. All of it came from architectural decisions, not from choosing a bigger model.
 >
 > That's what NomNom taught me."
 
