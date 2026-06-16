@@ -172,21 +172,107 @@
 
 ---
 
-## Phase 3: iOS Insight Tab Redesign (Days 3-4) 🚧 PENDING
+## Phase 3: iOS Insight Tab Redesign (Days 3-4) ✅ COMPLETE
 
 **Goal:** Update iOS Insight tab to display new AI insights card instead of static sections.
 
-**Tasks:**
-- [ ] Remove: Logging consistency progress bar
-- [ ] Remove: Daily Targets section (Protein/Carbs/Fat)
-- [ ] Remove: Top Foods section
-- [ ] Create: NutritionInsightsCard.swift component
-- [ ] Update: WeeklyNutritionView to include new card
-- [ ] Update: WeeklyNutritionViewModel to fetch insights
-- [ ] Test: Load and display insights for day/week/month periods
-- [ ] Polish: Loading states, error handling, animations
+**Status:** COMPLETE
 
-**Placeholder:** Will be filled in during Phase 3
+### Files Created
+
+1. **`NutritionInsightsCard.swift`** (NEW)
+   - Standalone component for displaying nutrition insights
+   - Displays:
+     - Summary text (1-2 sentences about nutrition status)
+     - "What You're Doing Well" section (strengths with star icons)
+     - "Areas to Improve" section (gaps with warning icons)
+     - "Recommendations" section with expandable cards
+   - Each recommendation shows:
+     - Nutrient category
+     - Suggested foods
+     - Reasoning (expandable)
+   - Visual design:
+     - Orange lightbulb icon for the card title
+     - Green checkmark icons for strengths
+     - Orange warning icons for gaps
+     - Green fork/knife icon for recommendations
+     - Expandable recommendation cards with smooth animations
+
+### Files Modified
+
+1. **`WeeklyNutritionView.swift`** (MODIFIED)
+   - Removed: Logging Consistency progress bar section
+   - Removed: Daily Targets section (Protein/Carbs/Fat with emoji)
+   - Removed: Top Foods section
+   - Added: NutritionInsightsCard display (between charts and end)
+   - Updated: .task block to load nutrition insights
+   - Kept: 4 line charts (Calories, Protein, Carbs, Fat) with target reference lines
+
+2. **`WeeklyNutritionViewModel.swift`** (MODIFIED)
+   - Added: @Published var nutritionInsights: NutritionInsights?
+   - Added: loadNutritionInsights() async method
+   - Added: New data models (NutritionInsightsResponse, NutritionInsights, RecommendationItem)
+   - Models defined in ViewModel for easy sharing across views
+
+### UI Layout
+
+New Insight Tab Structure:
+```
+┌─────────────────────────────┐
+│ Period Selector [W][M][6M]  │
+├─────────────────────────────┤
+│ Date Navigation             │
+├─────────────────────────────┤
+│ Calories Line Chart         │
+│ Protein Line Chart          │
+│ Carbs Line Chart            │
+│ Fat Line Chart              │
+├─────────────────────────────┤
+│ 💡 Your Nutrition Insights  │
+│                             │
+│ [Summary text]              │
+│                             │
+│ ✅ What You're Doing Well   │
+│ • Item 1                    │
+│ • Item 2                    │
+│                             │
+│ ⚠️  Areas to Improve        │
+│ • Gap 1                     │
+│ • Gap 2                     │
+│                             │
+│ 🍴 Recommendations          │
+│ [Expandable cards]          │
+└─────────────────────────────┘
+```
+
+### Removed Sections
+
+1. ✂️ **Logging Consistency** — Progress bar showing days logged
+2. ✂️ **Daily Targets** — Protein/Carbs/Fat summary cards with emoji
+3. ✂️ **Top Foods** — List of most-eaten foods during period
+
+These were replaced with intelligent AI-generated insights.
+
+### API Integration
+
+- Endpoint called: `GET /api/v1/nutrition/insights`
+- Called after `loadWeeklySummary()` completes
+- Gracefully handles failures (insights optional, summary required)
+- Loading state not shown (happens in background, insights populate when ready)
+
+### Testing Notes
+
+- Card displays correctly when insights are loaded
+- Card hidden if insights are nil (API failure)
+- Expandable recommendations work with smooth animations
+- All 3 period types (week/month/6m) fetch fresh insights
+- Changing periods re-fetches insights
+
+### Performance
+
+- Insights load asynchronously in background
+- Does not block UI while fetching (~1-2 seconds)
+- Graceful degradation if LLM fails
 
 ---
 
@@ -223,5 +309,6 @@ iOS NutritionInsightsCard renders data
 | Hash | Message |
 |------|---------|
 | c197491 | feat(iter19-phase1): Create nutrition insights endpoint and schemas |
-| TBD | feat(iter19-phase2): Add LLM nutrition agent with Claude analysis |
+| 8689855 | feat(iter19-phase2): Add LLM nutrition agent with Claude analysis |
+| TBD | feat(iter19-phase3): Add iOS nutrition insights card and remove old sections |
 

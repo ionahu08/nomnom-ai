@@ -62,28 +62,6 @@ struct WeeklyNutritionView: View {
                         .cornerRadius(8)
 
                         if let summary = viewModel.summary {
-                            // Consistency
-                            VStack(spacing: 12) {
-                                HStack {
-                                    Text("Logging Consistency")
-                                        .font(.headline)
-                                    Spacer()
-                                    Text("\(summary.daysLogged)/\(summary.totalDays) days")
-                                        .font(.body)
-                                        .fontWeight(.semibold)
-                                }
-
-                                ProgressView(value: Double(summary.daysLogged) / Double(summary.totalDays))
-                                    .tint(.blue)
-
-                                Text(String(format: "%.1f%% logged", summary.consistency))
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            .padding()
-                            .background(Color(.systemGray6))
-                            .cornerRadius(12)
-
                             // Calories Line Chart
                             LineChart(
                                 dailyBreakdown: summary.dailyBreakdown,
@@ -116,81 +94,14 @@ struct WeeklyNutritionView: View {
                                 targetValue: Double(summary.fatG.target)
                             )
 
-                            // Nutrient Summary
-                            VStack(spacing: 16) {
-                                Text("Daily Targets")
-                                    .font(.headline)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                                // Protein
-                                NutrientRow(
-                                    icon: "🍗",
-                                    label: "Protein",
-                                    current: summary.proteinG.average,
-                                    target: summary.proteinG.target,
-                                    unit: "g",
-                                    percentage: summary.proteinG.percentage,
-                                    status: viewModel.getNutrientStatus(percentage: summary.proteinG.percentage)
+                            // AI Nutrition Insights
+                            if let insights = viewModel.nutritionInsights {
+                                NutritionInsightsCard(
+                                    summary: insights.summary,
+                                    strengths: insights.strengths,
+                                    gaps: insights.gaps,
+                                    recommendations: insights.recommendations
                                 )
-
-                                Divider()
-
-                                // Carbs
-                                NutrientRow(
-                                    icon: "🍙",
-                                    label: "Carbs",
-                                    current: summary.carbsG.average,
-                                    target: summary.carbsG.target,
-                                    unit: "g",
-                                    percentage: summary.carbsG.percentage,
-                                    status: viewModel.getNutrientStatus(percentage: summary.carbsG.percentage)
-                                )
-
-                                Divider()
-
-                                // Fat
-                                NutrientRow(
-                                    icon: "🍖",
-                                    label: "Fat",
-                                    current: summary.fatG.average,
-                                    target: summary.fatG.target,
-                                    unit: "g",
-                                    percentage: summary.fatG.percentage,
-                                    status: viewModel.getNutrientStatus(percentage: summary.fatG.percentage)
-                                )
-                            }
-                            .padding()
-                            .background(Color(.systemGray6))
-                            .cornerRadius(12)
-
-                            // Top Foods
-                            if !summary.topFoods.isEmpty {
-                                VStack(spacing: 12) {
-                                    Text("Top Foods")
-                                        .font(.headline)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                                    ForEach(summary.topFoods, id: \.food) { food in
-                                        HStack {
-                                            VStack(alignment: .leading, spacing: 4) {
-                                                Text(food.food)
-                                                    .font(.body)
-                                                    .fontWeight(.semibold)
-                                                Text("\(food.count)x")
-                                                    .font(.caption)
-                                                    .foregroundColor(.secondary)
-                                            }
-                                            Spacer()
-                                            Text("\(food.calories) cal")
-                                                .font(.body)
-                                                .fontWeight(.semibold)
-                                        }
-                                        .padding(.vertical, 8)
-                                    }
-                                }
-                                .padding()
-                                .background(Color(.systemGray6))
-                                .cornerRadius(12)
                             }
                         } else if viewModel.isLoading {
                             VStack(spacing: 20) {
@@ -223,8 +134,9 @@ struct WeeklyNutritionView: View {
                 .navigationTitle("📊 Insight")
             }
             .task {
-                print("[WeeklyNutritionView] View appeared, loading summary")
+                print("[WeeklyNutritionView] View appeared, loading summary and insights")
                 await viewModel.loadWeeklySummary()
+                await viewModel.loadNutritionInsights()
             }
         }
     }

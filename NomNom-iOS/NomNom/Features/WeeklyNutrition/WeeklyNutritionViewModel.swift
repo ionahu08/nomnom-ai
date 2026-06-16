@@ -25,6 +25,7 @@ enum PeriodType: String, CaseIterable {
 @MainActor
 class WeeklyNutritionViewModel: ObservableObject {
     @Published var summary: WeeklySummaryResponse?
+    @Published var nutritionInsights: NutritionInsights?
     @Published var isLoading = false
     @Published var errorMessage: String?
     @Published var selectedDate = Date()
@@ -198,4 +199,42 @@ class WeeklyNutritionViewModel: ObservableObject {
         formatter.timeZone = TimeZone(abbreviation: "UTC")  // Always use UTC for consistency
         return formatter.date(from: dateString)
     }
+
+    func loadNutritionInsights() async {
+        do {
+            print("[InsightViewModel] Loading nutrition insights...")
+            let path = "/api/v1/nutrition/insights"
+
+            let response: NutritionInsightsResponse = try await api.get(path: path)
+            nutritionInsights = response.analysis
+
+            if nutritionInsights != nil {
+                print("[InsightViewModel] ✅ Nutrition insights loaded successfully")
+            } else {
+                print("[InsightViewModel] ⚠️ Insights returned but analysis is nil")
+            }
+        } catch {
+            print("[InsightViewModel] ⚠️ Failed to load nutrition insights: \(error)")
+            // Don't set errorMessage - this is supplementary data
+        }
+    }
+}
+
+// MARK: - API Response Models
+
+struct NutritionInsightsResponse: Codable {
+    let analysis: NutritionInsights?
+}
+
+struct NutritionInsights: Codable {
+    let summary: String
+    let strengths: [String]
+    let gaps: [String]
+    let recommendations: [RecommendationItem]
+}
+
+struct RecommendationItem: Codable {
+    let nutrient: String
+    let foods: [String]
+    let reasoning: String
 }
