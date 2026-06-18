@@ -19,6 +19,18 @@ This is a portfolio project showcasing full-stack AI engineering: production-gra
 
 ---
 
+## App UI — See It In Action
+
+| Overview | App Flow |
+|----------|----------|
+| ![NomNom Grid Overview](docs/assets/screenshots/NomNom-Grid-3x3.png) | ![App Flow](docs/assets/screenshots/Board-1-Flow.png) |
+
+| Insights Tab | Diary Tab |
+|----------|----------|
+| ![Insights & Recommendations](docs/assets/screenshots/Board-2-Insights.png) | ![Food Diary](docs/assets/screenshots/Board-3-Diary.png) |
+
+---
+
 ## The Problem
 
 Food tracking apps fail at three core issues:
