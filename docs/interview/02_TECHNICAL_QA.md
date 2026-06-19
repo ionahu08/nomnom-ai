@@ -3,6 +3,53 @@
 
 ---
 
+## 🎯 RESUME-ALIGNED Q&As (Focus These First)
+
+**The following Q&As directly support the 5 resume bullets. Prioritize these for interview prep:**
+
+### **Resume Bullet 1: Multimodal AI + Task-Based Model Routing + Orchestration**
+- 🎯 **Talking Point 2:** "Why did costs spike?" (model routing, task-based decisions)
+- 🎯 **Talking Point 4:** "Orchestrator-workers" (60s → 18s latency)
+- 🎯 **Q2:** Cost optimization (4.3x reduction)
+- 🎯 **Q13:** Workflow vs. agent (architectural decision)
+- 🎯 **Q14:** Orchestrator-workers pattern explanation
+
+### **Resume Bullet 2: Multi-Agent Architecture**
+- 🎯 **Talking Point 4:** Orchestrator-workers (5–15s latency, fixed pipeline + plan-act-reflect)
+- 🎯 **Q13:** Workflow vs. agent
+- 🎯 **Q14:** Orchestrator-workers pattern
+- 🎯 **Q50:** Context windows & agent state
+- 🎯 **Q52:** Multi-agent coordination
+- 🎯 **Q54:** Agent vs. workflow decision
+- 🎯 **Q58:** Workflow structure
+
+### **Resume Bullet 3: Production-Grade LLM Harness + Guardrails**
+- 🎯 **Q1:** Transient failures (tool use, retry fallback)
+- 🎯 **Q5:** Prompt design & templating
+- 🎯 **Q11:** Evaluation pipeline (near-100% success rate)
+- 🎯 **Q25:** PLAN/PHASES/BUGLOG/SUMMARY structure
+- 🎯 **Q27:** Quality gates
+
+### **Resume Bullet 4: Semantic Caching + RAG-Style Retrieval**
+- 🎯 **Talking Point 1:** "Why 0.82?" (0.82 threshold, 150 real meals, 85% hit rate)
+- 🎯 **Q3:** Prompt caching
+- 🎯 **Q8:** Semantic cache threshold tuning (the iconic 0.82 story)
+- 🎯 **Q9:** Vector search vs. BM25 vs. hybrid (vector + BM25)
+- 🎯 **Q39:** RAG evaluation (measuring quality)
+- 🎯 **Q40:** Hybrid search approach (BM25 + vector + RRF)
+- 🎯 **Q44:** A/B testing prompts (empirical validation)
+
+### **Resume Bullet 5: Full-Stack + Architecture**
+- 🎯 **Q23:** Development process (how you organize)
+- 🎯 **Q24:** Claude Code workflow
+- 🎯 **Q33:** iOS architecture (MVVM, backend integration)
+- 🎯 **Q34:** Database schema design
+- 🎯 **Q35:** Authentication & JWT security
+
+**Strategy:** Master these 🎯 Q&As first. They directly match interview questions on your resume bullets.
+
+---
+
 ## HOW TO USE THIS DOCUMENT
 
 **This file is designed for spoken delivery in interviews.** Here's how to navigate it:

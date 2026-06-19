@@ -11,13 +11,15 @@
 
 ### Core Achievements
 
-• Built an AI-powered food tracking app that analyzes meal photos using multimodal AI to estimate nutrition and generate personalized diet recommendations, with an interactive **nutrition coach agent** that refines suggestions based on user constraints.
+• Built NomNom, an AI-powered food tracking app that analyzes meal photos using **multimodal AI** to estimate nutrition and generate personalized diet recommendations.
 
-• Architected full-stack system (FastAPI + SwiftUI) with **model routing** (Haiku/Sonnet by task) and **agentic orchestration** (tool use, retry, fallback), achieving **15–30s latency** and **4.3x cost reduction** ($12 → $2.80/user/day).
+• Architected a full-stack system (FastAPI + SwiftUI) with **task-based model routing** (Haiku for lightweight extraction, Sonnet for complex reasoning) and **orchestration** (tool use, retry, fallback), achieving **5–15s latency** and **4.3x cost reduction** ($12 → $2.80/user/day) vs. a Sonnet-only baseline.
 
-• Engineered production LLM harness & prompt system using prompt templating, **structured outputs**, and **guardrails** (validation + retry), achieving **100% success rate** on 10K+ API calls and eliminating parsing failures.
+• Designed a **multi-agent architecture** combining a fixed orchestrator-worker pipeline (vision → nutrition → recommendation) for structured analysis with an autonomous **plan-act-reflect loop** for the interactive coach, choosing each pattern by task to balance reliability and flexibility.
 
-• Built **semantic caching system** using pgvector embeddings and **hybrid search** (RAG + BM25), achieving **85% cache hit rate** through empirically-tuned similarity threshold (0.82, tested on 150 real meals).
+• Engineered a **production-grade LLM harness** with **prompt templating**, structured outputs, and validation + retry **guardrails**, achieving a **near-100% success rate** on 10K+ API calls, driving parsing failures to near-zero.
+
+• Built a semantic caching system with **RAG-style retrieval** using pgvector embeddings and **hybrid search (vector + BM25)**, achieving an **85% cache hit rate** through an empirically-tuned similarity threshold (0.82, tested on 150 real meals), sharply cutting redundant LLM calls.
 
 ---
 
